@@ -130,6 +130,7 @@ public class ClusteredSessionHandlerTest extends SessionHandlerTestBase {
   public void testSessionSerializationNullPrincipal() {
     long timeout = 123;
     SessionImpl session = (SessionImpl)store.createSession(timeout);
+    assertNotNull(session.id());
     assertTrue(session.getRoles().isEmpty());
     assertTrue(session.getPermissions().isEmpty());
     stuffSession(session);
@@ -138,6 +139,7 @@ public class ClusteredSessionHandlerTest extends SessionHandlerTestBase {
     SessionImpl session2 = (SessionImpl)store.createSession(0);
     session2.readFromBuffer(buffer);
     checkSession(session2);
+    assertEquals(session.id(), session2.id());
     assertEquals(timeout, session2.timeout());
     assertNull(session2.getPrincipal());
     assertTrue(session2.getRoles().isEmpty());
@@ -156,6 +158,7 @@ public class ClusteredSessionHandlerTest extends SessionHandlerTestBase {
     SessionImpl session2 = (SessionImpl)store.createSession(0);
     session2.readFromBuffer(buffer);
     checkSession(session2);
+    assertEquals(session.id(), session2.id());
     assertEquals(timeout, session2.timeout());
     assertEquals(principal, session2.getPrincipal());
   }
@@ -176,6 +179,7 @@ public class ClusteredSessionHandlerTest extends SessionHandlerTestBase {
     SessionImpl session2 = (SessionImpl)store.createSession(0);
     session2.readFromBuffer(buffer);
     checkSession(session2);
+    assertEquals(session.id(), session2.id());
     assertEquals(timeout, session2.timeout());
     assertEquals(3, session2.getRoles().size());
     assertTrue(session2.getRoles().contains("role1"));

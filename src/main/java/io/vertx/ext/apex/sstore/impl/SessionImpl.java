@@ -59,7 +59,7 @@ public class SessionImpl implements Session, ClusterSerializable, Shareable {
   private static final byte TYPE_SERIALIZABLE = 12;
   private static final byte TYPE_CLUSTER_SERIALIZABLE = 13;
 
-  private final String id;
+  private String id;
   private final SessionStore sessionStore;
   private long timeout;
   private Map<String, Object> data;
@@ -248,6 +248,7 @@ public class SessionImpl implements Session, ClusterSerializable, Shareable {
   public Buffer writeToBuffer() {
     Buffer buff = Buffer.buffer();
 
+    writeString(buff, id);
     buff.appendLong(timeout);
 
     if (principal != null) {
@@ -267,9 +268,20 @@ public class SessionImpl implements Session, ClusterSerializable, Shareable {
     return buff;
   }
 
+  private void writeString(Buffer buffer, String str) {
+    byte[] bytes = str.getBytes(UTF8);
+    buffer.appendInt(bytes.length).appendBytes(bytes);
+  }
+
   @Override
   public void readFromBuffer(Buffer buffer) {
     int pos = 0;
+
+    int len = buffer.getInt(pos);
+    pos += 4;
+    byte[] bytes = buffer.getBytes(pos, pos + len);
+    pos += len;
+    id = new String(bytes, UTF8);
 
     timeout = buffer.getLong(pos);
     pos += 8;
@@ -277,7 +289,7 @@ public class SessionImpl implements Session, ClusterSerializable, Shareable {
     boolean hasPrincipal = buffer.getByte(pos) == (byte)1;
     pos ++;
     if (hasPrincipal) {
-      int len = buffer.getInt(pos);
+      len = buffer.getInt(pos);
       pos += 4;
       Buffer principalBuffer = buffer.getBuffer(pos, pos + len);
       pos += len;
@@ -309,8 +321,7 @@ public class SessionImpl implements Session, ClusterSerializable, Shareable {
     buff.appendInt(set == null ? 0 : set.size());
     if (set != null) {
       for (String entry : set) {
-        byte[] bytes = entry.getBytes(UTF8);
-        buff.appendInt(bytes.length).appendBytes(bytes);
+        writeString(buff, entry);
       }
     }
   }
@@ -363,8 +374,8 @@ public class SessionImpl implements Session, ClusterSerializable, Shareable {
         } else if (val instanceof Boolean) {
           buffer.appendByte(TYPE_BOOLEAN).appendByte((byte) ((boolean) val ? 1 : 0));
         } else if (val instanceof String) {
-          byte[] bytes = ((String) val).getBytes(UTF8);
-          buffer.appendByte(TYPE_STRING).appendInt(bytes.length).appendBytes(bytes);
+          buffer.appendByte(TYPE_STRING);
+          writeString(buffer, (String)val);
         } else if (val instanceof Buffer) {
           Buffer buff = (Buffer) val;
           buffer.appendByte(TYPE_BUFFER).appendInt(buff.length()).appendBuffer(buff);

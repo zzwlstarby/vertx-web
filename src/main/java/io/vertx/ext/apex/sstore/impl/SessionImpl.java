@@ -78,52 +78,52 @@ public class SessionImpl implements Session, ClusterSerializable, Shareable {
   }
 
   @Override
-  public String id() {
+  public synchronized String id() {
     return id;
   }
 
   @Override
-  public long timeout() {
+  public synchronized long timeout() {
     return timeout;
   }
 
   @Override
   @SuppressWarnings("unchecked")
-  public <T> T get(String key) {
+  public synchronized <T> T get(String key) {
     Object obj = getData().get(key);
     return (T)obj;
   }
 
   @Override
-  public Session put(String key, Object obj) {
+  public synchronized Session put(String key, Object obj) {
     getData().put(key, obj);
     return this;
   }
 
   @Override
   @SuppressWarnings("unchecked")
-  public <T> T remove(String key) {
+  public synchronized <T> T remove(String key) {
     Object obj = getData().remove(key);
     return (T)obj;
   }
 
   @Override
-  public Map<String, Object> data() {
+  public synchronized Map<String, Object> data() {
     return getData();
   }
 
   @Override
-  public long lastAccessed() {
+  public synchronized long lastAccessed() {
     return lastAccessed;
   }
 
   @Override
-  public void setAccessed() {
+  public synchronized void setAccessed() {
     this.lastAccessed = System.currentTimeMillis();
   }
 
   @Override
-  public void destroy() {
+  public synchronized void destroy() {
     destroyed = true;
     data = null;
     principal = null;
@@ -135,22 +135,22 @@ public class SessionImpl implements Session, ClusterSerializable, Shareable {
   }
 
   @Override
-  public boolean isDestroyed() {
+  public synchronized boolean isDestroyed() {
     return destroyed;
   }
 
   @Override
-  public SessionStore sessionStore() {
+  public synchronized SessionStore sessionStore() {
     return sessionStore;
   }
 
   @Override
-  public boolean isLoggedIn() {
+  public synchronized boolean isLoggedIn() {
     return principal != null;
   }
 
   @Override
-  public void hasRole(String role, Handler<AsyncResult<Boolean>> resultHandler) {
+  public synchronized void hasRole(String role, Handler<AsyncResult<Boolean>> resultHandler) {
     if (getRoles().contains(role)) {
       resultHandler.handle(Future.succeededFuture(true));
     } else {
@@ -175,7 +175,7 @@ public class SessionImpl implements Session, ClusterSerializable, Shareable {
   }
 
   @Override
-  public void hasRoles(Set<String> roles, Handler<AsyncResult<Boolean>> resultHandler) {
+  public synchronized void hasRoles(Set<String> roles, Handler<AsyncResult<Boolean>> resultHandler) {
     Handler<AsyncResult<Boolean>> wrapped = accumulatingHandler(roles.size(), resultHandler);
     for (String role: roles) {
       hasRole(role, wrapped);
@@ -183,7 +183,7 @@ public class SessionImpl implements Session, ClusterSerializable, Shareable {
   }
 
   @Override
-  public void hasPermissions(Set<String> permissions, Handler<AsyncResult<Boolean>> resultHandler) {
+  public synchronized void hasPermissions(Set<String> permissions, Handler<AsyncResult<Boolean>> resultHandler) {
     Handler<AsyncResult<Boolean>> wrapped = accumulatingHandler(permissions.size(), resultHandler);
     for (String permission: permissions) {
       hasPermission(permission, wrapped);
@@ -191,7 +191,7 @@ public class SessionImpl implements Session, ClusterSerializable, Shareable {
   }
 
   @Override
-  public void hasPermission(String permission, Handler<AsyncResult<Boolean>> resultHandler) {
+  public synchronized void hasPermission(String permission, Handler<AsyncResult<Boolean>> resultHandler) {
     if (getPermissions().contains(permission)) {
       resultHandler.handle(Future.succeededFuture(true));
     } else {
@@ -216,7 +216,7 @@ public class SessionImpl implements Session, ClusterSerializable, Shareable {
   }
 
   @Override
-  public void logout() {
+  public synchronized void logout() {
     if (authProvider == null && principal != null) {
       throw new IllegalStateException("No auth service");
     }
@@ -230,22 +230,22 @@ public class SessionImpl implements Session, ClusterSerializable, Shareable {
   }
 
   @Override
-  public void setPrincipal(JsonObject principal) {
+  public synchronized void setPrincipal(JsonObject principal) {
     this.principal = principal;
   }
 
   @Override
-  public JsonObject getPrincipal() {
+  public synchronized JsonObject getPrincipal() {
     return principal;
   }
 
   @Override
-  public void setAuthProvider(AuthProvider authProvider) {
+  public synchronized void setAuthProvider(AuthProvider authProvider) {
     this.authProvider = authProvider;
   }
 
   @Override
-  public Buffer writeToBuffer() {
+  public synchronized Buffer writeToBuffer() {
     Buffer buff = Buffer.buffer();
 
     writeString(buff, id);
@@ -268,13 +268,8 @@ public class SessionImpl implements Session, ClusterSerializable, Shareable {
     return buff;
   }
 
-  private void writeString(Buffer buffer, String str) {
-    byte[] bytes = str.getBytes(UTF8);
-    buffer.appendInt(bytes.length).appendBytes(bytes);
-  }
-
   @Override
-  public void readFromBuffer(Buffer buffer) {
+  public synchronized void readFromBuffer(Buffer buffer) {
     int pos = 0;
 
     int len = buffer.getInt(pos);
@@ -303,18 +298,23 @@ public class SessionImpl implements Session, ClusterSerializable, Shareable {
     data = readDataFromBuffer(buffer, pos);
   }
 
-  public Set<String> getRoles() {
+  public synchronized Set<String> getRoles() {
     if (roles == null) {
       roles = new HashSet<>();
     }
     return roles;
   }
 
-  public Set<String> getPermissions() {
+  public synchronized Set<String> getPermissions() {
     if (permissions == null) {
       permissions = new HashSet<>();
     }
     return permissions;
+  }
+
+  private void writeString(Buffer buffer, String str) {
+    byte[] bytes = str.getBytes(UTF8);
+    buffer.appendInt(bytes.length).appendBytes(bytes);
   }
 
   private void writeStringSet(Buffer buff, Set<String> set) {

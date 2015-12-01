@@ -2325,11 +2325,11 @@ You can specify which _matches_ you want to allow for inbound and outbound traff
 
 Each match is a `link:../dataobjects.html#PermittedOptions[PermittedOptions]` object:
 
-`link:../dataobjects.html#PermittedOptions#set_address-instance_method[address]`:: This represents the exact address the message is being sent to. If you want to allow messages based on
+`link:../../vertx-bridge-common/dataobjects.html#PermittedOptions#set_address-instance_method[address]`:: This represents the exact address the message is being sent to. If you want to allow messages based on
 an exact address you use this field.
-`link:../dataobjects.html#PermittedOptions#set_address_regex-instance_method[addressRegex]`:: This is a regular expression that will be matched against the address. If you want to allow messages
+`link:../../vertx-bridge-common/dataobjects.html#PermittedOptions#set_address_regex-instance_method[addressRegex]`:: This is a regular expression that will be matched against the address. If you want to allow messages
 based on a regular expression you use this field. If the `address` field is specified this field will be ignored.
-`link:../dataobjects.html#PermittedOptions#set_match-instance_method[match]`:: This allows you to allow messages based on their structure. Any fields in the match must exist in the
+`link:../../vertx-bridge-common/dataobjects.html#PermittedOptions#set_match-instance_method[match]`:: This allows you to allow messages based on their structure. Any fields in the match must exist in the
 message with the same values for them to be allowed. This currently only works with JSON messages.
 
 If a message is _in-bound_ (i.e. being sent from client side JavaScript to the server) when it is received Vert.x-Web
@@ -2430,21 +2430,7 @@ Here's an example:
 
 [source,ruby]
 ----
-
-# Let through any messages sent to 'demo.orderService' from the client
-inboundPermitted = {
-  'address' => "demo.orderService"
-}
-
-# But only if the user is logged in and has the authority "place_orders"
-inboundPermitted['requiredAuthority'] = "place_orders"
-
-options = {
-  'inboundPermitteds' => [
-    inboundPermitted
-  ]
-}
-
+Code not translatable
 ----
 
 For the user to be authorised they must be first logged in and secondly have the required authority.
@@ -2453,43 +2439,7 @@ To handle the login and actually auth you can configure the normal Vert.x auth h
 
 [source,ruby]
 ----
-require 'vertx-web/router'
-require 'vertx-web/sock_js_handler'
-require 'vertx-web/cookie_handler'
-require 'vertx-web/local_session_store'
-require 'vertx-web/session_handler'
-require 'vertx-web/basic_auth_handler'
-
-router = VertxWeb::Router.router(vertx)
-
-# Let through any messages sent to 'demo.orderService' from the client
-inboundPermitted = {
-  'address' => "demo.orderService"
-}
-
-# But only if the user is logged in and has the authority "place_orders"
-inboundPermitted['requiredAuthority'] = "place_orders"
-
-sockJSHandler = VertxWeb::SockJSHandler.create(vertx)
-sockJSHandler.bridge({
-  'inboundPermitteds' => [
-    inboundPermitted
-  ]
-})
-
-# Now set up some basic auth handling:
-
-router.route().handler(&VertxWeb::CookieHandler.create().method(:handle))
-router.route().handler(&VertxWeb::SessionHandler.create(VertxWeb::LocalSessionStore.create(vertx)).method(:handle))
-
-basicAuthHandler = VertxWeb::BasicAuthHandler.create(authProvider)
-
-router.route("/eventbus/*").handler(&basicAuthHandler.method(:handle))
-
-
-router.route("/eventbus/*").handler(&sockJSHandler.method(:handle))
-
-
+Code not translatable
 ----
 
 === Handling event bus bridge events

@@ -949,13 +949,13 @@ public class EventbusBridgeTest extends WebTestBase {
 
   @Test
   public void testSendRequiresAuthorityNotLoggedIn() throws Exception {
-    sockJSHandler.bridge(defaultOptions.addInboundPermitted(new PermittedOptions().setAddress(addr).setRequiredAuthority("admin")));
+    sockJSHandler.bridge(defaultOptions.addInboundPermitted(new PermittedOptions().setRequiredAuthority("admin").setAddress(addr)));
     testError(new JsonObject().put("type", "send").put("address", addr).put("body", "foo"), "not_logged_in");
   }
 
   @Test
   public void testSendRequiresAuthorityHasAuthority() throws Exception {
-    sockJSHandler.bridge(defaultOptions.addInboundPermitted(new PermittedOptions().setAddress(addr).setRequiredAuthority("bang_sticks")));
+    sockJSHandler.bridge(defaultOptions.addInboundPermitted(new PermittedOptions().setRequiredAuthority("bang_sticks").setAddress(addr)));
     router.clear();
     router.route().handler(CookieHandler.create());
     SessionStore store = LocalSessionStore.create(vertx);
@@ -969,7 +969,7 @@ public class EventbusBridgeTest extends WebTestBase {
 
   @Test
   public void testSendRequiresAuthorityHasnotAuthority() throws Exception {
-    sockJSHandler.bridge(defaultOptions.addInboundPermitted(new PermittedOptions().setAddress(addr).setRequiredAuthority("pick_nose")));
+    sockJSHandler.bridge(defaultOptions.addInboundPermitted(new PermittedOptions().setRequiredAuthority("pick_nose").setAddress(addr)));
     router.clear();
     router.route().handler(CookieHandler.create());
     SessionStore store = LocalSessionStore.create(vertx);

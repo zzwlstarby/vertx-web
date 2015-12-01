@@ -49,9 +49,10 @@ public class SockJSProtocolTest extends WebTestBase {
   public void testProtocol() throws Exception {
     String sockjsenv = "SOCKJS_URL=http://localhost:8080";
     File dir = new File("src/test/sockjs-protocol");
+    System.out.println(dir.getAbsolutePath());
     String OS = System.getProperty("os.name", "generic").toLowerCase(Locale.ENGLISH);
     Process p;
-    if (OS.contains("mac") || OS.contains("darwin")) {
+    if (OS.contains("mac") || OS.contains("darwin") || OS.contains("unix") || OS.contains("linux")) {
       // Use default python installation on OSX
       String[] envp = {
           sockjsenv,

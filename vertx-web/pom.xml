@@ -22,6 +22,13 @@
       <groupId>io.vertx</groupId>
       <artifactId>vertx-auth-common</artifactId>
     </dependency>
+
+    <dependency>
+      <groupId>io.vertx</groupId>
+      <artifactId>vertx-bridge-common</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
     <!--
     These should be optional so they're not dragged into web applications unless they're explicitly declared
      -->

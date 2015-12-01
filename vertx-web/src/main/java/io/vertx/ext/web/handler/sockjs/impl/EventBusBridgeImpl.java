@@ -42,11 +42,10 @@ import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.auth.User;
 import io.vertx.ext.web.handler.sockjs.*;
+import io.vertx.ext.web.handler.sockjs.BridgeOptions;
+import io.vertx.ext.web.handler.sockjs.PermittedOptions;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -73,11 +72,29 @@ public class EventBusBridgeImpl implements Handler<SockJSSocket> {
   private final Map<String, Pattern> compiledREs = new HashMap<>();
   private final Handler<BridgeEvent> bridgeEventHandler;
 
+  private static List<PermittedOptions> castPermittedOptions(List<io.vertx.ext.bridge.PermittedOptions> options) {
+    if (options == null) {
+      return Collections.emptyList();
+    }
+
+    final List<PermittedOptions> result = new ArrayList<>();
+
+    for (io.vertx.ext.bridge.PermittedOptions option : options) {
+      if (option instanceof PermittedOptions) {
+        result.add((PermittedOptions) option);
+      } else {
+        result.add(new PermittedOptions(option.toJson()));
+      }
+    }
+
+    return result;
+  }
+
   public EventBusBridgeImpl(Vertx vertx, BridgeOptions options, Handler<BridgeEvent> bridgeEventHandler) {
     this.vertx = vertx;
     this.eb = vertx.eventBus();
-    this.inboundPermitted = options.getInboundPermitteds() == null ? new ArrayList<>() : options.getInboundPermitteds();
-    this.outboundPermitted = options.getOutboundPermitteds() == null ? new ArrayList<>() : options.getOutboundPermitteds();
+    this.inboundPermitted = castPermittedOptions(options.getInboundPermitteds());
+    this.outboundPermitted = castPermittedOptions(options.getOutboundPermitteds());
     this.maxAddressLength = options.getMaxAddressLength();
     this.maxHandlersPerSocket = options.getMaxHandlersPerSocket();
     this.pingTimeout = options.getPingTimeout();

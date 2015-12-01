@@ -12,9 +12,13 @@ import io.vertx.ext.auth.jwt.JWTAuth;
 import io.vertx.ext.auth.jwt.JWTOptions;
 import io.vertx.ext.auth.oauth2.OAuth2Auth;
 import io.vertx.ext.auth.oauth2.OAuth2FlowType;
+import io.vertx.ext.bridge.PermittedOptions;
 import io.vertx.ext.web.*;
 import io.vertx.ext.web.handler.*;
-import io.vertx.ext.web.handler.sockjs.*;
+import io.vertx.ext.web.handler.sockjs.BridgeEventType;
+import io.vertx.ext.web.handler.sockjs.BridgeOptions;
+import io.vertx.ext.web.handler.sockjs.SockJSHandler;
+import io.vertx.ext.web.handler.sockjs.SockJSHandlerOptions;
 import io.vertx.ext.web.sstore.ClusteredSessionStore;
 import io.vertx.ext.web.sstore.LocalSessionStore;
 import io.vertx.ext.web.sstore.SessionStore;
@@ -902,7 +906,8 @@ public class WebExamples {
   public void example47() {
 
     // Let through any messages sent to 'demo.orderService' from the client
-    PermittedOptions inboundPermitted = new PermittedOptions().setAddress("demo.orderService");
+    io.vertx.ext.web.handler.sockjs.PermittedOptions inboundPermitted = new io.vertx.ext.web.handler.sockjs.PermittedOptions();
+    inboundPermitted.setAddress("demo.orderService");
 
     // But only if the user is logged in and has the authority "place_orders"
     inboundPermitted.setRequiredAuthority("place_orders");
@@ -915,7 +920,8 @@ public class WebExamples {
     Router router = Router.router(vertx);
 
     // Let through any messages sent to 'demo.orderService' from the client
-    PermittedOptions inboundPermitted = new PermittedOptions().setAddress("demo.orderService");
+    io.vertx.ext.web.handler.sockjs.PermittedOptions inboundPermitted = new io.vertx.ext.web.handler.sockjs.PermittedOptions();
+    inboundPermitted.setAddress("demo.orderService");
 
     // But only if the user is logged in and has the authority "place_orders"
     inboundPermitted.setRequiredAuthority("place_orders");

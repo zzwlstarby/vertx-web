@@ -294,40 +294,6 @@
  *
  * WARNING: this is only valid for the response decoded as a buffer.
  *
- * === RxJava API
- *
- * The RxJava {@link io.vertx.rxjava.webclient.HttpRequest} provides an rx-ified version of the original API,
- * the {@link io.vertx.rxjava.webclient.HttpRequest#rxSend()} method returns a `Single<HttpResponse<Buffer>>` that
- * makes the HTTP request upon subscription, as consequence, the {@code Single} can be subscribed many times.
- *
- * [source,$lang]
- * ----
- * {@link examples.RxWebClientExamples#simpleGet(io.vertx.rxjava.webclient.WebClient)}
- * ----
- *
- * The obtained {@code Single} can be composed and chained naturally with the RxJava API
- *
- * [source,$lang]
- * ----
- * {@link examples.RxWebClientExamples#flatMap(io.vertx.rxjava.webclient.WebClient)}
- * ----
- *
- * The same APIs is available
- *
- * [source,$lang]
- * ----
- * {@link examples.RxWebClientExamples#moreComplex(io.vertx.rxjava.webclient.WebClient)}
- * ----
- *
- * The {@link io.vertx.rxjava.webclient.HttpRequest#sendStream(rx.Observable, io.vertx.core.Handler)} shall
- * be preferred for sending bodies {@code Observable<Buffer>}
- *
- * [source,$lang]
- * ----
- * {@link examples.RxWebClientExamples#sendObservable(io.vertx.rxjava.webclient.WebClient)}
- * ----
- *
- * Upon subscription, the {@code body} will be subscribed and its content used for the request.
  */
 @Document(fileName = "index.adoc")
 @ModuleGen(name = "vertx-web-client", groupPackage = "io.vertx")

@@ -18,6 +18,7 @@ package io.vertx.ext.web.templ;
 
 import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.ext.web.RoutingContext;
@@ -39,4 +40,10 @@ public interface TemplateEngine {
    * @param handler  the handler that will be called with a result containing the buffer or a failure.
    */
   void render(RoutingContext context, String templateFileName, Handler<AsyncResult<Buffer>> handler);
+
+  default Future<Buffer> render(RoutingContext context, String templateFileName) {
+    Future<Buffer> fut = Future.future();
+    render(context, templateFileName, fut.completer());
+    return fut;
+  }
 }

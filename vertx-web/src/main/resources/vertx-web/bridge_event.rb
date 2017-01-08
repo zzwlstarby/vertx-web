@@ -41,15 +41,6 @@ module VertxWeb
       end
       raise ArgumentError, "Invalid arguments when calling complete?()"
     end
-    # @yield 
-    # @return [self]
-    def set_handler
-      if block_given?
-        @j_del.java_method(:setHandler, [Java::IoVertxCore::Handler.java_class]).call((Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
-        return self
-      end
-      raise ArgumentError, "Invalid arguments when calling set_handler()"
-    end
     # @param [true,false] arg0 
     # @return [void]
     def complete(arg0=nil)
@@ -100,33 +91,6 @@ module VertxWeb
         return @j_del.java_method(:failed, []).call()
       end
       raise ArgumentError, "Invalid arguments when calling failed?()"
-    end
-    # @overload compose(mapper)
-    #   @yield 
-    # @overload compose(handler,next)
-    #   @param [Proc] handler 
-    #   @param [::Vertx::Future] _next 
-    # @return [::Vertx::Future]
-    def compose(param_1=nil,param_2=nil)
-      if block_given? && param_1 == nil && param_2 == nil
-        return ::Vertx::Util::Utils.safe_create(@j_del.java_method(:compose, [Java::JavaUtilFunction::Function.java_class]).call((Proc.new { |event| yield(event).j_del })),::Vertx::Future, nil)
-      elsif param_1.class == Proc && param_2.class.method_defined?(:j_del) && !block_given?
-        return ::Vertx::Util::Utils.safe_create(@j_del.java_method(:compose, [Java::IoVertxCore::Handler.java_class,Java::IoVertxCore::Future.java_class]).call((Proc.new { |event| param_1.call(event) }),param_2.j_del),::Vertx::Future, nil)
-      end
-      raise ArgumentError, "Invalid arguments when calling compose(#{param_1},#{param_2})"
-    end
-    # @overload map(mapper)
-    #   @yield 
-    # @overload map(value)
-    #   @param [Object] value 
-    # @return [::Vertx::Future]
-    def map(param_1=nil)
-      if block_given? && param_1 == nil
-        return ::Vertx::Util::Utils.safe_create(@j_del.java_method(:map, [Java::JavaUtilFunction::Function.java_class]).call((Proc.new { |event| ::Vertx::Util::Utils.to_object(yield(event)) })),::Vertx::Future, nil)
-      elsif ::Vertx::Util::unknown_type.accept?(param_1) && !block_given?
-        return ::Vertx::Util::Utils.safe_create(@j_del.java_method(:map, [Java::java.lang.Object.java_class]).call(::Vertx::Util::Utils.to_object(param_1)),::Vertx::Future, nil)
-      end
-      raise ArgumentError, "Invalid arguments when calling map(#{param_1})"
     end
     # @return [Proc]
     def completer
@@ -190,6 +154,42 @@ module VertxWeb
         return @cached_socket = ::Vertx::Util::Utils.safe_create(@j_del.java_method(:socket, []).call(),::VertxWeb::SockJSSocket)
       end
       raise ArgumentError, "Invalid arguments when calling socket()"
+    end
+    # @yield 
+    # @return [self]
+    def set_handler
+      if block_given?
+        @j_del.java_method(:setHandler, [Java::IoVertxCore::Handler.java_class]).call((Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
+        return self
+      end
+      raise ArgumentError, "Invalid arguments when calling set_handler()"
+    end
+    # @overload compose(mapper)
+    #   @yield 
+    # @overload compose(handler,next)
+    #   @param [Proc] handler 
+    #   @param [::Vertx::Future] _next 
+    # @return [::Vertx::Future]
+    def compose(param_1=nil,param_2=nil)
+      if block_given? && param_1 == nil && param_2 == nil
+        return ::Vertx::Util::Utils.safe_create(@j_del.java_method(:compose, [Java::JavaUtilFunction::Function.java_class]).call((Proc.new { |event| yield(event).j_del })),::Vertx::Future, nil)
+      elsif param_1.class == Proc && param_2.class.method_defined?(:j_del) && !block_given?
+        return ::Vertx::Util::Utils.safe_create(@j_del.java_method(:compose, [Java::IoVertxCore::Handler.java_class,Java::IoVertxCore::Future.java_class]).call((Proc.new { |event| param_1.call(event) }),param_2.j_del),::Vertx::Future, nil)
+      end
+      raise ArgumentError, "Invalid arguments when calling compose(#{param_1},#{param_2})"
+    end
+    # @overload map(mapper)
+    #   @yield 
+    # @overload map(value)
+    #   @param [Object] value 
+    # @return [::Vertx::Future]
+    def map(param_1=nil)
+      if block_given? && param_1 == nil
+        return ::Vertx::Util::Utils.safe_create(@j_del.java_method(:map, [Java::JavaUtilFunction::Function.java_class]).call((Proc.new { |event| ::Vertx::Util::Utils.to_object(yield(event)) })),::Vertx::Future, nil)
+      elsif ::Vertx::Util::unknown_type.accept?(param_1) && !block_given?
+        return ::Vertx::Util::Utils.safe_create(@j_del.java_method(:map, [Java::java.lang.Object.java_class]).call(::Vertx::Util::Utils.to_object(param_1)),::Vertx::Future, nil)
+      end
+      raise ArgumentError, "Invalid arguments when calling map(#{param_1})"
     end
   end
 end

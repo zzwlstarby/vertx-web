@@ -2,6 +2,7 @@ require 'vertx/buffer'
 require 'vertx/multi_map'
 require 'vertx/read_stream'
 require 'vertx-web-client/body_codec'
+require 'vertx/future'
 require 'vertx-web-client/http_response'
 require 'vertx/util/utils.rb'
 # Generated from io.vertx.webclient.HttpRequest

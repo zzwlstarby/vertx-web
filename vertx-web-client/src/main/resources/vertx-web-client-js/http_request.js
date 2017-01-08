@@ -20,6 +20,7 @@ var Buffer = require('vertx-js/buffer');
 var MultiMap = require('vertx-js/multi_map');
 var ReadStream = require('vertx-js/read_stream');
 var BodyCodec = require('vertx-web-client-js/body_codec');
+var Future = require('vertx-js/future');
 var HttpResponse = require('vertx-web-client-js/http_response');
 
 var io = Packages.io;
@@ -231,14 +232,16 @@ var HttpRequest = function(j_val, j_arg_0) {
    @param body {ReadStream} the body 
    @param handler {function} 
    */
-  this.sendStream = function(body, handler) {
+  this.sendStream = function() {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0]._jdel && typeof __args[1] === 'function') {
-      j_httpRequest["sendStream(io.vertx.core.streams.ReadStream,io.vertx.core.Handler)"](body._jdel, function(ar) {
+    if (__args.length === 1 && typeof __args[0] === 'object' && __args[0]._jdel) {
+      j_httpRequest["sendStream(io.vertx.core.streams.ReadStream)"](__args[0]._jdel);
+    }  else if (__args.length === 2 && typeof __args[0] === 'object' && __args[0]._jdel && typeof __args[1] === 'function') {
+      j_httpRequest["sendStream(io.vertx.core.streams.ReadStream,io.vertx.core.Handler)"](__args[0]._jdel, function(ar) {
       if (ar.succeeded()) {
-        handler(utils.convReturnVertxGen(HttpResponse, ar.result(), undefined), null);
+        __args[1](utils.convReturnVertxGen(HttpResponse, ar.result(), undefined), null);
       } else {
-        handler(null, ar.cause());
+        __args[1](null, ar.cause());
       }
     });
     } else throw new TypeError('function invoked with invalid arguments');
@@ -251,14 +254,16 @@ var HttpRequest = function(j_val, j_arg_0) {
    @param body {Buffer} the body 
    @param handler {function} 
    */
-  this.sendBuffer = function(body, handler) {
+  this.sendBuffer = function() {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0]._jdel && typeof __args[1] === 'function') {
-      j_httpRequest["sendBuffer(io.vertx.core.buffer.Buffer,io.vertx.core.Handler)"](body._jdel, function(ar) {
+    if (__args.length === 1 && typeof __args[0] === 'object' && __args[0]._jdel) {
+      j_httpRequest["sendBuffer(io.vertx.core.buffer.Buffer)"](__args[0]._jdel);
+    }  else if (__args.length === 2 && typeof __args[0] === 'object' && __args[0]._jdel && typeof __args[1] === 'function') {
+      j_httpRequest["sendBuffer(io.vertx.core.buffer.Buffer,io.vertx.core.Handler)"](__args[0]._jdel, function(ar) {
       if (ar.succeeded()) {
-        handler(utils.convReturnVertxGen(HttpResponse, ar.result(), undefined), null);
+        __args[1](utils.convReturnVertxGen(HttpResponse, ar.result(), undefined), null);
       } else {
-        handler(null, ar.cause());
+        __args[1](null, ar.cause());
       }
     });
     } else throw new TypeError('function invoked with invalid arguments');
@@ -272,14 +277,16 @@ var HttpRequest = function(j_val, j_arg_0) {
    @param body {Object} the body 
    @param handler {function} 
    */
-  this.sendJsonObject = function(body, handler) {
+  this.sendJsonObject = function() {
     var __args = arguments;
-    if (__args.length === 2 && (typeof __args[0] === 'object' && __args[0] != null) && typeof __args[1] === 'function') {
-      j_httpRequest["sendJsonObject(io.vertx.core.json.JsonObject,io.vertx.core.Handler)"](utils.convParamJsonObject(body), function(ar) {
+    if (__args.length === 1 && (typeof __args[0] === 'object' && __args[0] != null)) {
+      j_httpRequest["sendJsonObject(io.vertx.core.json.JsonObject)"](utils.convParamJsonObject(__args[0]));
+    }  else if (__args.length === 2 && (typeof __args[0] === 'object' && __args[0] != null) && typeof __args[1] === 'function') {
+      j_httpRequest["sendJsonObject(io.vertx.core.json.JsonObject,io.vertx.core.Handler)"](utils.convParamJsonObject(__args[0]), function(ar) {
       if (ar.succeeded()) {
-        handler(utils.convReturnVertxGen(HttpResponse, ar.result(), undefined), null);
+        __args[1](utils.convReturnVertxGen(HttpResponse, ar.result(), undefined), null);
       } else {
-        handler(null, ar.cause());
+        __args[1](null, ar.cause());
       }
     });
     } else throw new TypeError('function invoked with invalid arguments');
@@ -293,14 +300,16 @@ var HttpRequest = function(j_val, j_arg_0) {
    @param body {Object} the body 
    @param handler {function} 
    */
-  this.sendJson = function(body, handler) {
+  this.sendJson = function() {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] !== 'function' && typeof __args[1] === 'function') {
-      j_httpRequest["sendJson(java.lang.Object,io.vertx.core.Handler)"](utils.convParamTypeUnknown(body), function(ar) {
+    if (__args.length === 1 && typeof __args[0] !== 'function') {
+      j_httpRequest["sendJson(java.lang.Object)"](utils.convParamTypeUnknown(__args[0]));
+    }  else if (__args.length === 2 && typeof __args[0] !== 'function' && typeof __args[1] === 'function') {
+      j_httpRequest["sendJson(java.lang.Object,io.vertx.core.Handler)"](utils.convParamTypeUnknown(__args[0]), function(ar) {
       if (ar.succeeded()) {
-        handler(utils.convReturnVertxGen(HttpResponse, ar.result(), undefined), null);
+        __args[1](utils.convReturnVertxGen(HttpResponse, ar.result(), undefined), null);
       } else {
-        handler(null, ar.cause());
+        __args[1](null, ar.cause());
       }
     });
     } else throw new TypeError('function invoked with invalid arguments');
@@ -316,14 +325,16 @@ var HttpRequest = function(j_val, j_arg_0) {
    @param body {MultiMap} the body 
    @param handler {function} 
    */
-  this.sendForm = function(body, handler) {
+  this.sendForm = function() {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0]._jdel && typeof __args[1] === 'function') {
-      j_httpRequest["sendForm(io.vertx.core.MultiMap,io.vertx.core.Handler)"](body._jdel, function(ar) {
+    if (__args.length === 1 && typeof __args[0] === 'object' && __args[0]._jdel) {
+      j_httpRequest["sendForm(io.vertx.core.MultiMap)"](__args[0]._jdel);
+    }  else if (__args.length === 2 && typeof __args[0] === 'object' && __args[0]._jdel && typeof __args[1] === 'function') {
+      j_httpRequest["sendForm(io.vertx.core.MultiMap,io.vertx.core.Handler)"](__args[0]._jdel, function(ar) {
       if (ar.succeeded()) {
-        handler(utils.convReturnVertxGen(HttpResponse, ar.result(), undefined), null);
+        __args[1](utils.convReturnVertxGen(HttpResponse, ar.result(), undefined), null);
       } else {
-        handler(null, ar.cause());
+        __args[1](null, ar.cause());
       }
     });
     } else throw new TypeError('function invoked with invalid arguments');
@@ -335,14 +346,16 @@ var HttpRequest = function(j_val, j_arg_0) {
    @public
    @param handler {function} 
    */
-  this.send = function(handler) {
+  this.send = function() {
     var __args = arguments;
-    if (__args.length === 1 && typeof __args[0] === 'function') {
+    if (__args.length === 0) {
+      j_httpRequest["send()"]();
+    }  else if (__args.length === 1 && typeof __args[0] === 'function') {
       j_httpRequest["send(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
-        handler(utils.convReturnVertxGen(HttpResponse, ar.result(), undefined), null);
+        __args[0](utils.convReturnVertxGen(HttpResponse, ar.result(), undefined), null);
       } else {
-        handler(null, ar.cause());
+        __args[0](null, ar.cause());
       }
     });
     } else throw new TypeError('function invoked with invalid arguments');

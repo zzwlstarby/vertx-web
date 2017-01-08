@@ -19,6 +19,7 @@ import io.vertx.codegen.annotations.CacheReturn;
 import io.vertx.codegen.annotations.Fluent;
 import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.MultiMap;
 import io.vertx.core.buffer.Buffer;
@@ -174,11 +175,23 @@ public interface HttpRequest<T> {
   void sendStream(ReadStream<Buffer> body, Handler<AsyncResult<HttpResponse<T>>> handler);
 
   /**
+   * Like {@link #sendStream(ReadStream, Handler)}but returns a {@code Future} that will be
+   * completed once the operation completes.
+   */
+  Future<HttpResponse<T>> sendStream(ReadStream<Buffer> body);
+
+  /**
    * Like {@link #send(Handler)} but with an HTTP request {@code body} buffer.
    *
    * @param body the body
    */
   void sendBuffer(Buffer body, Handler<AsyncResult<HttpResponse<T>>> handler);
+
+  /**
+   * Like {@link #sendBuffer(Buffer, Handler)}but returns a {@code Future} that will be
+   * completed once the operation completes.
+   */
+  Future<HttpResponse<T>> sendBuffer(Buffer body);
 
   /**
    * Like {@link #send(Handler)} but with an HTTP request {@code body} object encoded as json and the content type
@@ -189,12 +202,24 @@ public interface HttpRequest<T> {
   void sendJsonObject(JsonObject body, Handler<AsyncResult<HttpResponse<T>>> handler);
 
   /**
+   * Like {@link #sendJsonObject(JsonObject, Handler)}but returns a {@code Future} that will be
+   * completed once the operation completes.
+   */
+  Future<HttpResponse<T>> sendJsonObject(JsonObject body);
+
+  /**
    * Like {@link #send(Handler)} but with an HTTP request {@code body} object encoded as json and the content type
    * set to {@code application/json}.
    *
    * @param body the body
    */
   void sendJson(Object body, Handler<AsyncResult<HttpResponse<T>>> handler);
+
+  /**
+   * Like {@link #sendJson(Object, Handler)}but returns a {@code Future} that will be
+   * completed once the operation completes.
+   */
+  Future<HttpResponse<T>> sendJson(Object body);
 
   /**
    * Like {@link #send(Handler)} but with an HTTP request {@code body} multimap encoded as form and the content type
@@ -207,8 +232,19 @@ public interface HttpRequest<T> {
   void sendForm(MultiMap body, Handler<AsyncResult<HttpResponse<T>>> handler);
 
   /**
+   * Like {@link #sendForm(MultiMap, Handler)}but returns a {@code Future} that will be
+   * completed once the operation completes.
+   */
+  Future<HttpResponse<T>> sendForm(MultiMap body);
+
+  /**
    * Send a request, the {@code handler} will receive the response as an {@link HttpResponse}.
    */
   void send(Handler<AsyncResult<HttpResponse<T>>> handler);
 
+  /**
+   * Like {@link #send(Handler)}but returns a {@code Future} that will be
+   * completed once the operation completes.
+   */
+  Future<HttpResponse<T>> send();
 }

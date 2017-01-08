@@ -169,8 +169,22 @@ class HttpRequestImpl<T> implements HttpRequest<T> {
   }
 
   @Override
+  public Future<HttpResponse<T>> sendStream(ReadStream<Buffer> body) {
+    Future<HttpResponse<T>> fut = Future.future();
+    sendStream(body, fut.completer());
+    return fut;
+  }
+
+  @Override
   public void send(Handler<AsyncResult<HttpResponse<T>>> handler) {
     send(null, null, handler);
+  }
+
+  @Override
+  public Future<HttpResponse<T>> send() {
+    Future<HttpResponse<T>> fut = Future.future();
+    send(fut.completer());
+    return fut;
   }
 
   @Override
@@ -179,8 +193,22 @@ class HttpRequestImpl<T> implements HttpRequest<T> {
   }
 
   @Override
+  public Future<HttpResponse<T>> sendBuffer(Buffer body) {
+    Future<HttpResponse<T>> fut = Future.future();
+    sendBuffer(body, fut.completer());
+    return fut;
+  }
+
+  @Override
   public void sendJsonObject(JsonObject body, Handler<AsyncResult<HttpResponse<T>>> handler) {
     send("application/json", body,handler);
+  }
+
+  @Override
+  public Future<HttpResponse<T>> sendJsonObject(JsonObject body) {
+    Future<HttpResponse<T>> fut = Future.future();
+    sendJsonObject(body, fut.completer());
+    return fut;
   }
 
   @Override
@@ -189,8 +217,22 @@ class HttpRequestImpl<T> implements HttpRequest<T> {
   }
 
   @Override
+  public Future<HttpResponse<T>> sendJson(Object body) {
+    Future<HttpResponse<T>> fut = Future.future();
+    sendJson(body, fut.completer());
+    return fut;
+  }
+
+  @Override
   public void sendForm(MultiMap body, Handler<AsyncResult<HttpResponse<T>>> handler) {
     send("application/x-www-form-urlencoded", body, handler);
+  }
+
+  @Override
+  public Future<HttpResponse<T>> sendForm(MultiMap body) {
+    Future<HttpResponse<T>> fut = Future.future();
+    sendForm(body, fut.completer());
+    return fut;
   }
 
   private void send(String contentType, Object body, Handler<AsyncResult<HttpResponse<T>>> handler) {

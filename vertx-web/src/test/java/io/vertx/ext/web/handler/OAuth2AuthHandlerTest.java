@@ -70,7 +70,8 @@ public class OAuth2AuthHandlerTest extends WebTestBase {
       } else {
         req.response().setStatusCode(400).end();
       }
-    }).listen(10000, ready -> {
+    });
+    server.listen(10000, ready -> {
       if (ready.failed()) {
         throw new RuntimeException(ready.cause());
       }

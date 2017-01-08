@@ -52,26 +52,6 @@ var BridgeEvent = function(j_val) {
   /**
 
    @public
-   @param arg0 {function} 
-   @return {Future}
-   */
-  this.setHandler = function(arg0) {
-    var __args = arguments;
-    if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_bridgeEvent["setHandler(io.vertx.core.Handler)"](function(ar) {
-      if (ar.succeeded()) {
-        arg0(ar.result(), null);
-      } else {
-        arg0(null, ar.cause());
-      }
-    });
-      return that;
-    } else throw new TypeError('function invoked with invalid arguments');
-  };
-
-  /**
-
-   @public
    @param arg0 {boolean} 
    */
   this.complete = function() {
@@ -146,45 +126,6 @@ var BridgeEvent = function(j_val) {
     var __args = arguments;
     if (__args.length === 0) {
       return j_bridgeEvent["failed()"]();
-    } else throw new TypeError('function invoked with invalid arguments');
-  };
-
-  /**
-
-   @public
-   @param handler {function} 
-   @param next {Future} 
-   @return {Future}
-   */
-  this.compose = function() {
-    var __args = arguments;
-    if (__args.length === 1 && typeof __args[0] === 'function') {
-      return utils.convReturnVertxGen(Future, j_bridgeEvent["compose(java.util.function.Function)"](function(jVal) {
-      var jRet = __args[0](jVal);
-      return jRet._jdel;
-    }), undefined);
-    }  else if (__args.length === 2 && typeof __args[0] === 'function' && typeof __args[1] === 'object' && __args[1]._jdel) {
-      return utils.convReturnVertxGen(Future, j_bridgeEvent["compose(io.vertx.core.Handler,io.vertx.core.Future)"](function(jVal) {
-      __args[0](jVal);
-    }, __args[1]._jdel), undefined);
-    } else throw new TypeError('function invoked with invalid arguments');
-  };
-
-  /**
-
-   @public
-   @param value {Object} 
-   @return {Future}
-   */
-  this.map = function() {
-    var __args = arguments;
-    if (__args.length === 1 && typeof __args[0] === 'function') {
-      return utils.convReturnVertxGen(Future, j_bridgeEvent["map(java.util.function.Function)"](function(jVal) {
-      var jRet = __args[0](jVal);
-      return utils.convParamTypeUnknown(jRet);
-    }), undefined);
-    }  else if (__args.length === 1 && typeof __args[0] !== 'function') {
-      return utils.convReturnVertxGen(Future, j_bridgeEvent["map(java.lang.Object)"](utils.convParamTypeUnknown(__args[0])), undefined);
     } else throw new TypeError('function invoked with invalid arguments');
   };
 
@@ -283,6 +224,65 @@ var BridgeEvent = function(j_val) {
         that.cachedsocket = utils.convReturnVertxGen(SockJSSocket, j_bridgeEvent["socket()"]());
       }
       return that.cachedsocket;
+    } else throw new TypeError('function invoked with invalid arguments');
+  };
+
+  /**
+
+   @public
+   @param arg0 {function} 
+   @return {Future}
+   */
+  this.setHandler = function(arg0) {
+    var __args = arguments;
+    if (__args.length === 1 && typeof __args[0] === 'function') {
+      j_bridgeEvent["setHandler(io.vertx.core.Handler)"](function(ar) {
+      if (ar.succeeded()) {
+        arg0(ar.result(), null);
+      } else {
+        arg0(null, ar.cause());
+      }
+    });
+      return that;
+    } else throw new TypeError('function invoked with invalid arguments');
+  };
+
+  /**
+
+   @public
+   @param handler {function} 
+   @param next {Future} 
+   @return {Future}
+   */
+  this.compose = function() {
+    var __args = arguments;
+    if (__args.length === 1 && typeof __args[0] === 'function') {
+      return utils.convReturnVertxGen(Future, j_bridgeEvent["compose(java.util.function.Function)"](function(jVal) {
+      var jRet = __args[0](jVal);
+      return jRet._jdel;
+    }), undefined);
+    }  else if (__args.length === 2 && typeof __args[0] === 'function' && typeof __args[1] === 'object' && __args[1]._jdel) {
+      return utils.convReturnVertxGen(Future, j_bridgeEvent["compose(io.vertx.core.Handler,io.vertx.core.Future)"](function(jVal) {
+      __args[0](jVal);
+    }, __args[1]._jdel), undefined);
+    } else throw new TypeError('function invoked with invalid arguments');
+  };
+
+  /**
+
+   @public
+   @param value {Object} 
+   @return {Future}
+   */
+  this.map = function() {
+    var __args = arguments;
+    if (__args.length === 1 && typeof __args[0] === 'function') {
+      return utils.convReturnVertxGen(Future, j_bridgeEvent["map(java.util.function.Function)"](function(jVal) {
+      var jRet = __args[0](jVal);
+      return utils.convParamTypeUnknown(jRet);
+    }), undefined);
+    }  else if (__args.length === 1 && typeof __args[0] !== 'function') {
+      return utils.convReturnVertxGen(Future, j_bridgeEvent["map(java.lang.Object)"](utils.convParamTypeUnknown(__args[0])), undefined);
     } else throw new TypeError('function invoked with invalid arguments');
   };
 

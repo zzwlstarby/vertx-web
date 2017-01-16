@@ -18,10 +18,12 @@ package io.vertx.ext.web.templ;
 
 import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.AsyncResult;
-import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
+import io.vertx.core.spi.concurrent.CompletableStage;
 import io.vertx.ext.web.RoutingContext;
+
+import java.util.concurrent.CompletionStage;
 
 /**
  * A template engine uses a specific template and the data in a routing context to render a resource into a buffer.
@@ -41,9 +43,9 @@ public interface TemplateEngine {
    */
   void render(RoutingContext context, String templateFileName, Handler<AsyncResult<Buffer>> handler);
 
-  default Future<Buffer> render(RoutingContext context, String templateFileName) {
-    Future<Buffer> fut = Future.future();
-    render(context, templateFileName, fut.completer());
+  default CompletionStage<Buffer> render(RoutingContext context, String templateFileName) {
+    CompletableStage<Buffer> fut = CompletableStage.create();
+    render(context, templateFileName, fut);
     return fut;
   }
 }

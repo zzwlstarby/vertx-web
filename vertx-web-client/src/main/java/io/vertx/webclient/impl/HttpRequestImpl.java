@@ -37,6 +37,7 @@ import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
+import io.vertx.core.spi.concurrent.CompletableStage;
 import io.vertx.core.streams.Pump;
 import io.vertx.core.streams.ReadStream;
 import io.vertx.webclient.BodyCodec;
@@ -45,6 +46,7 @@ import io.vertx.webclient.HttpResponse;
 import io.vertx.webclient.spi.BodyStream;
 
 import java.util.Map;
+import java.util.concurrent.CompletionStage;
 
 /**
  * @author <a href="mailto:julien@julienviet.com">Julien Viet</a>
@@ -169,9 +171,9 @@ class HttpRequestImpl<T> implements HttpRequest<T> {
   }
 
   @Override
-  public Future<HttpResponse<T>> sendStream(ReadStream<Buffer> body) {
-    Future<HttpResponse<T>> fut = Future.future();
-    sendStream(body, fut.completer());
+  public CompletionStage<HttpResponse<T>> sendStream(ReadStream<Buffer> body) {
+    CompletableStage<HttpResponse<T>> fut = CompletableStage.create();
+    sendStream(body, fut);
     return fut;
   }
 
@@ -181,9 +183,9 @@ class HttpRequestImpl<T> implements HttpRequest<T> {
   }
 
   @Override
-  public Future<HttpResponse<T>> send() {
-    Future<HttpResponse<T>> fut = Future.future();
-    send(fut.completer());
+  public CompletionStage<HttpResponse<T>> send() {
+    CompletableStage<HttpResponse<T>> fut = CompletableStage.create();
+    send(fut);
     return fut;
   }
 
@@ -193,9 +195,9 @@ class HttpRequestImpl<T> implements HttpRequest<T> {
   }
 
   @Override
-  public Future<HttpResponse<T>> sendBuffer(Buffer body) {
-    Future<HttpResponse<T>> fut = Future.future();
-    sendBuffer(body, fut.completer());
+  public CompletionStage<HttpResponse<T>> sendBuffer(Buffer body) {
+    CompletableStage<HttpResponse<T>> fut = CompletableStage.create();
+    sendBuffer(body, fut);
     return fut;
   }
 
@@ -205,9 +207,9 @@ class HttpRequestImpl<T> implements HttpRequest<T> {
   }
 
   @Override
-  public Future<HttpResponse<T>> sendJsonObject(JsonObject body) {
-    Future<HttpResponse<T>> fut = Future.future();
-    sendJsonObject(body, fut.completer());
+  public CompletionStage<HttpResponse<T>> sendJsonObject(JsonObject body) {
+    CompletableStage<HttpResponse<T>> fut = CompletableStage.create();
+    sendJsonObject(body, fut);
     return fut;
   }
 
@@ -217,9 +219,9 @@ class HttpRequestImpl<T> implements HttpRequest<T> {
   }
 
   @Override
-  public Future<HttpResponse<T>> sendJson(Object body) {
-    Future<HttpResponse<T>> fut = Future.future();
-    sendJson(body, fut.completer());
+  public CompletionStage<HttpResponse<T>> sendJson(Object body) {
+    CompletableStage<HttpResponse<T>> fut = CompletableStage.create();
+    sendJson(body, fut);
     return fut;
   }
 
@@ -229,9 +231,9 @@ class HttpRequestImpl<T> implements HttpRequest<T> {
   }
 
   @Override
-  public Future<HttpResponse<T>> sendForm(MultiMap body) {
-    Future<HttpResponse<T>> fut = Future.future();
-    sendForm(body, fut.completer());
+  public CompletionStage<HttpResponse<T>> sendForm(MultiMap body) {
+    CompletableStage<HttpResponse<T>> fut = CompletableStage.create();
+    sendForm(body, fut);
     return fut;
   }
 

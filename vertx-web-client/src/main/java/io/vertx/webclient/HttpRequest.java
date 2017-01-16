@@ -19,13 +19,14 @@ import io.vertx.codegen.annotations.CacheReturn;
 import io.vertx.codegen.annotations.Fluent;
 import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.AsyncResult;
-import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.MultiMap;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.streams.ReadStream;
+
+import java.util.concurrent.CompletionStage;
 
 /**
  * A client-side HTTP request.
@@ -175,10 +176,10 @@ public interface HttpRequest<T> {
   void sendStream(ReadStream<Buffer> body, Handler<AsyncResult<HttpResponse<T>>> handler);
 
   /**
-   * Like {@link #sendStream(ReadStream, Handler)}but returns a {@code Future} that will be
+   * Like {@link #sendStream(ReadStream, Handler)}but returns a {@code CompletionStage} that will be
    * completed once the operation completes.
    */
-  Future<HttpResponse<T>> sendStream(ReadStream<Buffer> body);
+  CompletionStage<HttpResponse<T>> sendStream(ReadStream<Buffer> body);
 
   /**
    * Like {@link #send(Handler)} but with an HTTP request {@code body} buffer.
@@ -188,10 +189,10 @@ public interface HttpRequest<T> {
   void sendBuffer(Buffer body, Handler<AsyncResult<HttpResponse<T>>> handler);
 
   /**
-   * Like {@link #sendBuffer(Buffer, Handler)}but returns a {@code Future} that will be
+   * Like {@link #sendBuffer(Buffer, Handler)}but returns a {@code CompletionStage} that will be
    * completed once the operation completes.
    */
-  Future<HttpResponse<T>> sendBuffer(Buffer body);
+  CompletionStage<HttpResponse<T>> sendBuffer(Buffer body);
 
   /**
    * Like {@link #send(Handler)} but with an HTTP request {@code body} object encoded as json and the content type
@@ -202,10 +203,10 @@ public interface HttpRequest<T> {
   void sendJsonObject(JsonObject body, Handler<AsyncResult<HttpResponse<T>>> handler);
 
   /**
-   * Like {@link #sendJsonObject(JsonObject, Handler)}but returns a {@code Future} that will be
+   * Like {@link #sendJsonObject(JsonObject, Handler)}but returns a {@code CompletionStage} that will be
    * completed once the operation completes.
    */
-  Future<HttpResponse<T>> sendJsonObject(JsonObject body);
+  CompletionStage<HttpResponse<T>> sendJsonObject(JsonObject body);
 
   /**
    * Like {@link #send(Handler)} but with an HTTP request {@code body} object encoded as json and the content type
@@ -216,10 +217,10 @@ public interface HttpRequest<T> {
   void sendJson(Object body, Handler<AsyncResult<HttpResponse<T>>> handler);
 
   /**
-   * Like {@link #sendJson(Object, Handler)}but returns a {@code Future} that will be
+   * Like {@link #sendJson(Object, Handler)}but returns a {@code CompletionStage} that will be
    * completed once the operation completes.
    */
-  Future<HttpResponse<T>> sendJson(Object body);
+  CompletionStage<HttpResponse<T>> sendJson(Object body);
 
   /**
    * Like {@link #send(Handler)} but with an HTTP request {@code body} multimap encoded as form and the content type
@@ -232,10 +233,10 @@ public interface HttpRequest<T> {
   void sendForm(MultiMap body, Handler<AsyncResult<HttpResponse<T>>> handler);
 
   /**
-   * Like {@link #sendForm(MultiMap, Handler)}but returns a {@code Future} that will be
+   * Like {@link #sendForm(MultiMap, Handler)}but returns a {@code CompletionStage} that will be
    * completed once the operation completes.
    */
-  Future<HttpResponse<T>> sendForm(MultiMap body);
+  CompletionStage<HttpResponse<T>> sendForm(MultiMap body);
 
   /**
    * Send a request, the {@code handler} will receive the response as an {@link HttpResponse}.
@@ -243,8 +244,8 @@ public interface HttpRequest<T> {
   void send(Handler<AsyncResult<HttpResponse<T>>> handler);
 
   /**
-   * Like {@link #send(Handler)}but returns a {@code Future} that will be
+   * Like {@link #send(Handler)}but returns a {@code CompletionStage} that will be
    * completed once the operation completes.
    */
-  Future<HttpResponse<T>> send();
+  CompletionStage<HttpResponse<T>> send();
 }

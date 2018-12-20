@@ -89,8 +89,15 @@ class RawWebSocketTransport {
       return this;
     }
 
+    @Override
     public SockJSSocket write(Buffer data) {
       ws.writeBinaryMessage(data);
+      return this;
+    }
+
+    @Override
+    public SockJSSocket write(String data) {
+      ws.writeTextMessage(data);
       return this;
     }
 

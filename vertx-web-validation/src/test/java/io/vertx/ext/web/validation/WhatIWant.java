@@ -17,6 +17,7 @@ public class WhatIWant {
 
     // compile time checked with builder types
     // horrible to see parser passed every time as constructor param of schema builder
+    // requires change in schema builder apis
 
     ValidationHandler.create()
       .pathParameter(
@@ -44,10 +45,10 @@ public class WhatIWant {
   }
 
   @Test
-  public void example1() {
+  public void example2() {
     SchemaParser parser = null;
 
-    // Runtime checked with IAE thrown, one single method param(String,Schema)
+    // Runtime checked with IAE thrown when type is missing, one single method param(String,Schema)
     // Type inferred from schema (can share same algo for openapi stuff)
 
     ValidationHandler.create()
@@ -79,7 +80,7 @@ public class WhatIWant {
   }
 
   @Test
-  public void example2() {
+  public void example3() {
     SchemaParser parser = null;
 
     // Coupling between validation handler and vertx json schema lib

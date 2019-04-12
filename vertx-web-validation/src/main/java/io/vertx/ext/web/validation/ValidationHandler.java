@@ -1,9 +1,10 @@
 package io.vertx.ext.web.validation;
 
-import io.vertx.codegen.annotations.Fluent;
 import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.Handler;
+import io.vertx.ext.json.schema.SchemaParser;
 import io.vertx.ext.web.RoutingContext;
+import io.vertx.ext.web.validation.dsl.ValidationHandlerBuilder;
 
 /**
  * TODO
@@ -45,47 +46,8 @@ public interface ValidationHandler extends Handler<RoutingContext> {
   // - path, header -> simple
   // - query, cookie -> form (simple), exploded form, custom collection parser, deep object
 
-  @Fluent
-  ValidationHandler parameter(ParameterLocation location, ParameterProcessor processor);
-
-  @Fluent
-  default ValidationHandler queryParameter(StyledParameterProcessor parameterProcessor) {
-    return parameter(ParameterLocation.QUERY, parameterProcessor);
-  }
-
-  @Fluent
-  default ValidationHandler queryParameter(SimpleParameterProcessor parameterProcessor) {
-    return parameter(ParameterLocation.QUERY, parameterProcessor);
-  }
-
-  @Fluent
-  default ValidationHandler pathParameter(SimpleParameterProcessor parameterProcessor) {
-    return parameter(ParameterLocation.PATH, parameterProcessor);
-  }
-
-  @Fluent
-  default ValidationHandler cookieParameter(StyledParameterProcessor parameterProcessor) {
-    return parameter(ParameterLocation.COOKIE, parameterProcessor);
-  }
-
-  @Fluent
-  default ValidationHandler cookieParameter(SimpleParameterProcessor parameterProcessor) {
-    return parameter(ParameterLocation.COOKIE, parameterProcessor);
-  }
-
-  @Fluent
-  default ValidationHandler headerParameter(SimpleParameterProcessor parameterProcessor) {
-    return parameter(ParameterLocation.HEADER, parameterProcessor);
-  }
-
-  @Fluent
-  ValidationHandler body(BodyProcessor bodyProcessor);
-
-  @Fluent
-  ValidationHandler bodyRequired(boolean bodyRequired);
-
-  static ValidationHandler create() {
-    return null;
+  static ValidationHandlerBuilder builder(SchemaParser parser) {
+    return ValidationHandlerBuilder.create(parser);
   }
 
 }

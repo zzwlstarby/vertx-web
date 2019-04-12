@@ -1,18 +1,16 @@
 package io.vertx.ext.web.validation;
 
 import io.vertx.core.Future;
-import io.vertx.ext.json.schema.Schema;
+import io.vertx.ext.web.validation.impl.ParameterProcessorImpl;
 
+import java.util.List;
 import java.util.Map;
 
 public interface ParameterProcessor {
 
-  boolean canProcess(Map<String, String> params);
+  Future<RequestParameter> process(Map<String, List<String>> params);
 
-  Future<RequestParameter> process(Map<String, String> params);
-
-  static <T> ParameterProcessor create(String parameterName, ParameterParser<T> parser, Validator<T> validator, boolean isOptional) {
-    return null;
+  static ParameterProcessor create(String parameterName, ParameterLocation location, boolean isOptional, ParameterParser parser, Validator validator) {
+    return new ParameterProcessorImpl(parameterName, location, isOptional, parser, validator);
   }
-
 }

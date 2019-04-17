@@ -2,10 +2,10 @@ package io.vertx.ext.web.validation.dsl;
 
 import io.vertx.codegen.annotations.Fluent;
 import io.vertx.ext.json.schema.SchemaParser;
-import io.vertx.ext.web.validation.BodyProcessor;
 import io.vertx.ext.web.validation.ParameterLocation;
 import io.vertx.ext.web.validation.ParameterProcessor;
 import io.vertx.ext.web.validation.ValidationHandler;
+import io.vertx.ext.web.validation.dsl.impl.ValidationHandlerBuilderImpl;
 
 public interface ValidationHandlerBuilder {
 
@@ -31,7 +31,7 @@ public interface ValidationHandlerBuilder {
   ValidationHandlerBuilder headerParameter(SimpleParameterProcessorFactory parameterProcessor);
 
   @Fluent
-  ValidationHandlerBuilder body(BodyProcessor bodyProcessor);
+  ValidationHandlerBuilder body(BodyProcessorFactory bodyProcessor);
 
   @Fluent
   ValidationHandlerBuilder bodyRequired(boolean bodyRequired);
@@ -39,7 +39,7 @@ public interface ValidationHandlerBuilder {
   ValidationHandler build();
 
   static ValidationHandlerBuilder create(SchemaParser parser) {
-    return null; //TODO
+    return new ValidationHandlerBuilderImpl(parser);
   }
 
 }

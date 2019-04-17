@@ -24,7 +24,7 @@ public interface ValueParser {
     }
   };
   ValueParser BOOLEAN_PARSER = Boolean::parseBoolean;
-  ValueParser JSON = j -> {
+  ValueParser JSON_PARSER = j -> {
     try {
       return Json.decodeValue(j);
     } catch (DecodeException e) {

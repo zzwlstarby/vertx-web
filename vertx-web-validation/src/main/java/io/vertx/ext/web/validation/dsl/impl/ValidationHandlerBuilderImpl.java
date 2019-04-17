@@ -1,14 +1,22 @@
 package io.vertx.ext.web.validation.dsl.impl;
 
-import io.vertx.ext.web.validation.BodyProcessor;
+import io.vertx.ext.json.schema.SchemaParser;
 import io.vertx.ext.web.validation.ParameterLocation;
 import io.vertx.ext.web.validation.ParameterProcessor;
 import io.vertx.ext.web.validation.ValidationHandler;
+import io.vertx.ext.web.validation.dsl.BodyProcessorFactory;
 import io.vertx.ext.web.validation.dsl.SimpleParameterProcessorFactory;
 import io.vertx.ext.web.validation.dsl.StyledParameterProcessorFactory;
 import io.vertx.ext.web.validation.dsl.ValidationHandlerBuilder;
 
 public class ValidationHandlerBuilderImpl implements ValidationHandlerBuilder {
+
+  SchemaParser jsonSchemaParser;
+
+  public ValidationHandlerBuilderImpl(SchemaParser jsonSchemaParser) {
+    this.jsonSchemaParser = jsonSchemaParser;
+  }
+
   @Override
   public ValidationHandlerBuilder parameter(ParameterLocation location, ParameterProcessor processor) {
     return null;
@@ -45,7 +53,7 @@ public class ValidationHandlerBuilderImpl implements ValidationHandlerBuilder {
   }
 
   @Override
-  public ValidationHandlerBuilder body(BodyProcessor bodyProcessor) {
+  public ValidationHandlerBuilder body(BodyProcessorFactory bodyProcessor) {
     return null;
   }
 

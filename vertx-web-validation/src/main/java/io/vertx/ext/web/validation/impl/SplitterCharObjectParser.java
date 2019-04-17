@@ -6,25 +6,19 @@ import io.vertx.ext.web.validation.ValueParser;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.regex.Pattern;
 
-public class SplitterCharObjectParser implements ValueParser {
+public class SplitterCharObjectParser extends BaseObjectParser {
 
   private String separator;
-  private Map<String, ValueParser> propertiesParsers;
-  private Map<Pattern, ValueParser> patternPropertiesParsers;
-  private ValueParser additionalPropertiesParsers;
 
-  public SplitterCharObjectParser(String separator, Map<String, ValueParser> propertiesParsers, Map<Pattern, ValueParser> patternPropertiesParsers, ValueParser additionalPropertiesParsers) {
+  public SplitterCharObjectParser(Map<String, ValueParser> propertiesParsers, Map<Pattern, ValueParser> patternPropertiesParsers, ValueParser additionalPropertiesParsers, String separator) {
+    super(propertiesParsers, patternPropertiesParsers, additionalPropertiesParsers);
     this.separator = separator;
-    this.propertiesParsers = propertiesParsers;
-    this.patternPropertiesParsers = patternPropertiesParsers;
-    this.additionalPropertiesParsers = additionalPropertiesParsers;
   }
 
   @Override
-  public Object parse(String serialized) throws MalformedValueException {
+  public JsonObject parse(String serialized) throws MalformedValueException {
     Map<String, Object> result = new HashMap<>();
     String[] values = serialized.split(separator, -1);
     // Key value pairs -> odd length not allowed
@@ -39,23 +33,5 @@ public class SplitterCharObjectParser implements ValueParser {
       }
     }
     return new JsonObject(result);
-  }
-
-  private Object parseField(String key, String serialized) {
-    if (serialized.isEmpty()) return null;
-    if (propertiesParsers != null && propertiesParsers.containsKey(key)) return propertiesParsers.get(key).parse(serialized);
-    if (patternPropertiesParsers != null) {
-      Optional<ValueParser> p = patternPropertiesParsers
-        .entrySet()
-        .stream()
-        .filter(e -> e.getKey().matcher(key).find())
-        .map(Map.Entry::getValue)
-        .findFirst();
-      if (p.isPresent())
-        return p.get().parse(serialized);
-    }
-    if (additionalPropertiesParsers != null)
-      return additionalPropertiesParsers.parse(serialized);
-    throw new MalformedValueException("Unrecognized key " + key);
   }
 }

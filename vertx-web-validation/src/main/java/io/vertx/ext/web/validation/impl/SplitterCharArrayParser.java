@@ -17,7 +17,7 @@ public class SplitterCharArrayParser implements ValueParser {
   }
 
   @Override
-  public Object parse(String serialized) throws MalformedValueException {
+  public JsonArray parse(String serialized) throws MalformedValueException {
     return Arrays
       .stream(serialized.split(separator, -1))
       .map(this::parseValue)

@@ -5,12 +5,12 @@ import io.vertx.ext.web.validation.ValueParser;
 
 import java.util.List;
 
-public class MultiValueParser {
+public class FormValueParser implements ValueParser<List<String>> {
 
   private boolean expectedArray;
-  private ValueParser innerValueParser;
+  private ValueParser<String> innerValueParser;
 
-  public MultiValueParser(boolean expectedArray, ValueParser innerValueParser) {
+  public FormValueParser(boolean expectedArray, ValueParser<String> innerValueParser) {
     this.expectedArray = expectedArray;
     this.innerValueParser = innerValueParser;
   }

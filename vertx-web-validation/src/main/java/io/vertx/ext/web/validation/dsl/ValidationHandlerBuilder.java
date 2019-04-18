@@ -4,6 +4,7 @@ import io.vertx.codegen.annotations.Fluent;
 import io.vertx.ext.json.schema.SchemaParser;
 import io.vertx.ext.web.validation.ParameterLocation;
 import io.vertx.ext.web.validation.ParameterProcessor;
+import io.vertx.ext.web.validation.RequestPredicate;
 import io.vertx.ext.web.validation.ValidationHandler;
 import io.vertx.ext.web.validation.dsl.impl.ValidationHandlerBuilderImpl;
 
@@ -34,7 +35,7 @@ public interface ValidationHandlerBuilder {
   ValidationHandlerBuilder body(BodyProcessorFactory bodyProcessor);
 
   @Fluent
-  ValidationHandlerBuilder bodyRequired(boolean bodyRequired);
+  ValidationHandlerBuilder predicate(RequestPredicate predicate);
 
   ValidationHandler build();
 

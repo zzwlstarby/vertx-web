@@ -5,6 +5,7 @@ import io.vertx.core.json.Json;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.impl.Utils;
 import io.vertx.ext.web.validation.BodyProcessor;
+import io.vertx.ext.web.validation.BodyProcessorException;
 import io.vertx.ext.web.validation.RequestParameter;
 import io.vertx.ext.web.validation.Validator;
 
@@ -24,6 +25,6 @@ public class JsonBodyProcessorImpl implements BodyProcessor {
   @Override
   public Future<RequestParameter> process(RoutingContext requestContext) {
     Object json = Json.decodeValue(requestContext.getBody());
-    return valueValidator.validate(json);
+    return valueValidator.validate(json).recover(err -> Future.failedFuture(BodyProcessorException.createValidationError("application/json", err)));
   }
 }

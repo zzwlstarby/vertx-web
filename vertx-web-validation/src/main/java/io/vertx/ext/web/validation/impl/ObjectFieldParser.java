@@ -1,7 +1,5 @@
 package io.vertx.ext.web.validation.impl;
 
-import io.vertx.codegen.annotations.Nullable;
-import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.validation.MalformedValueException;
 import io.vertx.ext.web.validation.ValueParser;
 
@@ -9,26 +7,23 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
-public abstract class BaseObjectParser implements ValueParser {
+public abstract class ObjectFieldParser<X> {
 
-  private Map<String, ValueParser> propertiesParsers;
-  private Map<Pattern, ValueParser> patternPropertiesParsers;
-  private ValueParser additionalPropertiesParsers;
+  private Map<String, ValueParser<X>> propertiesParsers;
+  private Map<Pattern, ValueParser<X>> patternPropertiesParsers;
+  private ValueParser<X> additionalPropertiesParsers;
 
-  public BaseObjectParser(Map<String, ValueParser> propertiesParsers, Map<Pattern, ValueParser> patternPropertiesParsers, ValueParser additionalPropertiesParsers) {
+  public ObjectFieldParser(Map<String, ValueParser<X>> propertiesParsers, Map<Pattern, ValueParser<X>> patternPropertiesParsers, ValueParser<X> additionalPropertiesParsers) {
     this.propertiesParsers = propertiesParsers;
     this.patternPropertiesParsers = patternPropertiesParsers;
     this.additionalPropertiesParsers = additionalPropertiesParsers;
   }
 
-  @Override
-  public abstract @Nullable JsonObject parse(String serialized) throws MalformedValueException;
-
-  Object parseField(String key, String serialized) {
-    if (serialized.isEmpty()) return null;
+  Object parseField(String key, X serialized) {
+    if (serialized == null || isSerializedEmpty(serialized)) return null;
     if (propertiesParsers != null && propertiesParsers.containsKey(key)) return propertiesParsers.get(key).parse(serialized);
     if (patternPropertiesParsers != null) {
-      Optional<ValueParser> p = patternPropertiesParsers
+      Optional<ValueParser<X>> p = patternPropertiesParsers
         .entrySet()
         .stream()
         .filter(e -> e.getKey().matcher(key).find())
@@ -41,5 +36,7 @@ public abstract class BaseObjectParser implements ValueParser {
       return additionalPropertiesParsers.parse(serialized);
     throw new MalformedValueException("Unrecognized key " + key);
   }
+
+  protected abstract boolean isSerializedEmpty(X serialized);
 
 }

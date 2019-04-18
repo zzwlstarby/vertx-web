@@ -4,27 +4,27 @@ import io.vertx.codegen.annotations.Nullable;
 import io.vertx.core.json.DecodeException;
 import io.vertx.core.json.Json;
 
-public interface ValueParser {
+public interface ValueParser<T> {
 
-  @Nullable Object parse(String serialized) throws MalformedValueException;
+  @Nullable Object parse(T serialized) throws MalformedValueException;
 
-  ValueParser NOOP_PARSER = v -> v;
-  ValueParser LONG_PARSER = l -> {
+  ValueParser<String> NOOP_PARSER = v -> v;
+  ValueParser<String> LONG_PARSER = l -> {
     try {
       return Long.parseLong(l);
     } catch (NumberFormatException e) {
       throw new MalformedValueException(e);
     }
   };
-  ValueParser DOUBLE_PARSER = d -> {
+  ValueParser<String> DOUBLE_PARSER = d -> {
     try {
       return Double.parseDouble(d);
     } catch (NumberFormatException e) {
       throw new MalformedValueException(e);
     }
   };
-  ValueParser BOOLEAN_PARSER = Boolean::parseBoolean;
-  ValueParser JSON_PARSER = j -> {
+  ValueParser<String> BOOLEAN_PARSER = Boolean::parseBoolean;
+  ValueParser<String> JSON_PARSER = j -> {
     try {
       return Json.decodeValue(j);
     } catch (DecodeException e) {

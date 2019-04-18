@@ -6,13 +6,14 @@ import io.vertx.ext.web.validation.ValueParser;
 
 import java.util.List;
 
-public class SplitterCharArrayItemByItemParser implements ValueParser {
+public class SplitterCharArrayItemByItemParser implements ValueParser<String> {
 
-  private ValueParser[] itemsParser;
-  private ValueParser additionalItemsParser;
-  private String separator;
+  private final ValueParser<String>[] itemsParser;
+  private final ValueParser<String> additionalItemsParser;
+  private final String separator;
 
-  public SplitterCharArrayItemByItemParser(List<ValueParser> itemsParser, ValueParser additionalItemsParser, String separator) {
+  @SuppressWarnings("unchecked")
+  public SplitterCharArrayItemByItemParser(List<ValueParser<String>> itemsParser, ValueParser<String> additionalItemsParser, String separator) {
     this.itemsParser = itemsParser.toArray(new ValueParser[0]);
     this.additionalItemsParser = additionalItemsParser;
     this.separator = separator;
@@ -31,7 +32,7 @@ public class SplitterCharArrayItemByItemParser implements ValueParser {
     return result;
   }
 
-  private Object parseValue(String v, ValueParser parser) {
+  private Object parseValue(String v, ValueParser<String> parser) {
     return v.isEmpty() ? null : parser.parse(v);
   }
 

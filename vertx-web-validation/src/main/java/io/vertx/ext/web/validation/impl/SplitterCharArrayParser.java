@@ -6,12 +6,12 @@ import io.vertx.ext.web.validation.ValueParser;
 
 import java.util.Arrays;
 
-public class SplitterCharArrayParser implements ValueParser {
+public class SplitterCharArrayParser implements ValueParser<String> {
 
-  private ValueParser itemsParser;
+  private ValueParser<String> itemsParser;
   private String separator;
 
-  public SplitterCharArrayParser(ValueParser itemsParser, String separator) {
+  public SplitterCharArrayParser(ValueParser<String> itemsParser, String separator) {
     this.itemsParser = itemsParser;
     this.separator = separator;
   }

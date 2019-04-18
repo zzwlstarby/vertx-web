@@ -8,7 +8,7 @@ import java.util.List;
 @FunctionalInterface
 public interface ArrayItemByItemParserFactory {
 
-  ValueParser newArrayParser(List<ValueParser> itemsParser, ValueParser additionalItemsParser);
+  ValueParser<String> newArrayParser(List<ValueParser<String>> itemsParser, ValueParser<String> additionalItemsParser);
 
   static ArrayItemByItemParserFactory commaSeparatedArrayParser() {
     return (itemsParser, additionalItemsParser) -> new SplitterCharArrayItemByItemParser(itemsParser, additionalItemsParser, ",");

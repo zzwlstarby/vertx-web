@@ -1,13 +1,12 @@
 package io.vertx.ext.web.validation.dsl;
 
+import io.vertx.ext.json.schema.Schema;
 import io.vertx.ext.json.schema.SchemaParser;
 import io.vertx.ext.json.schema.generic.dsl.ArraySchemaBuilder;
 import io.vertx.ext.json.schema.generic.dsl.ObjectSchemaBuilder;
 import io.vertx.ext.json.schema.generic.dsl.StringSchemaBuilder;
 import io.vertx.ext.web.validation.BodyProcessor;
-import io.vertx.ext.web.validation.impl.JsonBodyProcessorImpl;
-import io.vertx.ext.web.validation.impl.SchemaValidator;
-import io.vertx.ext.web.validation.impl.TextPlainBodyProcessorImpl;
+import io.vertx.ext.web.validation.impl.*;
 
 public interface BodyProcessorFactory {
 
@@ -26,11 +25,31 @@ public interface BodyProcessorFactory {
   }
 
   static BodyProcessorFactory formUrlEncoded(ObjectSchemaBuilder schemaBuilder) {
-
+    return parser -> {
+      Schema s = schemaBuilder.build(parser);
+      Object jsonSchema = s.getJson();
+      return new FormBodyProcessorImpl(
+        ValueParserInferenceUtils.infeerPropertiesFormValueParserForObjectSchema(jsonSchema),
+        ValueParserInferenceUtils.infeerPatternPropertiesFormValueParserForObjectSchema(jsonSchema),
+        ValueParserInferenceUtils.infeerAdditionalPropertiesFormValueParserForObjectSchema(jsonSchema),
+        "application/x-www-form-urlencoded",
+        new SchemaValidator(s)
+      );
+    };
   }
 
-  static BodyProcessorFactory multipartFormData(ObjectSchemaBuilder schemaBuilder) { return null; }
-
-  static BodyProcessorFactory multipartFileUpload(String fileName, String expectedContentType) { return null; }
+  static BodyProcessorFactory multipartFormData(ObjectSchemaBuilder schemaBuilder) {
+    return parser -> {
+      Schema s = schemaBuilder.build(parser);
+      Object jsonSchema = s.getJson();
+      return new FormBodyProcessorImpl(
+        ValueParserInferenceUtils.infeerPropertiesFormValueParserForObjectSchema(jsonSchema),
+        ValueParserInferenceUtils.infeerPatternPropertiesFormValueParserForObjectSchema(jsonSchema),
+        ValueParserInferenceUtils.infeerAdditionalPropertiesFormValueParserForObjectSchema(jsonSchema),
+        "multipart/form-data",
+        new SchemaValidator(s)
+      );
+    };
+  }
 
 }

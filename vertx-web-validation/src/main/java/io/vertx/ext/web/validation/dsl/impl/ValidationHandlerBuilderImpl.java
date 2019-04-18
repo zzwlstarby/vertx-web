@@ -3,6 +3,7 @@ package io.vertx.ext.web.validation.dsl.impl;
 import io.vertx.ext.json.schema.SchemaParser;
 import io.vertx.ext.web.validation.ParameterLocation;
 import io.vertx.ext.web.validation.ParameterProcessor;
+import io.vertx.ext.web.validation.RequestPredicate;
 import io.vertx.ext.web.validation.ValidationHandler;
 import io.vertx.ext.web.validation.dsl.BodyProcessorFactory;
 import io.vertx.ext.web.validation.dsl.SimpleParameterProcessorFactory;
@@ -58,7 +59,7 @@ public class ValidationHandlerBuilderImpl implements ValidationHandlerBuilder {
   }
 
   @Override
-  public ValidationHandlerBuilder bodyRequired(boolean bodyRequired) {
+  public ValidationHandlerBuilder predicate(RequestPredicate predicate) {
     return null;
   }
 

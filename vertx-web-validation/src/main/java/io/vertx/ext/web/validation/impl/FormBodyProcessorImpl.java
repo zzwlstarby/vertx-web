@@ -2,16 +2,23 @@ package io.vertx.ext.web.validation.impl;
 
 import io.vertx.core.Future;
 import io.vertx.core.MultiMap;
+import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
-import io.vertx.ext.web.validation.BodyProcessor;
-import io.vertx.ext.web.validation.RequestParameter;
+import io.vertx.ext.web.validation.*;
 
-public class FormBodyProcessorImpl implements BodyProcessor {
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Pattern;
 
-  private String contentType;
+public class FormBodyProcessorImpl extends ObjectFieldParser<List<String>> implements BodyProcessor {
 
-  public FormBodyProcessorImpl(String contentType) {
+  private final String contentType;
+  private final Validator valueValidator;
+
+  public FormBodyProcessorImpl(Map<String, ValueParser<List<String>>> propertiesParsers, Map<Pattern, ValueParser<List<String>>> patternPropertiesParsers, ValueParser<List<String>> additionalPropertiesParsers, String contentType, Validator valueValidator) {
+    super(propertiesParsers, patternPropertiesParsers, additionalPropertiesParsers);
     this.contentType = contentType;
+    this.valueValidator = valueValidator;
   }
 
   @Override
@@ -21,8 +28,20 @@ public class FormBodyProcessorImpl implements BodyProcessor {
 
   @Override
   public Future<RequestParameter> process(RoutingContext requestContext) {
-    MultiMap multiMap = requestContext.request().formAttributes();
-    //TODO exploded form attributes?!?!?!
+    try {
+      MultiMap multiMap = requestContext.request().formAttributes();
+      JsonObject object = new JsonObject();
+      for (String key : multiMap.names()) {
+        object.put(key, parseField(key, multiMap.getAll(key)));
+      }
+      return valueValidator.validate(object).recover(err -> Future.failedFuture(BodyProcessorException.createValidationError(contentType, err)));
+    } catch (MalformedValueException e) {
+      return Future.failedFuture(BodyProcessorException.createParsingError(this.contentType, e));
+    }
   }
 
+  @Override
+  protected boolean isSerializedEmpty(List<String> serialized) {
+    return false;
+  }
 }

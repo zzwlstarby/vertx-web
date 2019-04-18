@@ -6,6 +6,7 @@ import io.vertx.ext.web.validation.ValueParser;
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -13,7 +14,7 @@ import static io.vertx.ext.web.validation.ValueParser.*;
 
 public class ValueParserInferenceUtils {
 
-  protected static ValueParser infeerPrimitiveParser(Object schema) {
+  protected static ValueParser<String> infeerPrimitiveParser(Object schema) {
     if (schema == null) return null;
     if (!(schema instanceof JsonObject)) return NOOP_PARSER;
     String type = ((JsonObject) schema).getString("type");
@@ -29,40 +30,33 @@ public class ValueParserInferenceUtils {
     }
   }
 
-  public static Map<String, ValueParser> infeerPropertiesParsersForObjectSchema(Object s) {
-    JsonObject schema = (JsonObject) s;
-    return schema.containsKey("properties") ? schema.getJsonObject("properties")
-      .stream()
-      .map(e -> new SimpleImmutableEntry<>(e.getKey(), infeerPrimitiveParser(e.getValue())))
-      .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)) : null;
-
+  public static Map<String, ValueParser<String>> infeerPropertiesParsersForObjectSchema(Object s) {
+    return jsonObjectSchemaToMapOfValueParser(
+      s,
+      "properties",
+      str -> str,
+      ValueParserInferenceUtils::infeerPrimitiveParser
+    );
   }
 
-  public static Map<Pattern, ValueParser> infeerPatternPropertiesParsersForObjectSchema(Object s) {
-    JsonObject schema = (JsonObject) s;
-    return schema.containsKey("patternProperties") ? schema.getJsonObject("patternProperties")
-      .stream()
-      .map(e -> new SimpleImmutableEntry<>(Pattern.compile(e.getKey()), infeerPrimitiveParser(e.getValue())))
-      .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)) : null;
+  public static Map<Pattern, ValueParser<String>> infeerPatternPropertiesParsersForObjectSchema(Object s) {
+    return jsonObjectSchemaToMapOfValueParser(
+      s,
+      "properties",
+      Pattern::compile,
+      ValueParserInferenceUtils::infeerPrimitiveParser
+    );
   }
 
-  public static ValueParser infeerAdditionalPropertiesParserForObjectSchema(Object s) {
-    try {
-      return infeerPrimitiveParser(((JsonObject)s).getJsonObject("additionalProperties"));
-    } catch (ClassCastException | NullPointerException e) {
-      return null;
-    }
+  public static ValueParser<String> infeerAdditionalPropertiesParserForObjectSchema(Object s) {
+    return infeerPrimitiveParserFromSchemaProperty(s, "additionalProperties");
   }
 
-  public static ValueParser infeerItemsParserForArraySchema(Object s) {
-    try {
-      return infeerPrimitiveParser(((JsonObject)s).getJsonObject("items"));
-    } catch (ClassCastException | NullPointerException e) {
-      return null;
-    }
+  public static ValueParser<String> infeerItemsParserForArraySchema(Object s) {
+    return infeerPrimitiveParserFromSchemaProperty(s, "items");
   }
 
-  public static List<ValueParser> infeerItemByItemParsersForArraySchema(Object s) {
+  public static List<ValueParser<String>> infeerItemByItemParsersForArraySchema(Object s) {
     try {
       return ((JsonObject) s)
         .getJsonArray("items")
@@ -74,12 +68,57 @@ public class ValueParserInferenceUtils {
     }
   }
 
-  public static ValueParser infeerAdditionalItemsParserForArraySchema(Object s) {
+  public static ValueParser<String> infeerAdditionalItemsParserForArraySchema(Object s) {
+    return infeerPrimitiveParserFromSchemaProperty(s, "additionalItems");
+  }
+
+  private static ValueParser<String> infeerPrimitiveParserFromSchemaProperty(Object s, String keySchemaProp) {
     try {
-      return infeerPrimitiveParser(((JsonObject)s).getJsonObject("additionalItems"));
+      return infeerPrimitiveParser(((JsonObject)s).getJsonObject(keySchemaProp));
     } catch (ClassCastException | NullPointerException e) {
       return null;
     }
+  }
+
+  public static Map<String, ValueParser<List<String>>> infeerPropertiesFormValueParserForObjectSchema(Object s) {
+    return jsonObjectSchemaToMapOfValueParser(s, "properties", Function.identity(), ValueParserInferenceUtils::mapSchemaToFormValueParser);
+  }
+
+  public static Map<Pattern, ValueParser<List<String>>> infeerPatternPropertiesFormValueParserForObjectSchema(Object s) {
+    return jsonObjectSchemaToMapOfValueParser(s, "patternProperties", Pattern::compile, ValueParserInferenceUtils::mapSchemaToFormValueParser);
+  }
+
+  public static ValueParser<List<String>> infeerAdditionalPropertiesFormValueParserForObjectSchema(Object s) {
+    try {
+      return mapSchemaToFormValueParser(((JsonObject)s).getJsonObject("additionalProperties"));
+    } catch (ClassCastException | NullPointerException e) {
+      return null;
+    }
+  }
+
+  private static <K, V> Map<K, V> jsonObjectSchemaToMapOfValueParser(Object s, String keyword, Function<String, K> keyMapper, Function<Object, V> valueMapper) {
+    try {
+      JsonObject schema = (JsonObject) s;
+      return schema.getJsonObject(keyword)
+        .stream()
+        .map(e -> new SimpleImmutableEntry<>(
+            keyMapper.apply(e.getKey()),
+            valueMapper.apply(e.getValue())
+          )
+        )
+        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    } catch (ClassCastException | NullPointerException e) {
+      return null;
+    }
+  }
+
+  private static FormValueParser mapSchemaToFormValueParser(Object o) {
+    if (!(o instanceof JsonObject))
+      return new FormValueParser(false, NOOP_PARSER);
+    JsonObject inner = (JsonObject) o;
+    if ("array".equals(inner.getString("type")))
+      return new FormValueParser(true, infeerPrimitiveParser(inner.getJsonObject("items")));
+    return new FormValueParser(false, infeerPrimitiveParser(inner));
   }
 
 }

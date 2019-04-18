@@ -8,11 +8,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-public class SplitterCharObjectParser extends BaseObjectParser {
+public class SplitterCharObjectFieldParser extends ObjectFieldParser<String> implements ValueParser<String> {
 
   private String separator;
 
-  public SplitterCharObjectParser(Map<String, ValueParser> propertiesParsers, Map<Pattern, ValueParser> patternPropertiesParsers, ValueParser additionalPropertiesParsers, String separator) {
+  public SplitterCharObjectFieldParser(Map<String, ValueParser<String>> propertiesParsers, Map<Pattern, ValueParser<String>> patternPropertiesParsers, ValueParser<String> additionalPropertiesParsers, String separator) {
     super(propertiesParsers, patternPropertiesParsers, additionalPropertiesParsers);
     this.separator = separator;
   }
@@ -33,5 +33,10 @@ public class SplitterCharObjectParser extends BaseObjectParser {
       }
     }
     return new JsonObject(result);
+  }
+
+  @Override
+  protected boolean isSerializedEmpty(String serialized) {
+    return serialized.isEmpty();
   }
 }

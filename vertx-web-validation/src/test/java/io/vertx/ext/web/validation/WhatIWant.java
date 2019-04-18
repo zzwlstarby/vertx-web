@@ -2,6 +2,7 @@ package io.vertx.ext.web.validation;
 
 import io.vertx.ext.json.schema.SchemaParser;
 import io.vertx.ext.web.validation.dsl.ArrayParserFactory;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static io.vertx.ext.json.schema.draft7.dsl.Keywords.maximum;
@@ -14,6 +15,7 @@ import static io.vertx.ext.web.validation.dsl.StyledParameterProcessorFactory.se
 public class WhatIWant {
 
   @Test
+  @Ignore
   public void example() {
     SchemaParser parser = null;
 

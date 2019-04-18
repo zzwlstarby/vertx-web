@@ -3,7 +3,6 @@ package io.vertx.ext.web.validation.impl;
 import io.vertx.core.Vertx;
 import io.vertx.ext.json.schema.*;
 import io.vertx.ext.json.schema.draft7.Draft7SchemaParser;
-import io.vertx.ext.json.schema.generic.dsl.ObjectSchemaBuilder;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.validation.BodyProcessor;
 import io.vertx.ext.web.validation.BodyProcessorException;
@@ -45,11 +44,9 @@ class JsonBodyProcessorImplTest {
 
   @Test
   public void testJsonObject(VertxTestContext testContext) {
-    ObjectSchemaBuilder schemaBuilder = TestSchemas.SAMPLE_OBJECT_SCHEMA_BUILDER;
-
     when(mockedContext.getBody()).thenReturn(TestSchemas.VALID_OBJECT.toBuffer());
 
-    BodyProcessor processor = BodyProcessorFactory.json(schemaBuilder).create(parser);
+    BodyProcessor processor = BodyProcessorFactory.json(TestSchemas.SAMPLE_OBJECT_SCHEMA_BUILDER).create(parser);
 
     processor.process(mockedContext).setHandler(testContext.succeeding(rp -> {
       testContext.verify(() -> {
@@ -61,7 +58,6 @@ class JsonBodyProcessorImplTest {
       });
       testContext.completeNow();
     }));
-
   }
 
   @Test
@@ -79,7 +75,40 @@ class JsonBodyProcessorImplTest {
       });
       testContext.completeNow();
     }));
-
   }
 
+  @Test
+  public void testJsonArray(VertxTestContext testContext) {
+    when(mockedContext.getBody()).thenReturn(TestSchemas.VALID_ARRAY.toBuffer());
+
+    BodyProcessor processor = BodyProcessorFactory.json(TestSchemas.SAMPLE_ARRAY_SCHEMA_BUILDER).create(parser);
+
+    processor.process(mockedContext).setHandler(testContext.succeeding(rp -> {
+      testContext.verify(() -> {
+        assertThat(rp.isJsonArray()).isTrue();
+        assertThat(rp.getJsonArray())
+          .isEqualTo(
+            TestSchemas.VALID_ARRAY
+          );
+      });
+      testContext.completeNow();
+    }));
+  }
+
+  @Test
+  public void testInvalidJsonArray(VertxTestContext testContext) {
+    when(mockedContext.getBody()).thenReturn(TestSchemas.INVALID_ARRAY.toBuffer());
+
+    BodyProcessor processor = BodyProcessorFactory.json(TestSchemas.SAMPLE_ARRAY_SCHEMA_BUILDER).create(parser);
+
+    processor.process(mockedContext).setHandler(testContext.failing(err -> {
+      testContext.verify(() -> {
+        assertThat(err)
+          .isInstanceOf(BodyProcessorException.class)
+          .hasFieldOrPropertyWithValue("contentType", "application/json")
+          .hasCauseInstanceOf(ValidationException.class);
+      });
+      testContext.completeNow();
+    }));
+  }
 }

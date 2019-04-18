@@ -6,13 +6,12 @@ import io.vertx.ext.web.validation.ValueParser;
 
 import java.util.Arrays;
 
-public class SplitterCharArrayParser implements ValueParser<String> {
+public class SplitterCharArrayParser extends ArrayParser<String> implements ValueParser<String> {
 
-  private ValueParser<String> itemsParser;
   private String separator;
 
   public SplitterCharArrayParser(ValueParser<String> itemsParser, String separator) {
-    this.itemsParser = itemsParser;
+    super(itemsParser);
     this.separator = separator;
   }
 
@@ -24,8 +23,8 @@ public class SplitterCharArrayParser implements ValueParser<String> {
       .reduce(new JsonArray(), JsonArray::add, JsonArray::addAll);
   }
 
-  private Object parseValue(String v) {
-    return v.isEmpty() ? null : itemsParser.parse(v);
+  @Override
+  protected boolean isSerializedEmpty(String serialized) {
+    return serialized.isEmpty();
   }
-
 }

@@ -23,7 +23,11 @@ public interface ValueParser<T> {
       throw new MalformedValueException(e);
     }
   };
-  ValueParser<String> BOOLEAN_PARSER = Boolean::parseBoolean;
+  ValueParser<String> BOOLEAN_PARSER = s -> {
+    if (s.equalsIgnoreCase("true")) return true;
+    if (s.equalsIgnoreCase("false")) return false;
+    throw new MalformedValueException("Value " + s + " should be true or false");
+  };
   ValueParser<String> JSON_PARSER = j -> {
     try {
       return Json.decodeValue(j);

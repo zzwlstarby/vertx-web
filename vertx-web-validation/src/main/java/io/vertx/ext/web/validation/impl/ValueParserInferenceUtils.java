@@ -42,7 +42,7 @@ public class ValueParserInferenceUtils {
   public static Map<Pattern, ValueParser<String>> infeerPatternPropertiesParsersForObjectSchema(Object s) {
     return jsonObjectSchemaToMapOfValueParser(
       s,
-      "properties",
+      "patternProperties",
       Pattern::compile,
       ValueParserInferenceUtils::infeerPrimitiveParser
     );
@@ -56,7 +56,7 @@ public class ValueParserInferenceUtils {
     return infeerPrimitiveParserFromSchemaProperty(s, "items");
   }
 
-  public static List<ValueParser<String>> infeerItemByItemParsersForArraySchema(Object s) {
+  public static List<ValueParser<String>> infeerTupleParsersForArraySchema(Object s) {
     try {
       return ((JsonObject) s)
         .getJsonArray("items")

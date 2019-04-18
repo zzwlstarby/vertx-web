@@ -1,25 +1,24 @@
 package io.vertx.ext.web.validation.impl;
 
-import io.vertx.ext.web.validation.MalformedValueException;
 import io.vertx.ext.web.validation.ValueParser;
 
 import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
-public abstract class ObjectFieldParser<X> {
+public abstract class ObjectParser<X> {
 
   private Map<String, ValueParser<X>> propertiesParsers;
   private Map<Pattern, ValueParser<X>> patternPropertiesParsers;
   private ValueParser<X> additionalPropertiesParsers;
 
-  public ObjectFieldParser(Map<String, ValueParser<X>> propertiesParsers, Map<Pattern, ValueParser<X>> patternPropertiesParsers, ValueParser<X> additionalPropertiesParsers) {
+  public ObjectParser(Map<String, ValueParser<X>> propertiesParsers, Map<Pattern, ValueParser<X>> patternPropertiesParsers, ValueParser<X> additionalPropertiesParsers) {
     this.propertiesParsers = propertiesParsers;
     this.patternPropertiesParsers = patternPropertiesParsers;
     this.additionalPropertiesParsers = additionalPropertiesParsers;
   }
 
-  Object parseField(String key, X serialized) {
+  protected Object parseField(String key, X serialized) {
     if (serialized == null || isSerializedEmpty(serialized)) return null;
     if (propertiesParsers != null && propertiesParsers.containsKey(key)) return propertiesParsers.get(key).parse(serialized);
     if (patternPropertiesParsers != null) {
@@ -34,7 +33,7 @@ public abstract class ObjectFieldParser<X> {
     }
     if (additionalPropertiesParsers != null)
       return additionalPropertiesParsers.parse(serialized);
-    throw new MalformedValueException("Unrecognized key " + key);
+    return null;
   }
 
   protected abstract boolean isSerializedEmpty(X serialized);

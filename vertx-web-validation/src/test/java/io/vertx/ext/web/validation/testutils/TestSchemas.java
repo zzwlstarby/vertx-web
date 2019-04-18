@@ -2,10 +2,13 @@ package io.vertx.ext.web.validation.testutils;
 
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import io.vertx.ext.json.schema.generic.dsl.ArraySchemaBuilder;
 import io.vertx.ext.json.schema.generic.dsl.ObjectSchemaBuilder;
+import io.vertx.ext.json.schema.generic.dsl.StringSchemaBuilder;
 
 import java.util.regex.Pattern;
 
+import static io.vertx.ext.json.schema.draft7.dsl.Keywords.maxLength;
 import static io.vertx.ext.json.schema.draft7.dsl.Schemas.*;
 
 public class TestSchemas {
@@ -33,5 +36,28 @@ public class TestSchemas {
       .put("someIntegers", new JsonArray().add(1).add(2))
       .put("oneInteger", 3)
       .put("aBoolean", "bla");
+
+  public static ArraySchemaBuilder SAMPLE_ARRAY_SCHEMA_BUILDER =
+    arraySchema()
+      .items(stringSchema());
+
+  public static JsonArray VALID_ARRAY =
+    new JsonArray()
+      .add("")
+      .add("bla");
+
+  public static JsonArray INVALID_ARRAY =
+    new JsonArray()
+      .add("")
+      .add("bla")
+      .add(1);
+
+  public static StringSchemaBuilder SAMPLE_STRING_SCHEMA_BUILDER =
+    stringSchema()
+      .with(maxLength(5));
+
+  public static String VALID_STRING = "aaa";
+
+  public static String INVALID_STRING = "aaaaaa";
 
 }

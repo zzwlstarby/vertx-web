@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-public class FormBodyProcessorImpl extends ObjectFieldParser<List<String>> implements BodyProcessor {
+public class FormBodyProcessorImpl extends ObjectParser<List<String>> implements BodyProcessor {
 
   private final String contentType;
   private final Validator valueValidator;

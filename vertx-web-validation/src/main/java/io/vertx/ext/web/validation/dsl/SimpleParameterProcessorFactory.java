@@ -61,21 +61,19 @@ public interface SimpleParameterProcessorFactory {
   static SimpleParameterProcessorFactory param(String parameterName, ArraySchemaBuilder schemaBuilder) {
     return ValidationDSLUtils.createArrayParamFactory(
       parameterName,
-      ArrayItemByItemParserFactory.commaSeparatedArrayParser(),
       ArrayParserFactory.commaSeparatedArrayParser(),
       schemaBuilder,
       false
-    );
+    )::apply;
   }
 
   static SimpleParameterProcessorFactory optionalParam(String parameterName, ArraySchemaBuilder schemaBuilder) {
     return ValidationDSLUtils.createArrayParamFactory(
       parameterName,
-      ArrayItemByItemParserFactory.commaSeparatedArrayParser(),
       ArrayParserFactory.commaSeparatedArrayParser(),
       schemaBuilder,
       true
-    );
+    )::apply;
   }
 
   static SimpleParameterProcessorFactory param(String parameterName, ObjectSchemaBuilder schemaBuilder) {
@@ -84,7 +82,7 @@ public interface SimpleParameterProcessorFactory {
       ObjectParserFactory.commaSeparatedObjectParser(),
       schemaBuilder,
       false
-    );
+    )::apply;
   }
 
   static SimpleParameterProcessorFactory optionalParam(String parameterName, ObjectSchemaBuilder schemaBuilder) {
@@ -93,7 +91,7 @@ public interface SimpleParameterProcessorFactory {
       ObjectParserFactory.commaSeparatedObjectParser(),
       schemaBuilder,
       true
-    );
+    )::apply;
   }
 
 }

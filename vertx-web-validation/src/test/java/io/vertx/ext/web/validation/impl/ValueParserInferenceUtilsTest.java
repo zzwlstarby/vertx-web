@@ -64,8 +64,16 @@ public class ValueParserInferenceUtilsTest {
   }
 
   @Test
-  public void testBooleanAdditionalPropertiesObjectInference() {
+  public void testAdditionalPropertiesObjectInference() {
     JsonObject schema = new JsonObject().put("additionalProperties", true);
+
+    assertThat(ValueParserInferenceUtils.infeerAdditionalPropertiesParserForObjectSchema(schema))
+      .isSameAs(ValueParser.NOOP_PARSER);
+  }
+
+  @Test
+  public void testNoAdditionalPropertiesObjectInference() {
+    JsonObject schema = new JsonObject().put("additionalProperties", false);
 
     assertThat(ValueParserInferenceUtils.infeerAdditionalPropertiesParserForObjectSchema(schema))
       .isNull();
@@ -89,13 +97,29 @@ public class ValueParserInferenceUtilsTest {
       .additionalItems(booleanSchema())
       .build(parser);
 
-    assertThat(ValueParserInferenceUtils.infeerItemByItemParsersForArraySchema(s.getJson()))
+    assertThat(ValueParserInferenceUtils.infeerTupleParsersForArraySchema(s.getJson()))
       .containsExactly(
         ValueParser.LONG_PARSER,
         ValueParser.DOUBLE_PARSER
       );
     assertThat(ValueParserInferenceUtils.infeerAdditionalItemsParserForArraySchema(s.getJson()))
       .isSameAs(ValueParser.BOOLEAN_PARSER);
+  }
+
+  @Test
+  public void testAdditionalItemsInference() {
+    JsonObject schema = new JsonObject().put("additionalItems", true);
+
+    assertThat(ValueParserInferenceUtils.infeerAdditionalPropertiesParserForObjectSchema(schema))
+      .isSameAs(ValueParser.NOOP_PARSER);
+  }
+
+  @Test
+  public void testNoAdditionalItemsInference() {
+    JsonObject schema = new JsonObject().put("additionalItems", false);
+
+    assertThat(ValueParserInferenceUtils.infeerAdditionalPropertiesParserForObjectSchema(schema))
+      .isNull();
   }
 
 }

@@ -2,40 +2,45 @@ package io.vertx.ext.web.validation.impl;
 
 import io.vertx.ext.web.validation.ValueParser;
 
+import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Map;
-import java.util.Optional;
 import java.util.regex.Pattern;
 
 public abstract class ObjectParser<X> {
 
   private Map<String, ValueParser<X>> propertiesParsers;
   private Map<Pattern, ValueParser<X>> patternPropertiesParsers;
-  private ValueParser<X> additionalPropertiesParsers;
+  protected ValueParser<X> additionalPropertiesParser;
 
-  public ObjectParser(Map<String, ValueParser<X>> propertiesParsers, Map<Pattern, ValueParser<X>> patternPropertiesParsers, ValueParser<X> additionalPropertiesParsers) {
+  public ObjectParser(Map<String, ValueParser<X>> propertiesParsers, Map<Pattern, ValueParser<X>> patternPropertiesParsers, ValueParser<X> additionalPropertiesParser) {
     this.propertiesParsers = propertiesParsers;
     this.patternPropertiesParsers = patternPropertiesParsers;
-    this.additionalPropertiesParsers = additionalPropertiesParsers;
+    this.additionalPropertiesParser = additionalPropertiesParser;
   }
 
-  protected Object parseField(String key, X serialized) {
-    if (serialized == null || isSerializedEmpty(serialized)) return null;
-    if (propertiesParsers != null && propertiesParsers.containsKey(key)) return propertiesParsers.get(key).parse(serialized);
-    if (patternPropertiesParsers != null) {
-      Optional<ValueParser<X>> p = patternPropertiesParsers
+  protected Map.Entry<String, Object> parseField(String key, X serialized) {
+    ValueParser<X> valueParser = null;
+    if (propertiesParsers != null && propertiesParsers.containsKey(key))
+      valueParser = propertiesParsers.get(key);
+    else if (patternPropertiesParsers != null) {
+      valueParser = patternPropertiesParsers
         .entrySet()
         .stream()
         .filter(e -> e.getKey().matcher(key).find())
         .map(Map.Entry::getValue)
-        .findFirst();
-      if (p.isPresent())
-        return p.get().parse(serialized);
+        .findFirst()
+        .orElse(null);
     }
-    if (additionalPropertiesParsers != null)
-      return additionalPropertiesParsers.parse(serialized);
-    return null;
+    if (valueParser == null) {
+      valueParser = getAdditionalPropertiesParserIfRequired();
+    }
+    if (valueParser == null) return null;
+    if (mustNullateValue(serialized, valueParser)) return new SimpleImmutableEntry<>(key, null);
+    return new SimpleImmutableEntry<>(key, valueParser.parse(serialized));
   }
 
-  protected abstract boolean isSerializedEmpty(X serialized);
+  protected abstract ValueParser<X> getAdditionalPropertiesParserIfRequired();
+
+  protected abstract boolean mustNullateValue(X serialized, ValueParser<X> parser);
 
 }

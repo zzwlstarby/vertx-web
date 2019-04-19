@@ -24,7 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 @ExtendWith(VertxExtension.class)
-public class ExplodedObjectValueParameterParserTest {
+public class DeepObjectValueParameterParserTest {
 
   SchemaRouter router;
   SchemaParser parser;
@@ -37,7 +37,7 @@ public class ExplodedObjectValueParameterParserTest {
 
   @Test
   public void testValid() {
-    ExplodedObjectValueParameterParser parser = new ExplodedObjectValueParameterParser(
+    DeepObjectValueParameterParser parser = new DeepObjectValueParameterParser(
       TestParsers.SAMPLE_PROPERTIES_PARSERS,
       TestParsers.SAMPLE_PATTERN_PROPERTIES_PARSERS,
       ValueParser.NOOP_PARSER,
@@ -45,11 +45,13 @@ public class ExplodedObjectValueParameterParserTest {
     );
 
     Map<String, List<String>> map = new HashMap<>();
-    map.put("prop1", singletonList("1"));
-    map.put("prop2", singletonList("2.1"));
-    map.put("prop3", singletonList("aaa"));
-    map.put("prop4", singletonList("true"));
-    map.put("other", singletonList("hello"));
+    map.put("bla[prop1]", singletonList("1"));
+    map.put("bla[prop2]", singletonList("2.1"));
+    map.put("bla[prop3]", singletonList("aaa"));
+    map.put("bla[prop4]", singletonList("true"));
+    map.put("bla[other]", singletonList("hello"));
+    map.put("other", singletonList("francesco"));
+    map.put("other[bla]", singletonList("world"));
 
     Object result = parser.parseParameter(map);
 
@@ -60,12 +62,12 @@ public class ExplodedObjectValueParameterParserTest {
       );
 
     assertThat(map)
-      .isEmpty();
+      .containsKeys("other", "other[bla]");
   }
 
   @Test
   public void testNoAdditionalProperties() {
-    ExplodedObjectValueParameterParser parser = new ExplodedObjectValueParameterParser(
+    DeepObjectValueParameterParser parser = new DeepObjectValueParameterParser(
       TestParsers.SAMPLE_PROPERTIES_PARSERS,
       TestParsers.SAMPLE_PATTERN_PROPERTIES_PARSERS,
       null,
@@ -73,27 +75,29 @@ public class ExplodedObjectValueParameterParserTest {
     );
 
     Map<String, List<String>> map = new HashMap<>();
-    map.put("prop1", singletonList("1"));
-    map.put("prop2", singletonList("2.1"));
-    map.put("prop3", singletonList("aaa"));
-    map.put("prop4", singletonList("true"));
-    map.put("other", singletonList("hello"));
+    map.put("bla[prop1]", singletonList("1"));
+    map.put("bla[prop2]", singletonList("2.1"));
+    map.put("bla[prop3]", singletonList("aaa"));
+    map.put("bla[prop4]", singletonList("true"));
+    map.put("bla[other]", singletonList("hello"));
+    map.put("other", singletonList("francesco"));
+    map.put("other[bla]", singletonList("world"));
 
     Object result = parser.parseParameter(map);
 
     assertThat(result)
       .isInstanceOfSatisfying(JsonObject.class, jo ->
         assertThat(jo)
-          .isEqualTo(TestParsers.SAMPLE_OBJECT)
+          .isEqualTo(TestParsers.SAMPLE_OBJECT.copy().put("other", "hello"))
       );
 
     assertThat(map)
-      .containsKey("other");
+      .containsKeys("other", "other[bla]");
   }
 
   @Test
   public void testNull() {
-    ExplodedObjectValueParameterParser parser = new ExplodedObjectValueParameterParser(
+    DeepObjectValueParameterParser parser = new DeepObjectValueParameterParser(
       TestParsers.SAMPLE_PROPERTIES_PARSERS,
       TestParsers.SAMPLE_PATTERN_PROPERTIES_PARSERS,
       ValueParser.NOOP_PARSER,
@@ -101,17 +105,18 @@ public class ExplodedObjectValueParameterParserTest {
     );
 
     Map<String, List<String>> map = new HashMap<>();
-    map.put("prop1", singletonList("1"));
-    map.put("prop2", singletonList(""));
-    map.put("prop3", singletonList(null));
-    map.put("prop4", singletonList("true"));
+    map.put("bla[prop1]", singletonList("1"));
+    map.put("bla[prop2]", singletonList(""));
+    map.put("bla[prop3]", singletonList(null));
+    map.put("bla[prop4]", singletonList("true"));
+    map.put("bla[other]", singletonList("hello"));
 
     Object result = parser.parseParameter(map);
 
     assertThat(result)
       .isInstanceOfSatisfying(JsonObject.class, jo ->
         assertThat(jo)
-          .isEqualTo(TestParsers.SAMPLE_OBJECT.copy().putNull("prop2").putNull("prop3"))
+          .isEqualTo(TestParsers.SAMPLE_OBJECT.copy().put("other", "hello").putNull("prop2").putNull("prop3"))
       );
 
     assertThat(map)
@@ -120,7 +125,7 @@ public class ExplodedObjectValueParameterParserTest {
 
   @Test
   public void testEmptyString() {
-    ExplodedObjectValueParameterParser parser = new ExplodedObjectValueParameterParser(
+    DeepObjectValueParameterParser parser = new DeepObjectValueParameterParser(
       TestParsers.SAMPLE_PROPERTIES_PARSERS,
       TestParsers.SAMPLE_PATTERN_PROPERTIES_PARSERS,
       ValueParser.NOOP_PARSER,
@@ -128,18 +133,18 @@ public class ExplodedObjectValueParameterParserTest {
     );
 
     Map<String, List<String>> map = new HashMap<>();
-    map.put("prop1", singletonList("1"));
-    map.put("prop2", singletonList(""));
-    map.put("prop3", singletonList(""));
-    map.put("prop4", singletonList("true"));
-    map.put("other", singletonList("hello"));
+    map.put("bla[prop1]", singletonList("1"));
+    map.put("bla[prop2]", singletonList("2.1"));
+    map.put("bla[prop3]", singletonList(""));
+    map.put("bla[prop4]", singletonList("true"));
+    map.put("bla[other]", singletonList("hello"));
 
     Object result = parser.parseParameter(map);
 
     assertThat(result)
       .isInstanceOfSatisfying(JsonObject.class, jo ->
         assertThat(jo)
-          .isEqualTo(TestParsers.SAMPLE_OBJECT.copy().putNull("prop2").put("prop3", "").put("other", "hello"))
+          .isEqualTo(TestParsers.SAMPLE_OBJECT.copy().put("other", "hello").put("prop3", ""))
       );
 
     assertThat(map)
@@ -148,7 +153,7 @@ public class ExplodedObjectValueParameterParserTest {
 
   @Test
   public void testMissingProp() {
-    ExplodedObjectValueParameterParser parser = new ExplodedObjectValueParameterParser(
+    DeepObjectValueParameterParser parser = new DeepObjectValueParameterParser(
       TestParsers.SAMPLE_PROPERTIES_PARSERS,
       TestParsers.SAMPLE_PATTERN_PROPERTIES_PARSERS,
       ValueParser.NOOP_PARSER,
@@ -156,16 +161,14 @@ public class ExplodedObjectValueParameterParserTest {
     );
 
     Map<String, List<String>> map = new HashMap<>();
-    map.put("prop1", singletonList("1"));
-    map.put("prop3", singletonList("aaa"));
-    map.put("other", singletonList("hello"));
+    map.put("bla[prop1]", singletonList("1"));
+    map.put("bla[prop3]", singletonList("aaa"));
 
     Object result = parser.parseParameter(map);
 
     JsonObject expected = TestParsers.SAMPLE_OBJECT.copy();
     expected.remove("prop2");
     expected.remove("prop4");
-    expected.put("other", "hello");
 
     assertThat(result)
       .isInstanceOfSatisfying(JsonObject.class, jo ->
@@ -179,7 +182,7 @@ public class ExplodedObjectValueParameterParserTest {
 
   @Test
   public void testInvalid() {
-    ExplodedObjectValueParameterParser parser = new ExplodedObjectValueParameterParser(
+    DeepObjectValueParameterParser parser = new DeepObjectValueParameterParser(
       TestParsers.SAMPLE_PROPERTIES_PARSERS,
       TestParsers.SAMPLE_PATTERN_PROPERTIES_PARSERS,
       ValueParser.NOOP_PARSER,
@@ -187,11 +190,13 @@ public class ExplodedObjectValueParameterParserTest {
     );
 
     Map<String, List<String>> map = new HashMap<>();
-    map.put("prop1", singletonList("1"));
-    map.put("prop2", singletonList("2.1"));
-    map.put("prop3", singletonList("aaa"));
-    map.put("prop4", singletonList("hello"));
-    map.put("other", singletonList("hello"));
+    map.put("bla[prop1]", singletonList("1"));
+    map.put("bla[prop2]", singletonList("bla"));
+    map.put("bla[prop3]", singletonList("aaa"));
+    map.put("bla[prop4]", singletonList("true"));
+    map.put("bla[other]", singletonList("hello"));
+    map.put("other", singletonList("francesco"));
+    map.put("other[bla]", singletonList("world"));
 
     assertThatExceptionOfType(MalformedValueException.class)
       .isThrownBy(() -> parser.parseParameter(map));

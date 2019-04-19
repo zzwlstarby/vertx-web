@@ -55,6 +55,29 @@ public class ExplodedArrayValueParameterParserTest {
   }
 
   @Test
+  public void testNull() {
+    ExplodedArrayValueParameterParser parser = new ExplodedArrayValueParameterParser(
+      ValueParser.BOOLEAN_PARSER, "bla"
+    );
+
+    Map<String, List<String>> map = new HashMap<>();
+    map.put("bla", Arrays.asList("true", "", null, "false"));
+    map.put("other", Collections.singletonList("aaa"));
+
+    Object result = parser.parseParameter(map);
+
+    assertThat(result)
+      .isInstanceOfSatisfying(JsonArray.class, ja ->
+        assertThat(ja)
+          .containsOnly(true, null, null, false)
+      );
+
+    assertThat(map)
+      .containsKey("other")
+      .doesNotContainKey("bla");
+  }
+
+  @Test
   public void testInvalid() {
     ExplodedArrayValueParameterParser parser = new ExplodedArrayValueParameterParser(
       ValueParser.BOOLEAN_PARSER, "bla"

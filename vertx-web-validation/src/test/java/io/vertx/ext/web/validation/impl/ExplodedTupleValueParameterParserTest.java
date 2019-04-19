@@ -60,7 +60,7 @@ public class ExplodedTupleValueParameterParserTest {
   }
 
   @Test
-  public void testNoAdditionalProperties() {
+  public void testNoAdditionalItems() {
     ExplodedTupleValueParameterParser parser = new ExplodedTupleValueParameterParser(
       TestParsers.SAMPLE_TUPLE_ITEMS_PARSERS, null, "bla"
     );
@@ -75,6 +75,29 @@ public class ExplodedTupleValueParameterParserTest {
       .isInstanceOfSatisfying(JsonArray.class, ja ->
         assertThat(ja)
           .isEqualTo(TestParsers.SAMPLE_TUPLE.copy().add("true"))
+      );
+
+    assertThat(map)
+      .containsKey("other")
+      .doesNotContainKey("bla");
+  }
+
+  @Test
+  public void testNullAndEmptyString() {
+    ExplodedTupleValueParameterParser parser = new ExplodedTupleValueParameterParser(
+      TestParsers.SAMPLE_TUPLE_ITEMS_PARSERS, ValueParser.BOOLEAN_PARSER, "bla"
+    );
+
+    Map<String, List<String>> map = new HashMap<>();
+    map.put("bla", Lists.newArrayList("", "", "2", "true"));
+    map.put("other", Collections.singletonList("aaa"));
+
+    Object result = parser.parseParameter(map);
+
+    assertThat(result)
+      .isInstanceOfSatisfying(JsonArray.class, ja ->
+        assertThat(ja)
+          .isEqualTo(new JsonArray().addNull().add("").add(2d).add(true))
       );
 
     assertThat(map)

@@ -91,4 +91,40 @@ public class SplitterCharObjectValueParserTest {
     assertThatExceptionOfType(MalformedValueException.class)
       .isThrownBy(() -> parser.parse("prop1,bla"));
   }
+
+  @Test
+  public void testMissingProps() {
+    SplitterCharObjectParser parser = new SplitterCharObjectParser(
+      TestParsers.SAMPLE_PROPERTIES_PARSERS,
+      TestParsers.SAMPLE_PATTERN_PROPERTIES_PARSERS,
+      null,
+      ","
+    );
+
+    Object result = parser.parse("prop1,1");
+
+    assertThat(result)
+      .isInstanceOfSatisfying(JsonObject.class, jo ->
+        assertThat(jo)
+          .isEqualTo(new JsonObject().put("prop1", 1L))
+      );
+  }
+
+  @Test
+  public void testNullAndEmptyString() {
+    SplitterCharObjectParser parser = new SplitterCharObjectParser(
+      TestParsers.SAMPLE_PROPERTIES_PARSERS,
+      TestParsers.SAMPLE_PATTERN_PROPERTIES_PARSERS,
+      null,
+      ","
+    );
+
+    Object result = parser.parse("prop1,,prop2,2.1,prop3,,prop4,true");
+
+    assertThat(result)
+      .isInstanceOfSatisfying(JsonObject.class, jo ->
+        assertThat(jo)
+          .isEqualTo(TestParsers.SAMPLE_OBJECT.copy().putNull("prop1").put("prop3", ""))
+      );
+  }
 }

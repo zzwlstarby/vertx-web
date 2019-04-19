@@ -2,6 +2,7 @@ package io.vertx.ext.web.validation.impl;
 
 import io.vertx.core.Future;
 import io.vertx.core.MultiMap;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.validation.*;
@@ -32,7 +33,9 @@ public class FormBodyProcessorImpl extends ObjectParser<List<String>> implements
       MultiMap multiMap = requestContext.request().formAttributes();
       JsonObject object = new JsonObject();
       for (String key : multiMap.names()) {
-        object.put(key, parseField(key, multiMap.getAll(key)));
+        List<String> serialized = multiMap.getAll(key);
+        Map.Entry<String, Object> parsed = parseField(key, serialized);
+        if (parsed != null) object.put(parsed.getKey(), parsed.getValue());
       }
       return valueValidator.validate(object).recover(err -> Future.failedFuture(BodyProcessorException.createValidationError(contentType, err)));
     } catch (MalformedValueException e) {
@@ -41,7 +44,13 @@ public class FormBodyProcessorImpl extends ObjectParser<List<String>> implements
   }
 
   @Override
-  protected boolean isSerializedEmpty(List<String> serialized) {
-    return false;
+  protected ValueParser<List<String>> getAdditionalPropertiesParserIfRequired() {
+    return (this.additionalPropertiesParser != null) ? this.additionalPropertiesParser : JsonArray::new;
   }
+
+  @Override
+  protected boolean mustNullateValue(List<String> serialized, ValueParser<List<String>> parser) {
+    return serialized == null || serialized.isEmpty();
+  }
+
 }

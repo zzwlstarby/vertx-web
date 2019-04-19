@@ -110,7 +110,7 @@ public class ValueParserInferenceUtilsTest {
   public void testAdditionalItemsInference() {
     JsonObject schema = new JsonObject().put("additionalItems", true);
 
-    assertThat(ValueParserInferenceUtils.infeerAdditionalPropertiesParserForObjectSchema(schema))
+    assertThat(ValueParserInferenceUtils.infeerAdditionalItemsParserForArraySchema(schema))
       .isSameAs(ValueParser.NOOP_PARSER);
   }
 
@@ -118,7 +118,7 @@ public class ValueParserInferenceUtilsTest {
   public void testNoAdditionalItemsInference() {
     JsonObject schema = new JsonObject().put("additionalItems", false);
 
-    assertThat(ValueParserInferenceUtils.infeerAdditionalPropertiesParserForObjectSchema(schema))
+    assertThat(ValueParserInferenceUtils.infeerAdditionalItemsParserForArraySchema(schema))
       .isNull();
   }
 

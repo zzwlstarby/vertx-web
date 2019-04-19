@@ -28,8 +28,8 @@ public class TestParsers {
 
   public static final JsonObject SAMPLE_OBJECT =
     new JsonObject()
-      .put("prop1", 1)
-      .put("prop2", 2.1)
+      .put("prop1", 1L)
+      .put("prop2", 2.1d)
       .put("prop3", "aaa")
       .put("prop4", true);
 

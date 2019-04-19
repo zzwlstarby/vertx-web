@@ -6,6 +6,7 @@ import io.vertx.ext.web.validation.MalformedValueException;
 import io.vertx.ext.web.validation.ParameterParser;
 import io.vertx.ext.web.validation.ValueParser;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -22,15 +23,26 @@ public class ExplodedObjectValueParameterParser extends ObjectParser<String> imp
   @Override
   public @Nullable Object parseParameter(Map<String, List<String>> parameters) throws MalformedValueException {
     JsonObject obj = new JsonObject();
-    for (String key: parameters.keySet()) {
-      Object parsed = parseField(key, parameters.remove(key).get(0));
-      if (parsed != null) obj.put(key, parsed);
+    Iterator<Map.Entry<String, List<String>>> it = parameters.entrySet().iterator();
+    while (it.hasNext()) {
+      Map.Entry<String, List<String>> e = it.next();
+      String key = e.getKey();
+      Map.Entry<String, Object> parsed = parseField(key, e.getValue().get(0));
+      if (parsed != null) {
+        it.remove();
+        obj.put(parsed.getKey(), parsed.getValue());
+      }
     }
     return obj.isEmpty() ? null : obj;
   }
 
   @Override
-  protected boolean isSerializedEmpty(String serialized) {
-    return serialized.isEmpty();
+  protected ValueParser<String> getAdditionalPropertiesParserIfRequired() {
+    return this.additionalPropertiesParser; // if no additional properties parser, the prop should be ignored
+  }
+
+  @Override
+  protected boolean mustNullateValue(String serialized, ValueParser<String> parser) {
+    return serialized == null || (serialized.isEmpty() && parser != ValueParser.NOOP_PARSER);
   }
 }

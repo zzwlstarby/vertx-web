@@ -6,6 +6,7 @@ import io.vertx.ext.web.validation.MalformedValueException;
 import io.vertx.ext.web.validation.ParameterParser;
 import io.vertx.ext.web.validation.ValueParser;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -22,18 +23,29 @@ public class DeepObjectValueParameterParser extends ObjectParser<String> impleme
   @Override
   public @Nullable Object parseParameter(Map<String, List<String>> parameters) throws MalformedValueException {
     JsonObject obj = new JsonObject();
-    for (String key: parameters.keySet()) {
+    Iterator<Map.Entry<String, List<String>>> it = parameters.entrySet().iterator();
+    while (it.hasNext()) {
+      Map.Entry<String, List<String>> e = it.next();
+      String key = e.getKey();
       if (key.contains(parameterName + "[") && key.charAt(key.length() - 1) == ']') {
         String realParameterName = key.substring(parameterName.length() + 1, key.length() - 1);
-        Object parsed = parseField(realParameterName, parameters.remove(key).get(0));
-        if (parsed != null) obj.put(realParameterName, parsed);
+        Map.Entry<String, Object> parsed = parseField(realParameterName, e.getValue().get(0));
+        if (parsed != null) {
+          it.remove();
+          obj.put(parsed.getKey(), parsed.getValue());
+        }
       }
     }
     return obj.isEmpty() ? null : obj;
   }
 
   @Override
-  protected boolean isSerializedEmpty(String serialized) {
-    return serialized.isEmpty();
+  protected ValueParser<String> getAdditionalPropertiesParserIfRequired() {
+    return (this.additionalPropertiesParser != null) ? this.additionalPropertiesParser : ValueParser.NOOP_PARSER;
+  }
+
+  @Override
+  protected boolean mustNullateValue(String serialized, ValueParser<String> parser) {
+    return serialized == null || (serialized.isEmpty() && parser != ValueParser.NOOP_PARSER);
   }
 }

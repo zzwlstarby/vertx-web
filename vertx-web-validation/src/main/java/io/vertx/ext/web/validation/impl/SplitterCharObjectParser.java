@@ -29,14 +29,20 @@ public class SplitterCharObjectParser extends ObjectParser<String> implements Va
       if (values[i].length() == 0) {
         throw new MalformedValueException("Empty key not allowed");
       } else {
-        result.put(values[i], parseField(values[i], values[i + 1]));
+        Map.Entry<String, Object> parsed = parseField(values[i], values[i + 1]);
+        if (parsed != null) result.put(parsed.getKey(), parsed.getValue());
       }
     }
     return new JsonObject(result);
   }
 
   @Override
-  protected boolean isSerializedEmpty(String serialized) {
-    return serialized.isEmpty();
+  protected ValueParser<String> getAdditionalPropertiesParserIfRequired() {
+    return (this.additionalPropertiesParser != null) ? this.additionalPropertiesParser : ValueParser.NOOP_PARSER;
+  }
+
+  @Override
+  protected boolean mustNullateValue(String serialized, ValueParser<String> parser) {
+    return serialized == null || (serialized.isEmpty() && parser != ValueParser.NOOP_PARSER);
   }
 }

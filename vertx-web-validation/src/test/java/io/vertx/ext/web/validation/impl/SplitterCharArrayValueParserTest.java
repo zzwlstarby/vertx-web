@@ -45,6 +45,36 @@ public class SplitterCharArrayValueParserTest {
   }
 
   @Test
+  public void testNull() {
+    SplitterCharArrayParser parser = new SplitterCharArrayParser(
+      ValueParser.BOOLEAN_PARSER, ","
+    );
+
+    Object result = parser.parse("true,,false");
+
+    assertThat(result)
+      .isInstanceOfSatisfying(JsonArray.class, ja ->
+        assertThat(ja)
+          .containsOnly(true, null, false)
+      );
+  }
+
+  @Test
+  public void testEmptyString() {
+    SplitterCharArrayParser parser = new SplitterCharArrayParser(
+      ValueParser.NOOP_PARSER, ","
+    );
+
+    Object result = parser.parse(",,bla");
+
+    assertThat(result)
+      .isInstanceOfSatisfying(JsonArray.class, ja ->
+        assertThat(ja)
+          .containsOnly("", "", "bla")
+      );
+  }
+
+  @Test
   public void testInvalid() {
     SplitterCharArrayParser parser = new SplitterCharArrayParser(
       ValueParser.BOOLEAN_PARSER, ","

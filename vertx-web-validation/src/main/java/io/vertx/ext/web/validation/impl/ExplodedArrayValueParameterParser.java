@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collector;
 
-public class ExplodedArrayValueParameterParser extends ArrayParser<String> implements ParameterParser {
+public class ExplodedArrayValueParameterParser extends ArrayParser implements ParameterParser {
 
   String parameterName;
 
@@ -29,7 +29,7 @@ public class ExplodedArrayValueParameterParser extends ArrayParser<String> imple
   }
 
   @Override
-  protected boolean isSerializedEmpty(String serialized) {
-    return serialized.isEmpty();
+  protected boolean mustNullateValue(String serialized) {
+    return serialized == null || (serialized.isEmpty() && itemsParser != ValueParser.NOOP_PARSER);
   }
 }

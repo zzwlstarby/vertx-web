@@ -12,7 +12,7 @@ import java.util.function.Function;
 import java.util.stream.Collector;
 import java.util.stream.IntStream;
 
-public class ExplodedTupleValueParameterParser extends TupleParser<String> implements ParameterParser {
+public class ExplodedTupleValueParameterParser extends TupleParser implements ParameterParser {
 
   String parameterName;
 
@@ -33,7 +33,7 @@ public class ExplodedTupleValueParameterParser extends TupleParser<String> imple
   }
 
   @Override
-  protected boolean isSerializedEmpty(String serialized) {
-    return serialized.isEmpty();
+  protected boolean mustNullateValue(String serialized, ValueParser<String> parser) {
+    return serialized.isEmpty() && parser != ValueParser.NOOP_PARSER;
   }
 }

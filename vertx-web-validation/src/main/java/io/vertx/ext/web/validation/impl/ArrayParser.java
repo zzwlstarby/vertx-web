@@ -2,17 +2,17 @@ package io.vertx.ext.web.validation.impl;
 
 import io.vertx.ext.web.validation.ValueParser;
 
-public abstract class ArrayParser<X> {
+public abstract class ArrayParser {
 
-  private final ValueParser<X> itemsParser;
+  protected final ValueParser<String> itemsParser;
 
-  public ArrayParser(ValueParser<X> itemsParser) {
+  public ArrayParser(ValueParser<String> itemsParser) {
     this.itemsParser = itemsParser;
   }
 
-  protected Object parseValue(X v) {
-    return isSerializedEmpty(v) ? null : itemsParser.parse(v);
+  protected Object parseValue(String v) {
+    return mustNullateValue(v) ? null : itemsParser.parse(v);
   }
 
-  protected abstract boolean isSerializedEmpty(X serialized);
+  protected abstract boolean mustNullateValue(String serialized);
 }

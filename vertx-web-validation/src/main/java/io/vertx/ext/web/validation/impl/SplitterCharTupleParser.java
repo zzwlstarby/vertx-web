@@ -6,7 +6,7 @@ import io.vertx.ext.web.validation.ValueParser;
 
 import java.util.List;
 
-public class SplitterCharTupleParser extends TupleParser<String> implements ValueParser<String> {
+public class SplitterCharTupleParser extends TupleParser implements ValueParser<String> {
 
   private final String separator;
 
@@ -26,7 +26,7 @@ public class SplitterCharTupleParser extends TupleParser<String> implements Valu
   }
 
   @Override
-  protected boolean isSerializedEmpty(String serialized) {
-    return serialized.isEmpty();
+  protected boolean mustNullateValue(String serialized, ValueParser<String> parser) {
+    return serialized.isEmpty() && parser != ValueParser.NOOP_PARSER;
   }
 }

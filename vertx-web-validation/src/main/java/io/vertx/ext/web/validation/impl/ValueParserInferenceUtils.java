@@ -16,7 +16,9 @@ public class ValueParserInferenceUtils {
 
   protected static ValueParser<String> infeerPrimitiveParser(Object schema) {
     if (schema == null) return null;
-    if (!(schema instanceof JsonObject)) return NOOP_PARSER;
+    if (schema instanceof Boolean) {
+      return (boolean)schema ? NOOP_PARSER : null;
+    }
     String type = ((JsonObject) schema).getString("type");
     switch (type) {
       case "integer":
@@ -74,7 +76,7 @@ public class ValueParserInferenceUtils {
 
   private static ValueParser<String> infeerPrimitiveParserFromSchemaProperty(Object s, String keySchemaProp) {
     try {
-      return infeerPrimitiveParser(((JsonObject)s).getJsonObject(keySchemaProp));
+      return infeerPrimitiveParser(((JsonObject)s).getValue(keySchemaProp));
     } catch (ClassCastException | NullPointerException e) {
       return null;
     }
@@ -90,7 +92,7 @@ public class ValueParserInferenceUtils {
 
   public static ValueParser<List<String>> infeerAdditionalPropertiesFormValueParserForObjectSchema(Object s) {
     try {
-      return mapSchemaToFormValueParser(((JsonObject)s).getJsonObject("additionalProperties"));
+      return mapSchemaToFormValueParser(((JsonObject)s).getValue("additionalProperties"));
     } catch (ClassCastException | NullPointerException e) {
       return null;
     }

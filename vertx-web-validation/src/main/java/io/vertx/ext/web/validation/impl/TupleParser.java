@@ -5,18 +5,18 @@ import io.vertx.ext.web.validation.ValueParser;
 import java.util.List;
 import java.util.stream.Stream;
 
-public abstract class TupleParser<X> {
+public abstract class TupleParser {
 
-  private final ValueParser<X>[] itemsParser;
-  private final ValueParser<X> additionalItemsParser;
+  private final ValueParser<String>[] itemsParser;
+  private final ValueParser<String> additionalItemsParser;
 
   @SuppressWarnings("unchecked")
-  public TupleParser(List<ValueParser<X>> itemsParser, ValueParser<X> additionalItemsParser) {
-    this.itemsParser = (ValueParser<X>[]) itemsParser.toArray();
-    this.additionalItemsParser = additionalItemsParser;
+  public TupleParser(List<ValueParser<String>> itemsParser, ValueParser<String> additionalItemsParser) {
+    this.itemsParser = (ValueParser<String>[]) itemsParser.toArray();
+    this.additionalItemsParser = additionalItemsParser != null ? additionalItemsParser : ValueParser.NOOP_PARSER;
   }
 
-  protected Stream<Object> parseItem(int i, X serialized) {
+  protected Stream<Object> parseItem(int i, String serialized) {
     if (i < itemsParser.length)
       return Stream.of(parseValue(serialized, itemsParser[i]));
     else if (additionalItemsParser != null)
@@ -25,9 +25,9 @@ public abstract class TupleParser<X> {
       return null;
   }
 
-  private Object parseValue(X v, ValueParser<X> parser) {
-    return isSerializedEmpty(v) ? null : parser.parse(v);
+  private Object parseValue(String v, ValueParser<String> parser) {
+    return mustNullateValue(v, parser) ? null : parser.parse(v);
   }
 
-  protected abstract boolean isSerializedEmpty(X serialized);
+  protected abstract boolean mustNullateValue(String serialized, ValueParser<String> parser);
 }

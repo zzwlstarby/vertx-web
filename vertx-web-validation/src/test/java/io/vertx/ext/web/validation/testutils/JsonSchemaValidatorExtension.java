@@ -13,6 +13,8 @@ import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.ParameterResolutionException;
 import org.junit.jupiter.api.extension.ParameterResolver;
 
+
+//TODO not working because I can't retrieve Vertx object from VertxExtension :(
 public class JsonSchemaValidatorExtension implements ParameterResolver {
 
   private static String ROUTER = "router";

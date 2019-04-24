@@ -1,10 +1,7 @@
 package io.vertx.ext.web.validation.dsl;
 
 import io.vertx.ext.json.schema.SchemaParser;
-import io.vertx.ext.json.schema.generic.dsl.ArraySchemaBuilder;
-import io.vertx.ext.json.schema.generic.dsl.NumberSchemaBuilder;
-import io.vertx.ext.json.schema.generic.dsl.ObjectSchemaBuilder;
-import io.vertx.ext.json.schema.generic.dsl.StringSchemaBuilder;
+import io.vertx.ext.json.schema.generic.dsl.*;
 import io.vertx.ext.web.validation.ParameterLocation;
 import io.vertx.ext.web.validation.ParameterProcessor;
 import io.vertx.ext.web.validation.ValueParser;
@@ -71,6 +68,24 @@ public interface SimpleParameterProcessorFactory {
     return ValidationDSLUtils.createArrayParamFactory(
       parameterName,
       ArrayParserFactory.commaSeparatedArrayParser(),
+      schemaBuilder,
+      true
+    )::apply;
+  }
+
+  static SimpleParameterProcessorFactory param(String parameterName, TupleSchemaBuilder schemaBuilder) {
+    return ValidationDSLUtils.createTupleParamFactory(
+      parameterName,
+      TupleParserFactory.commaSeparatedTupleParser(),
+      schemaBuilder,
+      false
+    )::apply;
+  }
+
+  static SimpleParameterProcessorFactory optionalParam(String parameterName, TupleSchemaBuilder schemaBuilder) {
+    return ValidationDSLUtils.createTupleParamFactory(
+      parameterName,
+      TupleParserFactory.commaSeparatedTupleParser(),
       schemaBuilder,
       true
     )::apply;

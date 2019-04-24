@@ -90,8 +90,8 @@ public class ValueParserInferenceUtilsTest {
   }
 
   @Test
-  public void testArrayItemByItemInference() {
-    Schema s = arraySchema()
+  public void testTupleInference() {
+    Schema s = tupleSchema()
       .item(intSchema())
       .item(numberSchema())
       .additionalItems(booleanSchema())

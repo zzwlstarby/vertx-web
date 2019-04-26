@@ -10,6 +10,8 @@ public interface ParameterProcessor {
 
   Future<RequestParameter> process(Map<String, List<String>> params);
 
+  String getName();
+
   static ParameterProcessor create(String parameterName, ParameterLocation location, boolean isOptional, ParameterParser parser, Validator validator) {
     return new ParameterProcessorImpl(parameterName, location, isOptional, parser, validator);
   }

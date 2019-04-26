@@ -19,27 +19,6 @@ import java.util.List;
 public interface RequestParameter {
 
   /**
-   * Set parameter name
-   *
-   * @param name
-   */
-  void setName(String name);
-
-  /**
-   * Set value
-   *
-   * @param value
-   */
-  void setValue(Object value);
-
-  /**
-   * Get parameter name
-   *
-   * @return
-   */
-  @Nullable String getName();
-
-  /**
    * If value is a map of fields, it returns keys of map, otherwise it returns null
    *
    * @return

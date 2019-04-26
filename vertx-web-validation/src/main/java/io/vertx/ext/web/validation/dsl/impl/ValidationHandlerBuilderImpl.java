@@ -1,18 +1,24 @@
 package io.vertx.ext.web.validation.dsl.impl;
 
 import io.vertx.ext.json.schema.SchemaParser;
-import io.vertx.ext.web.validation.ParameterLocation;
-import io.vertx.ext.web.validation.ParameterProcessor;
-import io.vertx.ext.web.validation.RequestPredicate;
-import io.vertx.ext.web.validation.ValidationHandler;
+import io.vertx.ext.web.validation.*;
 import io.vertx.ext.web.validation.dsl.BodyProcessorFactory;
 import io.vertx.ext.web.validation.dsl.SimpleParameterProcessorFactory;
 import io.vertx.ext.web.validation.dsl.StyledParameterProcessorFactory;
 import io.vertx.ext.web.validation.dsl.ValidationHandlerBuilder;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 public class ValidationHandlerBuilderImpl implements ValidationHandlerBuilder {
 
   SchemaParser jsonSchemaParser;
+
+  Map<ParameterLocation, List<ParameterProcessor>> parameterProcessors = new HashMap<>();
+  List<BodyProcessor> bodyProcessors = new ArrayList<>();
+  List<RequestPredicate> predicates = new ArrayList<>();
 
   public ValidationHandlerBuilderImpl(SchemaParser jsonSchemaParser) {
     this.jsonSchemaParser = jsonSchemaParser;
@@ -20,47 +26,50 @@ public class ValidationHandlerBuilderImpl implements ValidationHandlerBuilder {
 
   @Override
   public ValidationHandlerBuilder parameter(ParameterLocation location, ParameterProcessor processor) {
-    return null;
+    parameterProcessors.computeIfAbsent(location, k -> new ArrayList<>()).add(processor);
+    return this;
   }
 
   @Override
   public ValidationHandlerBuilder queryParameter(StyledParameterProcessorFactory parameterProcessor) {
-    return null;
+    return parameter(ParameterLocation.QUERY, parameterProcessor.create(ParameterLocation.QUERY, jsonSchemaParser));
   }
 
   @Override
   public ValidationHandlerBuilder queryParameter(SimpleParameterProcessorFactory parameterProcessor) {
-    return null;
+    return parameter(ParameterLocation.QUERY, parameterProcessor.create(ParameterLocation.QUERY, jsonSchemaParser));
   }
 
   @Override
   public ValidationHandlerBuilder pathParameter(SimpleParameterProcessorFactory parameterProcessor) {
-    return null;
+    return parameter(ParameterLocation.PATH, parameterProcessor.create(ParameterLocation.PATH, jsonSchemaParser));
   }
 
   @Override
   public ValidationHandlerBuilder cookieParameter(StyledParameterProcessorFactory parameterProcessor) {
-    return null;
+    return parameter(ParameterLocation.COOKIE, parameterProcessor.create(ParameterLocation.COOKIE, jsonSchemaParser));
   }
 
   @Override
   public ValidationHandlerBuilder cookieParameter(SimpleParameterProcessorFactory parameterProcessor) {
-    return null;
+    return parameter(ParameterLocation.COOKIE, parameterProcessor.create(ParameterLocation.COOKIE, jsonSchemaParser));
   }
 
   @Override
   public ValidationHandlerBuilder headerParameter(SimpleParameterProcessorFactory parameterProcessor) {
-    return null;
+    return parameter(ParameterLocation.HEADER, parameterProcessor.create(ParameterLocation.HEADER, jsonSchemaParser));
   }
 
   @Override
   public ValidationHandlerBuilder body(BodyProcessorFactory bodyProcessor) {
-    return null;
+    bodyProcessors.add(bodyProcessor.create(jsonSchemaParser));
+    return this;
   }
 
   @Override
   public ValidationHandlerBuilder predicate(RequestPredicate predicate) {
-    return null;
+    predicates.add(predicate);
+    return this;
   }
 
   @Override

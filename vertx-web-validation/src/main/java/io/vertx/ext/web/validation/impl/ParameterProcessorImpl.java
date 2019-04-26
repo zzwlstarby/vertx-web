@@ -40,4 +40,9 @@ public class ParameterProcessorImpl implements ParameterProcessor {
       return Future.succeededFuture();
 
   }
+
+  @Override
+  public String getName() {
+    return parameterName;
+  }
 }

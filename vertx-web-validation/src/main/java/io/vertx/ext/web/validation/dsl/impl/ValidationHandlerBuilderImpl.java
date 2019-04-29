@@ -1,16 +1,19 @@
 package io.vertx.ext.web.validation.dsl.impl;
 
 import io.vertx.ext.json.schema.SchemaParser;
+import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.validation.*;
 import io.vertx.ext.web.validation.dsl.BodyProcessorFactory;
 import io.vertx.ext.web.validation.dsl.SimpleParameterProcessorFactory;
 import io.vertx.ext.web.validation.dsl.StyledParameterProcessorFactory;
 import io.vertx.ext.web.validation.dsl.ValidationHandlerBuilder;
+import io.vertx.ext.web.validation.impl.ValidationHandlerImpl;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 public class ValidationHandlerBuilderImpl implements ValidationHandlerBuilder {
 
@@ -18,7 +21,7 @@ public class ValidationHandlerBuilderImpl implements ValidationHandlerBuilder {
 
   Map<ParameterLocation, List<ParameterProcessor>> parameterProcessors = new HashMap<>();
   List<BodyProcessor> bodyProcessors = new ArrayList<>();
-  List<RequestPredicate> predicates = new ArrayList<>();
+  List<Function<RoutingContext, RequestPredicateResult>> predicates = new ArrayList<>();
 
   public ValidationHandlerBuilderImpl(SchemaParser jsonSchemaParser) {
     this.jsonSchemaParser = jsonSchemaParser;
@@ -74,6 +77,10 @@ public class ValidationHandlerBuilderImpl implements ValidationHandlerBuilder {
 
   @Override
   public ValidationHandler build() {
-    return null;
+    return new ValidationHandlerImpl(
+      parameterProcessors,
+      bodyProcessors,
+      predicates
+    );
   }
 }

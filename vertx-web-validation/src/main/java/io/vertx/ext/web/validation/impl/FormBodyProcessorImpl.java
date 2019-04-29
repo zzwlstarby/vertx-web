@@ -37,9 +37,11 @@ public class FormBodyProcessorImpl extends ObjectParser<List<String>> implements
         Map.Entry<String, Object> parsed = parseField(key, serialized);
         if (parsed != null) object.put(parsed.getKey(), parsed.getValue());
       }
-      return valueValidator.validate(object).recover(err -> Future.failedFuture(BodyProcessorException.createValidationError(contentType, err)));
+      return valueValidator.validate(object).recover(err -> Future.failedFuture(
+        BodyProcessorException.createValidationError(requestContext.parsedHeaders().contentType().value(), err)
+      ));
     } catch (MalformedValueException e) {
-      return Future.failedFuture(BodyProcessorException.createParsingError(this.contentType, e));
+      return Future.failedFuture(BodyProcessorException.createParsingError(requestContext.parsedHeaders().contentType().value(), e));
     }
   }
 

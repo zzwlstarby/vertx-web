@@ -55,6 +55,26 @@ public interface SimpleParameterProcessorFactory {
     );
   }
 
+  static SimpleParameterProcessorFactory param(String parameterName, BooleanSchemaBuilder schemaBuilder) {
+    return (location, jsonSchemaParser) -> new ParameterProcessorImpl(
+      parameterName,
+      location,
+      false,
+      new SingleValueParameterParser(parameterName, ValueParser.BOOLEAN_PARSER),
+      new SchemaValidator(schemaBuilder.build(jsonSchemaParser))
+    );
+  }
+
+  static SimpleParameterProcessorFactory optionalParam(String parameterName, BooleanSchemaBuilder schemaBuilder) {
+    return (location, jsonSchemaParser) -> new ParameterProcessorImpl(
+      parameterName,
+      location,
+      true,
+      new SingleValueParameterParser(parameterName, ValueParser.BOOLEAN_PARSER),
+      new SchemaValidator(schemaBuilder.build(jsonSchemaParser))
+    );
+  }
+
   static SimpleParameterProcessorFactory param(String parameterName, ArraySchemaBuilder schemaBuilder) {
     return ValidationDSLUtils.createArrayParamFactory(
       parameterName,

@@ -1,5 +1,7 @@
 package io.vertx.ext.web.validation;
 
+import io.vertx.core.json.JsonObject;
+
 public class ParameterProcessorException extends BadRequestException {
 
   public enum ParameterProcessorErrorType {
@@ -8,9 +10,9 @@ public class ParameterProcessorException extends BadRequestException {
     VALIDATION_ERROR
   }
 
-  String parameterName;
-  ParameterLocation location;
-  ParameterProcessorErrorType errorType;
+  private String parameterName;
+  private ParameterLocation location;
+  private ParameterProcessorErrorType errorType;
 
   public ParameterProcessorException(String message, String parameterName, ParameterLocation location, ParameterProcessorErrorType errorType, Throwable cause) {
     super(message, cause);
@@ -29,6 +31,14 @@ public class ParameterProcessorException extends BadRequestException {
 
   public ParameterProcessorErrorType getErrorType() {
     return errorType;
+  }
+
+  @Override
+  public JsonObject toJson() {
+    return super.toJson()
+      .put("parameterName", this.parameterName)
+      .put("errorType", this.errorType.name())
+      .put("location", this.location.name());
   }
 
   public static ParameterProcessorException createMissingParameterWhenRequired(String parameterName, ParameterLocation location) {

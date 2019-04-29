@@ -7,9 +7,6 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.validation.impl.RequestParameterImpl;
 
-import java.util.List;
-
-//TODO fix number stuff
 /**
  * Request parameter holder
  *
@@ -17,42 +14,6 @@ import java.util.List;
  */
 @VertxGen
 public interface RequestParameter {
-
-  /**
-   * If value is a map of fields, it returns keys of map, otherwise it returns null
-   *
-   * @return
-   */
-  @Nullable List<String> getObjectKeys();
-
-  /**
-   * If value is a map of fields, it returns value of field with key provided, otherwise it returns null
-   *
-   * @param key
-   * @return
-   */
-  @Nullable RequestParameter getObjectValue(String key);
-
-  /**
-   * Returns true if value of RequestParameter is a map of fields
-   *
-   * @return
-   */
-  boolean isObject();
-
-  /**
-   * Returns null if value is not a list, otherwise it returns value
-   *
-   * @return
-   */
-  @Nullable List<RequestParameter> getArray();
-
-  /**
-   * Returns true if value of RequestParameter is an array
-   *
-   * @return
-   */
-  boolean isArray();
 
   /**
    * Returns null if value is not a String, otherwise it returns value
@@ -76,25 +37,11 @@ public interface RequestParameter {
   @Nullable Integer getInteger();
 
   /**
-   * Returns true if value of RequestParameter is an Integer instance
-   *
-   * @return
-   */
-  boolean isInteger();
-
-  /**
    * Returns null if value is not a Long, otherwise it returns value
    *
    * @return
    */
   @Nullable Long getLong();
-
-  /**
-   * Returns true if value of RequestParameter is a Long instance
-   *
-   * @return
-   */
-  boolean isLong();
 
   /**
    * Returns null if value is not a Float, otherwise it returns value
@@ -104,13 +51,6 @@ public interface RequestParameter {
   @Nullable Float getFloat();
 
   /**
-   * Returns true if value of RequestParameter is a Float instance
-   *
-   * @return
-   */
-  boolean isFloat();
-
-  /**
    * Returns null if value is not a Double, otherwise it returns value
    *
    * @return
@@ -118,11 +58,11 @@ public interface RequestParameter {
   @Nullable Double getDouble();
 
   /**
-   * Returns true if value of RequestParameter is a Double instance
+   * Returns true if value of RequestParameter is a Number instance
    *
    * @return
    */
-  boolean isDouble();
+  boolean isNumber();
 
   /**
    * Returns null if value is not a Boolean, otherwise it returns value
@@ -195,12 +135,8 @@ public interface RequestParameter {
    */
   RequestParameter merge(RequestParameter otherParameter);
 
-  static RequestParameter create(String name, Object value) {
-    return new RequestParameterImpl(name, value);
-  }
-
   static RequestParameter create(Object value) {
-    return new RequestParameterImpl(null, value);
+    return new RequestParameterImpl(value);
   }
 
 }

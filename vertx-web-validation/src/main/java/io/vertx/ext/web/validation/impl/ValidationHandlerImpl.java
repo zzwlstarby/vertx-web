@@ -68,7 +68,7 @@ public class ValidationHandlerImpl implements ValidationHandler {
           if (f.succeeded()) {
             requestParameters.setPathParameters(f.result());
           } else {
-            routingContext.fail(f.cause());
+            routingContext.fail(400, f.cause());
           }
         } else {
           waitingFut = f.compose(res -> {
@@ -84,7 +84,7 @@ public class ValidationHandlerImpl implements ValidationHandler {
           if (f.succeeded()) {
             requestParameters.setCookieParameters(f.result());
           } else {
-            routingContext.fail(f.cause());
+            routingContext.fail(400, f.cause());
           }
         } else {
           waitingFut = f.compose(res -> {
@@ -100,7 +100,7 @@ public class ValidationHandlerImpl implements ValidationHandler {
           if (f.succeeded()) {
             requestParameters.setQueryParameters(f.result());
           } else {
-            routingContext.fail(f.cause());
+            routingContext.fail(400, f.cause());
           }
         } else {
           waitingFut = f.compose(res -> {
@@ -116,7 +116,7 @@ public class ValidationHandlerImpl implements ValidationHandler {
           if (f.succeeded()) {
             requestParameters.setHeaderParameters(f.result());
           } else {
-            routingContext.fail(f.cause());
+            routingContext.fail(400, f.cause());
           }
         } else {
           waitingFut = f.compose(res -> {
@@ -127,18 +127,22 @@ public class ValidationHandlerImpl implements ValidationHandler {
       }
 
       if (bodyProcessors != null && routingContext.getBody() != null) {
-        Future<RequestParameter> f = validateBody(routingContext);
-        if (f.isComplete()) {
-          if (f.succeeded()) {
-            requestParameters.setBody(f.result());
+        try {
+          Future<RequestParameter> f = validateBody(routingContext);
+          if (f.isComplete()) {
+            if (f.succeeded()) {
+              requestParameters.setBody(f.result());
+            } else {
+              routingContext.fail(400, f.cause());
+            }
           } else {
-            routingContext.fail(f.cause());
+            waitingFut = f.compose(res -> {
+              requestParameters.setBody(res);
+              return resultFut;
+            });
           }
-        } else {
-          waitingFut = f.compose(res -> {
-            requestParameters.setBody(res);
-            return resultFut;
-          });
+        } catch (BadRequestException e) {
+          routingContext.fail(400, e);
         }
       }
 
@@ -229,25 +233,29 @@ public class ValidationHandlerImpl implements ValidationHandler {
     Future<Map<String, RequestParameter>> waitingFutureChain = Future.succeededFuture(parsedParams);
 
     for (ParameterProcessor processor : processors) {
-      Future<RequestParameter> fut = processor.process(params);
-      if (fut.isComplete()) {
-        if (fut.succeeded()) {
-          parsedParams.put(processor.getName(), fut.result());
-        } else if (fut.failed()) {
-          return Future.failedFuture(fut.cause());
-        }
-      } else {
-        if (waitingFutureChain == null) {
-          waitingFutureChain = fut.map(rp -> {
-            parsedParams.put(processor.getName(), rp);
-            return parsedParams;
-          });
+      try {
+        Future<RequestParameter> fut = processor.process(params);
+        if (fut.isComplete()) {
+          if (fut.succeeded()) {
+            parsedParams.put(processor.getName(), fut.result());
+          } else if (fut.failed()) {
+            return Future.failedFuture(fut.cause());
+          }
         } else {
-          waitingFutureChain.compose(m -> fut.map(rp -> {
-            parsedParams.put(processor.getName(), rp);
-            return parsedParams;
-          }));
+          if (waitingFutureChain == null) {
+            waitingFutureChain = fut.map(rp -> {
+              parsedParams.put(processor.getName(), rp);
+              return parsedParams;
+            });
+          } else {
+            waitingFutureChain.compose(m -> fut.map(rp -> {
+              parsedParams.put(processor.getName(), rp);
+              return parsedParams;
+            }));
+          }
         }
+      } catch (BadRequestException e) {
+        return Future.failedFuture(e);
       }
     }
 

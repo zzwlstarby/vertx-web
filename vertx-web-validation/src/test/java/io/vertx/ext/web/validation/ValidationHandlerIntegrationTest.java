@@ -3,6 +3,7 @@ package io.vertx.ext.web.validation;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.http.HttpServer;
+import io.vertx.core.json.JsonArray;
 import io.vertx.ext.json.schema.SchemaParser;
 import io.vertx.ext.json.schema.SchemaParserOptions;
 import io.vertx.ext.json.schema.SchemaRouter;
@@ -22,6 +23,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 import static io.vertx.ext.json.schema.generic.dsl.Schemas.*;
 import static io.vertx.ext.web.validation.dsl.SimpleParameterProcessorFactory.param;
+import static io.vertx.ext.web.validation.dsl.StyledParameterProcessorFactory.explodedParam;
 import static io.vertx.ext.web.validation.testutils.TestRequest.*;
 import static io.vertx.ext.web.validation.testutils.ValidationTestUtils.badParameterResponse;
 
@@ -57,7 +59,7 @@ public class ValidationHandlerIntegrationTest {
 
   @Test
   public void testPathParamsSimpleTypes(VertxTestContext testContext) {
-    Checkpoint checkpoint = testContext.checkpoint();
+    Checkpoint checkpoint = testContext.checkpoint(2);
 
     ValidationHandler validationHandler = ValidationHandlerBuilder
       .create(parser)
@@ -92,66 +94,75 @@ public class ValidationHandlerIntegrationTest {
       ))
       .send(testContext, checkpoint);
   }
-//
-//  @Test
-//  public void testQueryParamsWithIncludedTypes() throws Exception {
-//    HTTPRequestValidationHandler validationHandler = HTTPRequestValidationHandler.create().addQueryParam("param1",
-//      ParameterType.BOOL, true).addQueryParam("param2", ParameterType.INT, true);
-//    schemaRouter.get("/testQueryParams").handler(validationHandler);
-//    schemaRouter.get("/testQueryParams").handler(routingContext -> {
-//      RequestParameters params = routingContext.get("parsedParameters");
-//      routingContext.response().setStatusMessage(params.queryParameter("param1").getBoolean().toString() + params
-//        .queryParameter("param2").getInteger().toString()).end();
-//    }).failureHandler(generateFailureHandler(false));
-//    QueryStringEncoder encoder = new QueryStringEncoder("/testQueryParams");
-//    String param1 = getSuccessSample(ParameterType.BOOL).getBoolean().toString();
-//    String param2 = getSuccessSample(ParameterType.INT).getInteger().toString();
-//    encoder.addParam("param1", param1);
-//    encoder.addParam("param2", param2);
-//    testRequest(HttpMethod.GET, encoder.toString(), 200, param1 + param2);
-//  }
-//
-//  @Test
-//  public void testQueryParamsFailureWithIncludedTypes() throws Exception {
-//    HTTPRequestValidationHandler validationHandler = HTTPRequestValidationHandler.create().addQueryParam("param1",
-//      ParameterType.BOOL, true).addQueryParam("param2", ParameterType.INT, true);
-//    schemaRouter.get("/testQueryParams").handler(validationHandler);
-//    schemaRouter.get("/testQueryParams").handler(routingContext -> {
-//      RequestParameters params = routingContext.get("parsedParameters");
-//      routingContext.response().setStatusMessage(params.queryParameter("param1").getBoolean().toString() + params
-//        .queryParameter("param2").getInteger().toString());
-//    }).failureHandler(generateFailureHandler(true));
-//    QueryStringEncoder encoder = new QueryStringEncoder("/testQueryParams");
-//    encoder.addParam("param1", getFailureSample(ParameterType.BOOL));
-//    encoder.addParam("param2", getFailureSample(ParameterType.INT));
-//    testRequest(HttpMethod.GET, encoder.toString(), 400, "failure:NO_MATCH");
-//  }
-//
-//  @Test
-//  public void testQueryParamsArrayAndPathParamsWithIncludedTypes() throws Exception {
-//    HTTPRequestValidationHandler validationHandler = HTTPRequestValidationHandler.create().addPathParam("pathParam1",
-//      ParameterType.INT).addQueryParamsArray("awesomeArray", ParameterType.EMAIL, true).addQueryParam("anotherParam",
-//      ParameterType.DOUBLE, true);
-//    schemaRouter.get("/testQueryParams/:pathParam1").handler(validationHandler);
-//    schemaRouter.get("/testQueryParams/:pathParam1").handler(routingContext -> {
-//      RequestParameters params = routingContext.get("parsedParameters");
-//      routingContext.response().setStatusMessage(params.pathParameter("pathParam1").getInteger().toString() + params
-//        .queryParameter("awesomeArray").getArray().size() + params.queryParameter("anotherParam").getDouble()
-//        .toString()).end();
-//    }).failureHandler(generateFailureHandler(false));
-//
-//    String pathParam = getSuccessSample(ParameterType.INT).getInteger().toString();
-//    String arrayValue1 = getSuccessSample(ParameterType.EMAIL).getString();
-//    String arrayValue2 = getSuccessSample(ParameterType.EMAIL).getString();
-//    String anotherParam = getSuccessSample(ParameterType.DOUBLE).getDouble().toString();
-//
-//    QueryStringEncoder encoder = new QueryStringEncoder("/testQueryParams/" + URLEncoder.encode(pathParam, "UTF-8"));
-//    encoder.addParam("awesomeArray", arrayValue1);
-//    encoder.addParam("awesomeArray", arrayValue2);
-//    encoder.addParam("anotherParam", anotherParam);
-//
-//    testRequest(HttpMethod.GET, encoder.toString(), 200, pathParam + "2" + anotherParam);
-//  }
+
+  @Test
+  public void testQueryParamsSimpleTypes(VertxTestContext testContext) {
+    Checkpoint checkpoint = testContext.checkpoint(2);
+
+    ValidationHandler validationHandler = ValidationHandlerBuilder
+      .create(parser)
+      .queryParameter(param("param1", booleanSchema()))
+      .queryParameter(param("param2", intSchema()))
+      .build();
+    router
+      .get("/testQueryParams")
+      .handler(validationHandler)
+      .handler(routingContext -> {
+      RequestParameters params = routingContext.get("parsedParameters");
+      routingContext.response().setStatusMessage(
+        params.queryParameter("param1").getBoolean().toString() + params.queryParameter("param2").getInteger().toString()
+      ).end();
+    });
+    testRequest(client, HttpMethod.GET, "/testQueryParams?param1=true&param2=10")
+      .withResponseAsserts(statusCode(200), statusMessage("true10"))
+      .send(testContext, checkpoint);
+
+    testRequest(client, HttpMethod.GET, "/testQueryParams?param1=true&param2=bla")
+      .withResponseAsserts(statusCode(400))
+      .withResponseAsserts(badParameterResponse(
+        ParameterProcessorException.ParameterProcessorErrorType.PARSING_ERROR,
+        "param2",
+        ParameterLocation.QUERY
+      ))
+      .send(testContext, checkpoint);
+  }
+
+
+  @Test
+  public void testQueryArrayParamsArrayAndPathParam(VertxTestContext testContext) throws Exception {
+    Checkpoint checkpoint = testContext.checkpoint(2);
+
+    ValidationHandler validationHandler = ValidationHandlerBuilder
+      .create(parser)
+      .pathParameter(param("pathParam", booleanSchema()))
+      .queryParameter(explodedParam("awesomeArray", arraySchema().items(intSchema())))
+      .queryParameter(param("anotherParam", numberSchema()))
+      .build();
+    router
+      .get("/testQueryParams/:pathParam")
+      .handler(validationHandler)
+      .handler(routingContext -> {
+      RequestParameters params = routingContext.get("parsedParameters");
+      routingContext.response().setStatusMessage(
+        params.pathParameter("pathParam").toString() +
+          params.queryParameter("awesomeArray").toString() +
+          params.queryParameter("anotherParam").toString()
+      ).end();
+    });
+
+    testRequest(client, HttpMethod.GET, "/testQueryParams/true?awesomeArray=1&awesomeArray=2&awesomeArray=3&anotherParam=5.2")
+      .withResponseAsserts(statusCode(200), statusMessage("true" + new JsonArray().add(1).add(2).add(3).toString() + "5.2"))
+      .send(testContext, checkpoint);
+
+    testRequest(client, HttpMethod.GET, "/testQueryParams/true?awesomeArray=1&awesomeArray=bla&awesomeArray=3&anotherParam=5.2")
+      .withResponseAsserts(statusCode(400))
+      .withResponseAsserts(badParameterResponse(
+        ParameterProcessorException.ParameterProcessorErrorType.PARSING_ERROR,
+        "awesomeArray",
+        ParameterLocation.QUERY
+      ))
+      .send(testContext, checkpoint);
+  }
 //
 //  @Test
 //  public void testQueryParamsArrayAndPathParamsFailureWithIncludedTypes() throws Exception {

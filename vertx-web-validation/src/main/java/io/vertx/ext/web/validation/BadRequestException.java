@@ -8,7 +8,7 @@ import io.vertx.core.json.JsonObject;
 public abstract class BadRequestException extends VertxException {
 
   public BadRequestException(String message, Throwable cause) {
-    super("Bad Request: " + message, cause);
+    super("[Bad Request] " + message, cause);
   }
 
   public JsonObject toJson() {

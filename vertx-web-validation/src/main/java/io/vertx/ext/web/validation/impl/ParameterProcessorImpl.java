@@ -30,12 +30,12 @@ public class ParameterProcessorImpl implements ParameterProcessor {
     try {
       json = parser.parseParameter(params);
     } catch (MalformedValueException e) {
-      return Future.failedFuture(createParsingError(parameterName, location, e));
+      throw createParsingError(parameterName, location, e);
     }
     if (json != null)
       return validator.validate(json).recover(t -> Future.failedFuture(createValidationError(parameterName, location, t)));
     else if (!isOptional)
-      return Future.failedFuture(createMissingParameterWhenRequired(parameterName, location));
+      throw createMissingParameterWhenRequired(parameterName, location);
     else
       return Future.succeededFuture();
 

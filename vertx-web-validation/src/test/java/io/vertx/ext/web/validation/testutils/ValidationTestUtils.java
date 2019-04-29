@@ -28,6 +28,11 @@ public class ValidationTestUtils {
         routingContext.response().setStatusCode(500).setStatusMessage("Unknown failure: " + failure.toString()).end();
       }
     });
+    router.errorHandler(500, routingContext -> {
+      Throwable failure = routingContext.failure();
+      failure.printStackTrace();
+      routingContext.response().setStatusCode(500).setStatusMessage("Unknown failure: " + failure.toString()).end();
+    });
   }
 
   public static Consumer<HttpResponse<Buffer>> badParameterResponse(ParameterProcessorException.ParameterProcessorErrorType errorType) {

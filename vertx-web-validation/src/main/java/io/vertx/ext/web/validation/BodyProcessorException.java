@@ -1,5 +1,6 @@
 package io.vertx.ext.web.validation;
 
+import io.vertx.core.json.DecodeException;
 import io.vertx.core.json.JsonObject;
 
 public class BodyProcessorException extends BadRequestException {
@@ -37,6 +38,12 @@ public class BodyProcessorException extends BadRequestException {
   public static BodyProcessorException createParsingError(String contentType, MalformedValueException cause) {
     return new BodyProcessorException(
       String.format("Body %s parsing error: %s", contentType, cause.getMessage()), cause, contentType, BodyProcessorErrorType.PARSING_ERROR
+    );
+  }
+
+  public static BodyProcessorException createParsingError(String contentType, DecodeException cause) {
+    return new BodyProcessorException(
+      String.format("Json body %s parsing error: %s", contentType, cause.getMessage()), cause, contentType, BodyProcessorErrorType.PARSING_ERROR
     );
   }
 

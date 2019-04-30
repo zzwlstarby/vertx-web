@@ -126,7 +126,7 @@ public class ValidationHandlerImpl implements ValidationHandler {
         }
       }
 
-      if (bodyProcessors != null && routingContext.getBody() != null) {
+      if (bodyProcessors != null && routingContext.request().headers().contains("content-type")) {
         try {
           Future<RequestParameter> f = validateBody(routingContext);
           if (f.isComplete()) {

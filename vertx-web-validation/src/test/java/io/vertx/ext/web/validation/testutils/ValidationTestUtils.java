@@ -4,9 +4,7 @@ import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.client.HttpResponse;
-import io.vertx.ext.web.validation.BadRequestException;
-import io.vertx.ext.web.validation.ParameterLocation;
-import io.vertx.ext.web.validation.ParameterProcessorException;
+import io.vertx.ext.web.validation.*;
 
 import java.util.function.Consumer;
 
@@ -50,6 +48,21 @@ public class ValidationTestUtils {
       assertThat(obj.getString("errorType")).isEqualTo(errorType.name());
       assertThat(obj.getString("parameterName")).isEqualTo(parameterName);
       assertThat(obj.getString("location")).isEqualTo(location.name());
+    };
+  }
+
+  public static Consumer<HttpResponse<Buffer>> badBodyResponse(BodyProcessorException.BodyProcessorErrorType errorType) {
+    return req -> {
+      JsonObject obj = req.bodyAsJsonObject();
+      assertThat(obj.getString("type")).isEqualTo(BodyProcessorException.class.getSimpleName());
+      assertThat(obj.getString("errorType")).isEqualTo(errorType.name());
+    };
+  }
+
+  public static Consumer<HttpResponse<Buffer>> failurePredicateResponse() {
+    return req -> {
+      JsonObject obj = req.bodyAsJsonObject();
+      assertThat(obj.getString("type")).isEqualTo(RequestPredicateException.class.getSimpleName());
     };
   }
 

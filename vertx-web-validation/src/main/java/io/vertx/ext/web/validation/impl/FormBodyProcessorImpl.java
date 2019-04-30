@@ -2,6 +2,7 @@ package io.vertx.ext.web.validation.impl;
 
 import io.vertx.core.Future;
 import io.vertx.core.MultiMap;
+import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
@@ -41,7 +42,7 @@ public class FormBodyProcessorImpl extends ObjectParser<List<String>> implements
         BodyProcessorException.createValidationError(requestContext.parsedHeaders().contentType().value(), err)
       ));
     } catch (MalformedValueException e) {
-      return Future.failedFuture(BodyProcessorException.createParsingError(requestContext.parsedHeaders().contentType().value(), e));
+      return Future.failedFuture(BodyProcessorException.createParsingError(requestContext.request().getHeader(HttpHeaders.CONTENT_TYPE), e));
     }
   }
 

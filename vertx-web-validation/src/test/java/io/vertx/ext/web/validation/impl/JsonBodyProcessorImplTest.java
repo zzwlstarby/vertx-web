@@ -1,6 +1,10 @@
 package io.vertx.ext.web.validation.impl;
 
 import io.vertx.core.Vertx;
+import io.vertx.core.buffer.Buffer;
+import io.vertx.core.http.HttpHeaders;
+import io.vertx.core.http.HttpServerRequest;
+import io.vertx.core.json.DecodeException;
 import io.vertx.ext.json.schema.*;
 import io.vertx.ext.json.schema.draft7.Draft7SchemaParser;
 import io.vertx.ext.web.RoutingContext;
@@ -17,6 +21,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(VertxExtension.class)
@@ -27,6 +32,7 @@ class JsonBodyProcessorImplTest {
   SchemaParser parser;
 
   @Mock RoutingContext mockedContext;
+  @Mock HttpServerRequest mockerServerRequest;
 
   @BeforeEach
   public void setUp(Vertx vertx) {
@@ -62,6 +68,8 @@ class JsonBodyProcessorImplTest {
 
   @Test
   public void testInvalidJsonObject(VertxTestContext testContext) {
+    when(mockerServerRequest.getHeader(HttpHeaders.CONTENT_TYPE)).thenReturn("application/json");
+    when(mockedContext.request()).thenReturn(mockerServerRequest);
     when(mockedContext.getBody()).thenReturn(TestSchemas.INVALID_OBJECT.toBuffer());
 
     BodyProcessor processor = BodyProcessorFactory.json(TestSchemas.SAMPLE_OBJECT_SCHEMA_BUILDER).create(parser);
@@ -70,7 +78,7 @@ class JsonBodyProcessorImplTest {
       testContext.verify(() -> {
         assertThat(err)
           .isInstanceOf(BodyProcessorException.class)
-          .hasFieldOrPropertyWithValue("contentType", "application/json")
+          .hasFieldOrPropertyWithValue("actualContentType", "application/json")
           .hasCauseInstanceOf(ValidationException.class);
       });
       testContext.completeNow();
@@ -97,6 +105,8 @@ class JsonBodyProcessorImplTest {
 
   @Test
   public void testInvalidJsonArray(VertxTestContext testContext) {
+    when(mockerServerRequest.getHeader(HttpHeaders.CONTENT_TYPE)).thenReturn("application/json");
+    when(mockedContext.request()).thenReturn(mockerServerRequest);
     when(mockedContext.getBody()).thenReturn(TestSchemas.INVALID_ARRAY.toBuffer());
 
     BodyProcessor processor = BodyProcessorFactory.json(TestSchemas.SAMPLE_ARRAY_SCHEMA_BUILDER).create(parser);
@@ -105,10 +115,24 @@ class JsonBodyProcessorImplTest {
       testContext.verify(() -> {
         assertThat(err)
           .isInstanceOf(BodyProcessorException.class)
-          .hasFieldOrPropertyWithValue("contentType", "application/json")
+          .hasFieldOrPropertyWithValue("actualContentType", "application/json")
           .hasCauseInstanceOf(ValidationException.class);
       });
       testContext.completeNow();
     }));
+  }
+
+  @Test
+  public void testMalformedJson() {
+    when(mockerServerRequest.getHeader(HttpHeaders.CONTENT_TYPE)).thenReturn("application/json");
+    when(mockedContext.request()).thenReturn(mockerServerRequest);
+    when(mockedContext.getBody()).thenReturn(Buffer.buffer("{\"a"));
+
+    BodyProcessor processor = BodyProcessorFactory.json(TestSchemas.SAMPLE_ARRAY_SCHEMA_BUILDER).create(parser);
+
+    assertThatCode(() -> processor.process(mockedContext))
+      .isInstanceOf(BodyProcessorException.class)
+      .hasFieldOrPropertyWithValue("actualContentType", "application/json")
+      .hasCauseInstanceOf(DecodeException.class);
   }
 }

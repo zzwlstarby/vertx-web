@@ -17,6 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.HashMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -37,7 +38,7 @@ public class ParameterProcessorUnitTest {
   }
 
   @Test
-  public void testRequiredParam(VertxTestContext testContext) {
+  public void testRequiredParam() {
     ParameterProcessor processor = new ParameterProcessorImpl(
       "myParam",
       ParameterLocation.QUERY,
@@ -47,18 +48,12 @@ public class ParameterProcessorUnitTest {
     );
 
     when(mockedParser.parseParameter(any())).thenReturn(null);
-
-    processor.process(new HashMap<>()).setHandler(testContext.failing(throwable -> {
-      testContext.verify(() -> {
-        assertThat(throwable)
-          .isInstanceOf(ParameterProcessorException.class)
-          .hasFieldOrPropertyWithValue("errorType", ParameterProcessorException.ParameterProcessorErrorType.MISSING_PARAMETER_WHEN_REQUIRED_ERROR)
-          .hasFieldOrPropertyWithValue("location", ParameterLocation.QUERY)
-          .hasFieldOrPropertyWithValue("parameterName", "myParam")
-          .hasNoCause();
-      });
-      testContext.completeNow();
-    }));
+    assertThatCode(() -> processor.process(new HashMap<>()))
+      .isInstanceOf(ParameterProcessorException.class)
+      .hasFieldOrPropertyWithValue("errorType", ParameterProcessorException.ParameterProcessorErrorType.MISSING_PARAMETER_WHEN_REQUIRED_ERROR)
+      .hasFieldOrPropertyWithValue("location", ParameterLocation.QUERY)
+      .hasFieldOrPropertyWithValue("parameterName", "myParam")
+      .hasNoCause();
   }
 
   @Test
@@ -82,7 +77,7 @@ public class ParameterProcessorUnitTest {
   }
 
   @Test
-  public void testParsingFailure(VertxTestContext testContext) {
+  public void testParsingFailure() {
     ParameterProcessor processor = new ParameterProcessorImpl(
       "myParam",
       ParameterLocation.QUERY,
@@ -93,17 +88,12 @@ public class ParameterProcessorUnitTest {
 
     when(mockedParser.parseParameter(any())).thenThrow(new MalformedValueException("bla"));
 
-    processor.process(new HashMap<>()).setHandler(testContext.failing(throwable -> {
-      testContext.verify(() -> {
-        assertThat(throwable)
-          .isInstanceOf(ParameterProcessorException.class)
-          .hasFieldOrPropertyWithValue("errorType", ParameterProcessorException.ParameterProcessorErrorType.PARSING_ERROR)
-          .hasFieldOrPropertyWithValue("location", ParameterLocation.QUERY)
-          .hasFieldOrPropertyWithValue("parameterName", "myParam")
-          .hasCauseInstanceOf(MalformedValueException.class);
-      });
-      testContext.completeNow();
-    }));
+    assertThatCode(() -> processor.process(new HashMap<>()))
+      .isInstanceOf(ParameterProcessorException.class)
+      .hasFieldOrPropertyWithValue("errorType", ParameterProcessorException.ParameterProcessorErrorType.PARSING_ERROR)
+      .hasFieldOrPropertyWithValue("location", ParameterLocation.QUERY)
+      .hasFieldOrPropertyWithValue("parameterName", "myParam")
+      .hasCauseInstanceOf(MalformedValueException.class);
   }
 
   @Test

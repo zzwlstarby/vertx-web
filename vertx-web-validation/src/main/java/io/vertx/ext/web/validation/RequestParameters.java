@@ -79,21 +79,6 @@ public interface RequestParameters {
   @Nullable RequestParameter cookieParameter(String name);
 
   /**
-   * Get list of all parameter names inside body form
-   *
-   * @return
-   */
-  List<String> formParametersNames();
-
-  /**
-   * Get form parameter by name
-   *
-   * @param name Parameter name
-   * @return
-   */
-  @Nullable RequestParameter formParameter(String name);
-
-  /**
    * Return request body
    *
    * @return

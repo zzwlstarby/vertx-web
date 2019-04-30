@@ -16,7 +16,6 @@ public class RequestParametersImpl implements RequestParameters {
   private Map<String, RequestParameter> queryParameters;
   private Map<String, RequestParameter> headerParameters;
   private Map<String, RequestParameter> cookieParameters;
-  private Map<String, RequestParameter> formParameters;
   private RequestParameter body;
 
   public RequestParametersImpl() {
@@ -24,7 +23,6 @@ public class RequestParametersImpl implements RequestParameters {
     queryParameters = new HashMap<>();
     headerParameters = new HashMap<>();
     cookieParameters = new HashMap<>();
-    formParameters = new HashMap<>();
     body = null;
   }
 
@@ -52,12 +50,6 @@ public class RequestParametersImpl implements RequestParameters {
     }
   }
 
-  public void setFormParameters(Map<String, RequestParameter> formParameters) {
-    if (formParameters != null) {
-      this.formParameters = formParameters;
-    }
-  }
-
   public void setBody(RequestParameter body) {
     if (body != null) {
       this.body = body;
@@ -73,8 +65,6 @@ public class RequestParametersImpl implements RequestParameters {
       this.headerParameters.putAll(other.headerParameters);
     if (other.cookieParameters != null)
       this.cookieParameters.putAll(other.cookieParameters);
-    if (other.formParameters != null)
-      this.formParameters.putAll(other.formParameters);
     this.body = (other.body == null) ? this.body : other.body;
   }
 
@@ -119,16 +109,6 @@ public class RequestParametersImpl implements RequestParameters {
   }
 
   @Override
-  public List<String> formParametersNames() {
-    return new ArrayList<>(formParameters.keySet());
-  }
-
-  @Override
-  public RequestParameter formParameter(String name) {
-    return formParameters.get(name);
-  }
-
-  @Override
   public RequestParameter body() {
     return body;
   }
@@ -142,13 +122,12 @@ public class RequestParametersImpl implements RequestParameters {
       Objects.equals(queryParameters, that.queryParameters) &&
       Objects.equals(headerParameters, that.headerParameters) &&
       Objects.equals(cookieParameters, that.cookieParameters) &&
-      Objects.equals(formParameters, that.formParameters) &&
       Objects.equals(body, that.body);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(pathParameters, queryParameters, headerParameters, cookieParameters, formParameters, body);
+    return Objects.hash(pathParameters, queryParameters, headerParameters, cookieParameters, body);
   }
 
   @Override
@@ -158,7 +137,6 @@ public class RequestParametersImpl implements RequestParameters {
     root.put("query", mapToJsonObject(queryParameters));
     root.put("header", mapToJsonObject(headerParameters));
     root.put("cookie", mapToJsonObject(cookieParameters));
-    root.put("form", mapToJsonObject(formParameters));
     if (body != null)
       root.put("body", body.toJson());
     return root;

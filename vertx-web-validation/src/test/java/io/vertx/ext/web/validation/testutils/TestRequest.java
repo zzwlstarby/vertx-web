@@ -1,10 +1,12 @@
 package io.vertx.ext.web.validation.testutils;
 
+import io.vertx.core.MultiMap;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.ext.web.client.HttpRequest;
 import io.vertx.ext.web.client.HttpResponse;
 import io.vertx.ext.web.client.WebClient;
+import io.vertx.ext.web.multipart.MultipartForm;
 import io.vertx.junit5.Checkpoint;
 import io.vertx.junit5.VertxTestContext;
 import org.assertj.core.api.Condition;
@@ -54,6 +56,54 @@ public class TestRequest {
     HttpRequest<Buffer> req = client.request(method, path);
     this.requestTranformations.forEach(c -> c.accept(req));
     req.send(ar -> {
+      if (ar.failed()) testContext.failNow(ar.cause());
+      else {
+        testContext.verify(() -> {
+          this.responseConditions.forEach(c -> assertThat(ar.result()).satisfies(c));
+          this.responseAsserts.forEach(c -> c.accept(ar.result()));
+        });
+        checkpoint.flag();
+      }
+    });
+    return this;
+  }
+
+  public TestRequest sendJson(Object json, VertxTestContext testContext, Checkpoint checkpoint) {
+    HttpRequest<Buffer> req = client.request(method, path);
+    this.requestTranformations.forEach(c -> c.accept(req));
+    req.sendJson(json, ar -> {
+      if (ar.failed()) testContext.failNow(ar.cause());
+      else {
+        testContext.verify(() -> {
+          this.responseConditions.forEach(c -> assertThat(ar.result()).satisfies(c));
+          this.responseAsserts.forEach(c -> c.accept(ar.result()));
+        });
+        checkpoint.flag();
+      }
+    });
+    return this;
+  }
+
+  public TestRequest sendURLEncodedForm(MultiMap form, VertxTestContext testContext, Checkpoint checkpoint) {
+    HttpRequest<Buffer> req = client.request(method, path);
+    this.requestTranformations.forEach(c -> c.accept(req));
+    req.sendForm(form, ar -> {
+      if (ar.failed()) testContext.failNow(ar.cause());
+      else {
+        testContext.verify(() -> {
+          this.responseConditions.forEach(c -> assertThat(ar.result()).satisfies(c));
+          this.responseAsserts.forEach(c -> c.accept(ar.result()));
+        });
+        checkpoint.flag();
+      }
+    });
+    return this;
+  }
+
+  public TestRequest sendMultipartForm(MultipartForm form, VertxTestContext testContext, Checkpoint checkpoint) {
+    HttpRequest<Buffer> req = client.request(method, path);
+    this.requestTranformations.forEach(c -> c.accept(req));
+    req.sendMultipartForm(form, ar -> {
       if (ar.failed()) testContext.failNow(ar.cause());
       else {
         testContext.verify(() -> {

@@ -20,6 +20,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import static io.vertx.ext.json.schema.generic.dsl.Schemas.schema;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.Mockito.when;
@@ -134,5 +135,19 @@ class JsonBodyProcessorImplTest {
       .isInstanceOf(BodyProcessorException.class)
       .hasFieldOrPropertyWithValue("actualContentType", "application/json")
       .hasCauseInstanceOf(DecodeException.class);
+  }
+
+  @Test
+  public void testNull(VertxTestContext testContext) {
+    when(mockedContext.getBody()).thenReturn(Buffer.buffer("null"));
+
+    BodyProcessor processor = BodyProcessorFactory.json(schema().withKeyword("type", "null")).create(parser);
+
+    processor.process(mockedContext).setHandler(testContext.succeeding(rp -> {
+      testContext.verify(() -> {
+        assertThat(rp.isNull()).isTrue();
+      });
+      testContext.completeNow();
+    }));
   }
 }

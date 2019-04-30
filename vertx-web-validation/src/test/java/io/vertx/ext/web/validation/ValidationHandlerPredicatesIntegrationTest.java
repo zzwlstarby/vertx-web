@@ -78,15 +78,15 @@ public class ValidationHandlerPredicatesIntegrationTest {
       );
 
     testRequest(client, HttpMethod.POST, "/testRequiredBody")
-      .withResponseAsserts(statusCode(200))
+      .asserts(statusCode(200))
       .sendJson(new JsonObject(), testContext, checkpoint);
 
     testRequest(client, HttpMethod.GET, "/testRequiredBody")
-      .withResponseAsserts(statusCode(400), failurePredicateResponse())
+      .asserts(statusCode(400), failurePredicateResponse())
       .send(testContext, checkpoint);
 
     testRequest(client, HttpMethod.POST, "/testRequiredBody")
-      .withResponseAsserts(statusCode(400), failurePredicateResponse())
+      .asserts(statusCode(400), failurePredicateResponse())
       .send(testContext, checkpoint);
   }
 
@@ -113,19 +113,19 @@ public class ValidationHandlerPredicatesIntegrationTest {
       );
 
     testRequest(client, HttpMethod.POST, "/testFileUpload")
-      .withResponseAsserts(statusCode(200))
+      .asserts(statusCode(200))
       .send(testContext, checkpoint);
 
     testRequest(client, HttpMethod.POST, "/testFileUpload")
-      .withResponseAsserts(statusCode(400))
+      .asserts(statusCode(400))
       .sendMultipartForm(MultipartForm.create(), testContext, checkpoint);
 
     testRequest(client, HttpMethod.POST, "/testFileUpload")
-      .withResponseAsserts(statusCode(400))
+      .asserts(statusCode(400))
       .sendMultipartForm(MultipartForm.create().attribute("myfile", "bla"), testContext, checkpoint);
 
     testRequest(client, HttpMethod.POST, "/testFileUpload")
-      .withResponseAsserts(statusCode(200))
+      .asserts(statusCode(200))
       .sendMultipartForm(MultipartForm.create().textFileUpload("myfile", "myfile.txt", "src/test/resources/myfile.txt", "text/plain"), testContext, checkpoint);
   }
 

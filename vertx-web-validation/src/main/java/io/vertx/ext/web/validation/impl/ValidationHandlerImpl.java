@@ -69,6 +69,7 @@ public class ValidationHandlerImpl implements ValidationHandler {
             requestParameters.setPathParameters(f.result());
           } else {
             routingContext.fail(400, f.cause());
+            return;
           }
         } else {
           waitingFut = f.compose(res -> {
@@ -85,6 +86,7 @@ public class ValidationHandlerImpl implements ValidationHandler {
             requestParameters.setCookieParameters(f.result());
           } else {
             routingContext.fail(400, f.cause());
+            return;
           }
         } else {
           waitingFut = f.compose(res -> {
@@ -101,6 +103,7 @@ public class ValidationHandlerImpl implements ValidationHandler {
             requestParameters.setQueryParameters(f.result());
           } else {
             routingContext.fail(400, f.cause());
+            return;
           }
         } else {
           waitingFut = f.compose(res -> {
@@ -117,6 +120,7 @@ public class ValidationHandlerImpl implements ValidationHandler {
             requestParameters.setHeaderParameters(f.result());
           } else {
             routingContext.fail(400, f.cause());
+            return;
           }
         } else {
           waitingFut = f.compose(res -> {
@@ -127,22 +131,19 @@ public class ValidationHandlerImpl implements ValidationHandler {
       }
 
       if (bodyProcessors != null && routingContext.request().headers().contains("content-type")) {
-        try {
-          Future<RequestParameter> f = validateBody(routingContext);
-          if (f.isComplete()) {
-            if (f.succeeded()) {
-              requestParameters.setBody(f.result());
-            } else {
-              routingContext.fail(400, f.cause());
-            }
+        Future<RequestParameter> f = validateBody(routingContext);
+        if (f.isComplete()) {
+          if (f.succeeded()) {
+            requestParameters.setBody(f.result());
           } else {
-            waitingFut = f.compose(res -> {
-              requestParameters.setBody(res);
-              return resultFut;
-            });
+            routingContext.fail(400, f.cause());
+            return;
           }
-        } catch (BadRequestException e) {
-          routingContext.fail(400, e);
+        } else {
+          waitingFut = f.compose(res -> {
+            requestParameters.setBody(res);
+            return resultFut;
+          });
         }
       }
 

@@ -15,7 +15,6 @@ public class ValidationTestUtils {
   public static void mountRouterFailureHandler(Router router) {
     router.errorHandler(400, routingContext -> {
       Throwable failure = routingContext.failure();
-      failure.printStackTrace();
       if (failure instanceof BadRequestException) {
         routingContext
           .response()
@@ -23,6 +22,7 @@ public class ValidationTestUtils {
           .setStatusCode(400)
           .end(((BadRequestException) failure).toJson().toBuffer());
       } else {
+        failure.printStackTrace();
         routingContext.response().setStatusCode(500).setStatusMessage("Unknown failure: " + failure.toString()).end();
       }
     });

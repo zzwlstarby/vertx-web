@@ -76,6 +76,28 @@ public class ParameterProcessorUnitTest {
     }));
   }
 
+
+  @Test
+  public void testOptionalParamWithDefault(VertxTestContext testContext) {
+    ParameterProcessor processor = new ParameterProcessorImpl(
+      "myParam",
+      ParameterLocation.QUERY,
+      true,
+      mockedParser,
+      mockedValidator
+    );
+
+    when(mockedParser.parseParameter(any())).thenReturn(null);
+    when(mockedValidator.getDefault()).thenReturn("bla");
+
+    processor.process(new HashMap<>()).setHandler(testContext.succeeding(value -> {
+      testContext.verify(() ->
+        assertThat(value.getString()).isEqualTo("bla")
+      );
+      testContext.completeNow();
+    }));
+  }
+
   @Test
   public void testParsingFailure() {
     ParameterProcessor processor = new ParameterProcessorImpl(

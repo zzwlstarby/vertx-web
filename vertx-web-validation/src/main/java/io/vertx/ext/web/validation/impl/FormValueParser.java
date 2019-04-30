@@ -4,7 +4,6 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.ext.web.validation.ValueParser;
 
 import java.util.List;
-import java.util.Objects;
 
 public class FormValueParser implements ValueParser<List<String>> {
 
@@ -23,17 +22,4 @@ public class FormValueParser implements ValueParser<List<String>> {
       return innerValueParser.parse(values.get(0));
   }
 
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-    FormValueParser that = (FormValueParser) o;
-    return expectedArray == that.expectedArray &&
-      Objects.equals(innerValueParser, that.innerValueParser);
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(expectedArray, innerValueParser);
-  }
 }

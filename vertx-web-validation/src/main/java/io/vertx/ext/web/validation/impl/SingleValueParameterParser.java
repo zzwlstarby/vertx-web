@@ -20,7 +20,9 @@ public class SingleValueParameterParser implements ParameterParser  {
 
   @Override
   public @Nullable Object parseParameter(Map<String, List<String>> parameterValue) throws MalformedValueException {
-    String extracted = parameterValue.remove(parameterName).get(0);
+    List<String> extractedList = parameterValue.remove(parameterName);
+    if (extractedList == null) return null;
+    String extracted = extractedList.get(0);
     return extracted != null ? valueParser.parse(extracted) : null;
   }
 }

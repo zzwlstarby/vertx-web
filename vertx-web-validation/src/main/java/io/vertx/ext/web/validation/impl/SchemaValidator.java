@@ -30,4 +30,10 @@ public class SchemaValidator implements Validator {
       return RequestParameter.create(json);
     });
   }
+
+  @Override
+  public Object getDefault() {
+    return s.getDefaultValue();
+  }
+
 }

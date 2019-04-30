@@ -1,5 +1,6 @@
 package io.vertx.ext.web.validation.testutils;
 
+import io.netty.handler.codec.http.QueryStringEncoder;
 import io.vertx.core.MultiMap;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpMethod;
@@ -9,8 +10,10 @@ import io.vertx.ext.web.client.WebClient;
 import io.vertx.ext.web.multipart.MultipartForm;
 import io.vertx.junit5.Checkpoint;
 import io.vertx.junit5.VertxTestContext;
-import org.assertj.core.api.Condition;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URISyntaxException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -26,7 +29,6 @@ public class TestRequest {
   String path;
   List<Consumer<HttpRequest<Buffer>>> requestTranformations;
   List<Consumer<HttpResponse<Buffer>>> responseAsserts;
-  List<Condition<HttpResponse<Buffer>>> responseConditions;
 
   public TestRequest(WebClient client, HttpMethod method, String path) {
     this.client = client;
@@ -34,21 +36,15 @@ public class TestRequest {
     this.path = path;
     this.requestTranformations = new ArrayList<>();
     this.responseAsserts = new ArrayList<>();
-    this.responseConditions = new ArrayList<>();
   }
 
-  public TestRequest withTransformations(Consumer<HttpRequest<Buffer>>... transformations) {
+  public TestRequest transformations(Consumer<HttpRequest<Buffer>>... transformations) {
     requestTranformations.addAll(Arrays.asList(transformations));
     return this;
   }
 
-  public TestRequest withResponseAsserts(Consumer<HttpResponse<Buffer>>... asserts) {
+  public TestRequest asserts(Consumer<HttpResponse<Buffer>>... asserts) {
     responseAsserts.addAll(Arrays.asList(asserts));
-    return this;
-  }
-
-  public TestRequest withResponseConditions(Condition<HttpResponse<Buffer>>... conditions) {
-    responseConditions.addAll(Arrays.asList(conditions));
     return this;
   }
 
@@ -59,7 +55,6 @@ public class TestRequest {
       if (ar.failed()) testContext.failNow(ar.cause());
       else {
         testContext.verify(() -> {
-          this.responseConditions.forEach(c -> assertThat(ar.result()).satisfies(c));
           this.responseAsserts.forEach(c -> c.accept(ar.result()));
         });
         checkpoint.flag();
@@ -75,7 +70,6 @@ public class TestRequest {
       if (ar.failed()) testContext.failNow(ar.cause());
       else {
         testContext.verify(() -> {
-          this.responseConditions.forEach(c -> assertThat(ar.result()).satisfies(c));
           this.responseAsserts.forEach(c -> c.accept(ar.result()));
         });
         checkpoint.flag();
@@ -91,7 +85,6 @@ public class TestRequest {
       if (ar.failed()) testContext.failNow(ar.cause());
       else {
         testContext.verify(() -> {
-          this.responseConditions.forEach(c -> assertThat(ar.result()).satisfies(c));
           this.responseAsserts.forEach(c -> c.accept(ar.result()));
         });
         checkpoint.flag();
@@ -107,7 +100,6 @@ public class TestRequest {
       if (ar.failed()) testContext.failNow(ar.cause());
       else {
         testContext.verify(() -> {
-          this.responseConditions.forEach(c -> assertThat(ar.result()).satisfies(c));
           this.responseAsserts.forEach(c -> c.accept(ar.result()));
         });
         checkpoint.flag();
@@ -120,12 +112,41 @@ public class TestRequest {
     return new TestRequest(client, method, path);
   }
 
+  public static TestRequest testRequest(WebClient client, HttpMethod method) {
+    return new TestRequest(client, method, "/test");
+  }
+
   public static Consumer<HttpResponse<Buffer>> statusCode(int statusCode) {
     return res -> assertThat(res.statusCode()).isEqualTo(statusCode);
   }
 
   public static Consumer<HttpResponse<Buffer>> statusMessage(String statusMessage) {
     return res -> assertThat(res.statusMessage()).isEqualTo(statusMessage);
+  }
+
+  public static Consumer<HttpRequest<Buffer>> header(String key, String value) {
+    return req -> req.putHeader(key, value);
+  }
+
+  public static Consumer<HttpRequest<Buffer>> cookie(QueryStringEncoder encoder) {
+    return req -> {
+      try {
+        String rawQuery = encoder.toUri().getRawQuery();
+        if (rawQuery != null && !rawQuery.isEmpty())
+          req.putHeader("cookie", encoder.toUri().getRawQuery());
+      } catch (URISyntaxException e) {
+        e.printStackTrace();
+      }
+    };
+  }
+
+  public static String urlEncode(String s) {
+    try {
+      return URLEncoder.encode(s, "UTF-8");
+    } catch (UnsupportedEncodingException e) {
+      e.printStackTrace();
+      return null;
+    }
   }
 
 }

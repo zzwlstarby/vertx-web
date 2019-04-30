@@ -36,8 +36,12 @@ public class ParameterProcessorImpl implements ParameterProcessor {
       return validator.validate(json).recover(t -> Future.failedFuture(createValidationError(parameterName, location, t)));
     else if (!isOptional)
       throw createMissingParameterWhenRequired(parameterName, location);
-    else
-      return Future.succeededFuture();
+    else {
+      if (validator.getDefault() != null)
+        return Future.succeededFuture(RequestParameter.create(validator.getDefault()));
+      else
+        return Future.succeededFuture();
+    }
 
   }
 

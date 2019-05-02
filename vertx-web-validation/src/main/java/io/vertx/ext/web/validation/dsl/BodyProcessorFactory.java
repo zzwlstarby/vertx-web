@@ -2,7 +2,6 @@ package io.vertx.ext.web.validation.dsl;
 
 import io.vertx.ext.json.schema.Schema;
 import io.vertx.ext.json.schema.SchemaParser;
-import io.vertx.ext.json.schema.generic.dsl.ArraySchemaBuilder;
 import io.vertx.ext.json.schema.generic.dsl.ObjectSchemaBuilder;
 import io.vertx.ext.json.schema.generic.dsl.SchemaBuilder;
 import io.vertx.ext.json.schema.generic.dsl.StringSchemaBuilder;
@@ -14,14 +13,6 @@ public interface BodyProcessorFactory {
   BodyProcessor create(SchemaParser parser);
 
   static BodyProcessorFactory json(SchemaBuilder schemaBuilder) {
-    return parser -> new JsonBodyProcessorImpl(new SchemaValidator(schemaBuilder.build(parser)));
-  }
-
-  static BodyProcessorFactory json(ObjectSchemaBuilder schemaBuilder) {
-    return parser -> new JsonBodyProcessorImpl(new SchemaValidator(schemaBuilder.build(parser)));
-  }
-
-  static BodyProcessorFactory json(ArraySchemaBuilder schemaBuilder) {
     return parser -> new JsonBodyProcessorImpl(new SchemaValidator(schemaBuilder.build(parser)));
   }
 

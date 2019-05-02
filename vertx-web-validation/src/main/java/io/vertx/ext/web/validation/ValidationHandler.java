@@ -1,6 +1,5 @@
 package io.vertx.ext.web.validation;
 
-import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.Handler;
 import io.vertx.ext.json.schema.SchemaParser;
 import io.vertx.ext.web.RoutingContext;
@@ -11,7 +10,7 @@ import io.vertx.ext.web.validation.dsl.ValidationHandlerBuilder;
  *
  * @author Francesco Guardiani @slinkydeveloper
  */
-@VertxGen(concrete = false)
+//@VertxGen(concrete = false)
 public interface ValidationHandler extends Handler<RoutingContext> {
 
   //TODO normal query, path, cookie, header parameters has:

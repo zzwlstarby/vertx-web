@@ -243,24 +243,17 @@ public class ValidationHandlerImpl implements ValidationHandler {
             return Future.failedFuture(fut.cause());
           }
         } else {
-          if (waitingFutureChain == null) {
-            waitingFutureChain = fut.map(rp -> {
-              parsedParams.put(processor.getName(), rp);
-              return parsedParams;
-            });
-          } else {
-            waitingFutureChain.compose(m -> fut.map(rp -> {
-              parsedParams.put(processor.getName(), rp);
-              return parsedParams;
-            }));
-          }
+          waitingFutureChain = waitingFutureChain.compose(m -> fut.map(rp -> {
+            parsedParams.put(processor.getName(), rp);
+            return parsedParams;
+          }));
         }
       } catch (BadRequestException e) {
         return Future.failedFuture(e);
       }
     }
 
-    return Future.succeededFuture(parsedParams);
+    return waitingFutureChain;
   }
 
 }

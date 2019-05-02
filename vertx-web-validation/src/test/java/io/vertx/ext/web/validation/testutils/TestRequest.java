@@ -4,6 +4,7 @@ import io.netty.handler.codec.http.QueryStringEncoder;
 import io.vertx.core.MultiMap;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpMethod;
+import io.vertx.core.json.Json;
 import io.vertx.ext.web.client.HttpRequest;
 import io.vertx.ext.web.client.HttpResponse;
 import io.vertx.ext.web.client.WebClient;
@@ -137,6 +138,14 @@ public class TestRequest {
       } catch (URISyntaxException e) {
         e.printStackTrace();
       }
+    };
+  }
+
+  public static Consumer<HttpResponse<Buffer>> jsonBodyResponse(Object expected) {
+    return res -> {
+      assertThat(res.getHeader("content-type")).isEqualTo("application/json");
+      Object json = Json.decodeValue(res.bodyAsBuffer());
+      assertThat(json).isEqualTo(json);
     };
   }
 

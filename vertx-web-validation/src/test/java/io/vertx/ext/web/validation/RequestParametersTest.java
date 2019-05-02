@@ -29,7 +29,6 @@ public class RequestParametersTest {
     assertEquals(0, obj.getJsonObject("path").size());
     assertEquals(0, obj.getJsonObject("cookie").size());
     assertEquals(0, obj.getJsonObject("query").size());
-    assertEquals(0, obj.getJsonObject("form").size());
     assertEquals(0, obj.getJsonObject("header").size());
     assertNull(obj.getValue("body"));
   }

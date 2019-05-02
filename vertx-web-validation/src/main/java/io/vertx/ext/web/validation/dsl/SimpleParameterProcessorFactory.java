@@ -129,4 +129,24 @@ public interface SimpleParameterProcessorFactory {
     )::apply;
   }
 
+  static SimpleParameterProcessorFactory param(String parameterName, SchemaBuilder schemaBuilder, ValueParser<String> parser) {
+    return (location, jsonSchemaParser) -> new ParameterProcessorImpl(
+      parameterName,
+      location,
+      false,
+      new SingleValueParameterParser(parameterName, parser),
+      new SchemaValidator(schemaBuilder.build(jsonSchemaParser))
+    );
+  }
+
+  static SimpleParameterProcessorFactory optionalParam(String parameterName, SchemaBuilder schemaBuilder, ValueParser<String> parser) {
+    return (location, jsonSchemaParser) -> new ParameterProcessorImpl(
+      parameterName,
+      location,
+      true,
+      new SingleValueParameterParser(parameterName, parser),
+      new SchemaValidator(schemaBuilder.build(jsonSchemaParser))
+    );
+  }
+
 }

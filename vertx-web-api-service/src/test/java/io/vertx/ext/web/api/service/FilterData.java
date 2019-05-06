@@ -7,7 +7,7 @@ import io.vertx.core.json.JsonObject;
 import java.util.ArrayList;
 import java.util.List;
 
-@DataObject(generateConverter = true, publicConverter = false)
+@DataObject(generateConverter = true)
 public class FilterData {
 
   private List<String> from;

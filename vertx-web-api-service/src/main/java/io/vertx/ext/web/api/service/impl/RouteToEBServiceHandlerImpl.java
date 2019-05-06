@@ -43,7 +43,7 @@ public class RouteToEBServiceHandlerImpl implements RouteToEBServiceHandler {
         else
           response.end();
       } else {
-        routingContext.fail(res.cause());
+        routingContext.fail(500, res.cause());
       }
     });
   }

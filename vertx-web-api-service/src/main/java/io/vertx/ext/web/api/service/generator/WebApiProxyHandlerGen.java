@@ -95,7 +95,7 @@ public class WebApiProxyHandlerGen extends ServiceProxyHandlerGen {
     writer.unindent()
       .codeln("} catch (Exception e) {")
       .indent()
-      .stmt("msg.reply(new ServiceException(-1, e.getMessage()))")
+      .stmt("HelperUtils.manageFailure(msg, e, includeDebugInfo)")
       .unindent()
       .codeln("}");
     if (m.isProxyClose()) writer.stmt("close()");

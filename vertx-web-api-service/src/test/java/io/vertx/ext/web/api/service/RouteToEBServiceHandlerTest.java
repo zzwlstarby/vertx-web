@@ -212,4 +212,55 @@ public class RouteToEBServiceHandlerTest extends BaseValidationHandlerTest {
       .asserts(jsonBodyResponse(new JsonObject().put("result", "Hello slinkydeveloper!")))
       .send(testContext, checkpoint);
   }
+
+  @Test
+  public void serviceProxyManualFailureTest(Vertx vertx, VertxTestContext testContext) {
+    Checkpoint checkpoint = testContext.checkpoint(2);
+
+    FailureTestService service = new FailureTestServiceImpl(vertx);
+    final ServiceBinder serviceBinder = new ServiceBinder(vertx).setAddress("someAddress");
+    consumer = serviceBinder
+      .setIncludeDebugInfo(true)
+      .register(FailureTestService.class, service);
+
+    router
+      .post("/testFailure")
+      .handler(BodyHandler.create())
+      .handler(
+        ValidationHandler.builder(parser)
+          .body(json(
+            objectSchema()
+              .requiredProperty("hello", stringSchema())
+              .requiredProperty("name", stringSchema())
+              .allowAdditionalProperties(false)
+          )).build()
+      ).handler(
+        RouteToEBServiceHandler.build(vertx.eventBus(), "someAddress", "testFailure")
+      ).failureHandler(
+        rc -> rc.response().setStatusCode(501).setStatusMessage(rc.failure().getMessage()).end()
+      );
+
+    router
+      .post("/testException")
+      .handler(BodyHandler.create())
+      .handler(
+        ValidationHandler.builder(parser)
+          .body(json(
+            objectSchema()
+              .requiredProperty("hello", stringSchema())
+              .requiredProperty("name", stringSchema())
+              .allowAdditionalProperties(false)
+          )).build()
+      ).handler(
+        RouteToEBServiceHandler.build(vertx.eventBus(), "someAddress", "testException")
+      );
+
+    testRequest(client, HttpMethod.POST, "/testFailure")
+      .asserts(statusCode(501), statusMessage("error for Francesco"))
+      .sendJson(new JsonObject().put("hello", "Ciao").put("name", "Francesco"), testContext, checkpoint);
+
+    testRequest(client, HttpMethod.POST, "/testException")
+      .asserts(statusCode(500), statusMessage("Unknown failure: (RECIPIENT_FAILURE,-1)"))
+      .sendJson(new JsonObject().put("hello", "Ciao").put("name", "Francesco"), testContext, checkpoint);
+  }
 }

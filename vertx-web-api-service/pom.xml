@@ -143,6 +143,7 @@
               </processors>
               <excludes>
                 <exclude>**/Invalid*.java</exclude>
+                <exclude>**/*Test.java</exclude>
               </excludes>
             </configuration>
           </execution>

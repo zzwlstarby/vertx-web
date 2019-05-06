@@ -158,4 +158,10 @@ public class TestRequest {
     }
   }
 
+  public static Consumer<HttpResponse<Buffer>> emptyResponse() {
+    return res -> {
+      assertThat(res.body()).isNull();
+    };
+  }
+
 }

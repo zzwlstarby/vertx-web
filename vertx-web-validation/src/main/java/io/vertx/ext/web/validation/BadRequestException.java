@@ -1,10 +1,9 @@
 package io.vertx.ext.web.validation;
 
-import io.vertx.codegen.annotations.DataObject;
 import io.vertx.core.VertxException;
 import io.vertx.core.json.JsonObject;
 
-@DataObject
+
 public abstract class BadRequestException extends VertxException {
 
   public BadRequestException(String message, Throwable cause) {

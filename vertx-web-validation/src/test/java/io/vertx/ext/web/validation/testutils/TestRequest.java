@@ -149,6 +149,13 @@ public class TestRequest {
     };
   }
 
+  public static Consumer<HttpResponse<Buffer>> bodyResponse(Buffer expected, String expectedContentType) {
+    return res -> {
+      assertThat(res.getHeader("content-type")).isEqualTo(expectedContentType);
+      assertThat(res.bodyAsBuffer()).isEqualTo(expected);
+    };
+  }
+
   public static String urlEncode(String s) {
     try {
       return URLEncoder.encode(s, "UTF-8");

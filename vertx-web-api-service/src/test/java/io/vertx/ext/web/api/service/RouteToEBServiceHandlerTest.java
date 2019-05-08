@@ -3,6 +3,7 @@ package io.vertx.ext.web.api.service;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
+import io.vertx.core.buffer.Buffer;
 import io.vertx.core.eventbus.MessageConsumer;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonArray;
@@ -262,5 +263,31 @@ public class RouteToEBServiceHandlerTest extends BaseValidationHandlerTest {
     testRequest(client, HttpMethod.POST, "/testException")
       .asserts(statusCode(500), statusMessage("Unknown failure: (RECIPIENT_FAILURE,-1)"))
       .sendJson(new JsonObject().put("hello", "Ciao").put("name", "Francesco"), testContext, checkpoint);
+  }
+
+
+  @Test
+  public void binaryDataTest(Vertx vertx, VertxTestContext testContext) {
+    Checkpoint checkpoint = testContext.checkpoint();
+
+    BinaryTestService service = new BinaryTestServiceImpl();
+    final ServiceBinder serviceBinder = new ServiceBinder(vertx).setAddress("someAddress");
+    consumer = serviceBinder
+      .setIncludeDebugInfo(true)
+      .register(BinaryTestService.class, service);
+
+    router
+      .get("/test")
+      .handler(BodyHandler.create())
+      .handler(
+        ValidationHandler.builder(parser).build()
+      ).handler(
+        RouteToEBServiceHandler.build(vertx.eventBus(), "someAddress", "binaryTest")
+      );
+
+    testRequest(client, HttpMethod.GET)
+      .asserts(statusCode(200), statusMessage("OK"))
+      .asserts(bodyResponse(Buffer.buffer(new byte[] {(byte) 0xb0}), "application/octet-stream"))
+      .send(testContext, checkpoint);
   }
 }

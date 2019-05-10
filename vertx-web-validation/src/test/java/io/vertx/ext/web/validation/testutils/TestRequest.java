@@ -50,6 +50,14 @@ public class TestRequest {
   }
 
   public TestRequest send(VertxTestContext testContext, Checkpoint checkpoint) {
+    return send(testContext, (VertxTestContext.ExecutionBlock) checkpoint::flag);
+  }
+
+  public TestRequest send(VertxTestContext testContext) {
+    return send(testContext, (VertxTestContext.ExecutionBlock) testContext::completeNow);
+  }
+
+  public TestRequest send(VertxTestContext testContext, VertxTestContext.ExecutionBlock onEnd) {
     HttpRequest<Buffer> req = client.request(method, path);
     this.requestTranformations.forEach(c -> c.accept(req));
     req.send(ar -> {
@@ -57,14 +65,22 @@ public class TestRequest {
       else {
         testContext.verify(() -> {
           this.responseAsserts.forEach(c -> c.accept(ar.result()));
+          onEnd.apply();
         });
-        checkpoint.flag();
       }
     });
     return this;
   }
 
   public TestRequest sendJson(Object json, VertxTestContext testContext, Checkpoint checkpoint) {
+    return sendJson(json, testContext, (VertxTestContext.ExecutionBlock) checkpoint::flag);
+  }
+
+  public TestRequest sendJson(Object json, VertxTestContext testContext) {
+    return sendJson(json, testContext, (VertxTestContext.ExecutionBlock) testContext::completeNow);
+  }
+
+  public TestRequest sendJson(Object json, VertxTestContext testContext, VertxTestContext.ExecutionBlock onEnd) {
     HttpRequest<Buffer> req = client.request(method, path);
     this.requestTranformations.forEach(c -> c.accept(req));
     req.sendJson(json, ar -> {
@@ -72,14 +88,45 @@ public class TestRequest {
       else {
         testContext.verify(() -> {
           this.responseAsserts.forEach(c -> c.accept(ar.result()));
+          onEnd.apply();
         });
-        checkpoint.flag();
+      }
+    });
+    return this;
+  }
+
+  public TestRequest sendBuffer(Buffer buf, VertxTestContext testContext, Checkpoint checkpoint) {
+    return sendBuffer(buf, testContext, (VertxTestContext.ExecutionBlock) checkpoint::flag);
+  }
+
+  public TestRequest sendBuffer(Buffer buf, VertxTestContext testContext) {
+    return sendBuffer(buf, testContext, (VertxTestContext.ExecutionBlock) testContext::completeNow);
+  }
+
+  public TestRequest sendBuffer(Buffer buf, VertxTestContext testContext, VertxTestContext.ExecutionBlock onEnd) {
+    HttpRequest<Buffer> req = client.request(method, path);
+    this.requestTranformations.forEach(c -> c.accept(req));
+    req.sendBuffer(buf, ar -> {
+      if (ar.failed()) testContext.failNow(ar.cause());
+      else {
+        testContext.verify(() -> {
+          this.responseAsserts.forEach(c -> c.accept(ar.result()));
+          onEnd.apply();
+        });
       }
     });
     return this;
   }
 
   public TestRequest sendURLEncodedForm(MultiMap form, VertxTestContext testContext, Checkpoint checkpoint) {
+    return sendURLEncodedForm(form, testContext, (VertxTestContext.ExecutionBlock) checkpoint::flag);
+  }
+
+  public TestRequest sendURLEncodedForm(MultiMap form, VertxTestContext testContext) {
+    return sendURLEncodedForm(form, testContext, (VertxTestContext.ExecutionBlock) testContext::completeNow);
+  }
+
+  public TestRequest sendURLEncodedForm(MultiMap form, VertxTestContext testContext, VertxTestContext.ExecutionBlock onEnd) {
     HttpRequest<Buffer> req = client.request(method, path);
     this.requestTranformations.forEach(c -> c.accept(req));
     req.sendForm(form, ar -> {
@@ -87,14 +134,22 @@ public class TestRequest {
       else {
         testContext.verify(() -> {
           this.responseAsserts.forEach(c -> c.accept(ar.result()));
+          onEnd.apply();
         });
-        checkpoint.flag();
       }
     });
     return this;
   }
 
   public TestRequest sendMultipartForm(MultipartForm form, VertxTestContext testContext, Checkpoint checkpoint) {
+    return sendMultipartForm(form, testContext, (VertxTestContext.ExecutionBlock) checkpoint::flag);
+  }
+
+  public TestRequest sendMultipartForm(MultipartForm form, VertxTestContext testContext) {
+    return sendMultipartForm(form, testContext, (VertxTestContext.ExecutionBlock) testContext::completeNow);
+  }
+
+  public TestRequest sendMultipartForm(MultipartForm form, VertxTestContext testContext, VertxTestContext.ExecutionBlock onEnd) {
     HttpRequest<Buffer> req = client.request(method, path);
     this.requestTranformations.forEach(c -> c.accept(req));
     req.sendMultipartForm(form, ar -> {
@@ -102,8 +157,8 @@ public class TestRequest {
       else {
         testContext.verify(() -> {
           this.responseAsserts.forEach(c -> c.accept(ar.result()));
+          onEnd.apply();
         });
-        checkpoint.flag();
       }
     });
     return this;
@@ -153,6 +208,12 @@ public class TestRequest {
     return res -> {
       assertThat(res.getHeader("content-type")).isEqualTo(expectedContentType);
       assertThat(res.bodyAsBuffer()).isEqualTo(expected);
+    };
+  }
+
+  public static Consumer<HttpResponse<Buffer>> headerResponse(String headerName, String headerValue) {
+    return res -> {
+      assertThat(res.getHeader(headerName)).isEqualTo(headerValue);
     };
   }
 

@@ -23,9 +23,9 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>io.slinkydeveloper</groupId>
-      <artifactId>vertx-json-validator</artifactId>
-      <version>1.0-SNAPSHOT</version>
+      <groupId>io.vertx</groupId>
+      <artifactId>vertx-json-schema</artifactId>
+      <version>${project.version}</version>
     </dependency>
 
     <!-- Testing dependencies -->

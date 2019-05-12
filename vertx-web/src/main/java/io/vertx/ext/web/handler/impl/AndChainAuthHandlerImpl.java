@@ -12,11 +12,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-public class ChainAuthHandlerImpl extends AuthHandlerImpl implements ChainAuthHandler {
+public class AndChainAuthHandlerImpl extends AuthHandlerImpl implements ChainAuthHandler {
 
   private final List<AuthHandler> handlers = new ArrayList<>();
 
-  public ChainAuthHandlerImpl() {
+  public AndChainAuthHandlerImpl() {
     super(null);
   }
 
@@ -58,11 +58,11 @@ public class ChainAuthHandlerImpl extends AuthHandlerImpl implements ChainAuthHa
     iterate(0, context, null, handler);
   }
 
-  private void iterate(final int idx, final RoutingContext ctx, HttpStatusException lastException, Handler<AsyncResult<JsonObject>> handler) {
+  private void iterate(final int idx, final RoutingContext ctx, JsonObject lastResult, Handler<AsyncResult<JsonObject>> handler) {
     // stop condition
     if (idx >= handlers.size()) {
-      // no more providers, means that we failed to find a provider capable of performing this operation
-      handler.handle(Future.failedFuture(lastException));
+      // no more providers, means that we succeeded
+      handler.handle(Future.succeededFuture(lastResult));
       return;
     }
 
@@ -70,19 +70,7 @@ public class ChainAuthHandlerImpl extends AuthHandlerImpl implements ChainAuthHa
     final AuthHandler authHandler = handlers.get(idx);
 
     authHandler.parseCredentials(ctx, res -> {
-      if (res.failed()) {
-        if (res.cause() instanceof HttpStatusException) {
-          final HttpStatusException exception = (HttpStatusException) res.cause();
-          switch (exception.getStatusCode()) {
-            case 302:
-            case 400:
-            case 401:
-            case 403:
-              // try again with next provider since we know what kind of error it is
-              iterate(idx + 1, ctx, exception, handler);
-              return;
-          }
-        }
+      if (res.failed()) { // Boom! Failed
         handler.handle(Future.failedFuture(res.cause()));
         return;
       }
@@ -91,7 +79,8 @@ public class ChainAuthHandlerImpl extends AuthHandlerImpl implements ChainAuthHa
       if (authHandler instanceof AuthHandlerImpl) {
         ctx.put(AuthHandlerImpl.AUTH_PROVIDER_CONTEXT_KEY, ((AuthHandlerImpl) authHandler).authProvider);
       }
-      handler.handle(Future.succeededFuture(res.result()));
+      JsonObject mergedResult = lastResult == null ? res.result() : res.result() == null ? lastResult : lastResult.mergeIn(res.result());
+      iterate(idx + 1, ctx, mergedResult, handler);
     });
   }
 }

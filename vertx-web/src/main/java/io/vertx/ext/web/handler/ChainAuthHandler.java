@@ -17,7 +17,8 @@ package io.vertx.ext.web.handler;
 
 import io.vertx.codegen.annotations.Fluent;
 import io.vertx.codegen.annotations.VertxGen;
-import io.vertx.ext.web.handler.impl.ChainAuthHandlerImpl;
+import io.vertx.ext.web.handler.impl.AndChainAuthHandlerImpl;
+import io.vertx.ext.web.handler.impl.OrChainAuthHandlerImpl;
 
 /**
  * An auth handler that chains to a sequence of handlers.
@@ -27,8 +28,31 @@ import io.vertx.ext.web.handler.impl.ChainAuthHandlerImpl;
 @VertxGen
 public interface ChainAuthHandler extends AuthHandler {
 
+  /**
+   * Same as {@link ChainAuthHandler#or()}
+   *
+    * @return
+   */
   static ChainAuthHandler create() {
-    return new ChainAuthHandlerImpl();
+    return new OrChainAuthHandlerImpl();
+  }
+
+  /**
+   * Returns a ChainAuthHandler that executes every of the appended auth handlers till returns valid credentials
+   *
+   * @return
+   */
+  static ChainAuthHandler or() {
+    return new OrChainAuthHandlerImpl();
+  }
+
+  /**
+   * Returns a ChainAuthHandler that does th
+   *
+   * @return
+   */
+  static ChainAuthHandler and() {
+    return new AndChainAuthHandlerImpl();
   }
 
   /**

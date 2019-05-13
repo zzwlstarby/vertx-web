@@ -200,7 +200,7 @@ public class TestRequest {
     return res -> {
       assertThat(res.getHeader("content-type")).isEqualTo("application/json");
       Object json = Json.decodeValue(res.bodyAsBuffer());
-      assertThat(json).isEqualTo(json);
+      assertThat(json).isEqualTo(expected);
     };
   }
 

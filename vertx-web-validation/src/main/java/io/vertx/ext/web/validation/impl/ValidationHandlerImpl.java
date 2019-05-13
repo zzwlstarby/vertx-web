@@ -164,6 +164,10 @@ public class ValidationHandlerImpl implements ValidationHandler {
     }
   }
 
+  public boolean isBodyRequired() {
+    return Arrays.stream(predicates).anyMatch(p -> p == RequestPredicate.BODY_REQUIRED);
+  }
+
   private void runPredicates(RoutingContext context) throws BadRequestException {
     for (Function<RoutingContext, RequestPredicateResult> p : predicates) {
       RequestPredicateResult res = p.apply(context);

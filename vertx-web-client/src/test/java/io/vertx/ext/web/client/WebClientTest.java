@@ -1682,4 +1682,12 @@ public class WebClientTest extends HttpTestBase {
     });
   }
 
+  @Test
+  public void testRendersPathTemplate() throws Exception {
+    testRequest(
+      client -> client.get(PathTemplate.parse("/:name"), PathParameters.create().param("name", "francesco")),
+      req -> assertEquals("/francesco", req.path())
+    );
+  }
+
 }

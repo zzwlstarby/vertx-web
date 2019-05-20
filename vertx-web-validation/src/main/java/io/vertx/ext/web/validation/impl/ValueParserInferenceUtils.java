@@ -14,7 +14,7 @@ import static io.vertx.ext.web.validation.ValueParser.*;
 
 public class ValueParserInferenceUtils {
 
-  protected static ValueParser<String> infeerPrimitiveParser(Object schema) {
+  public static ValueParser<String> infeerPrimitiveParser(Object schema) {
     if (schema == null) return null;
     if (schema instanceof Boolean) {
       return (boolean)schema ? NOOP_PARSER : null;

@@ -12,6 +12,8 @@ public interface ParameterProcessor {
 
   String getName();
 
+  ParameterLocation getLocation();
+
   static ParameterProcessor create(String parameterName, ParameterLocation location, boolean isOptional, ParameterParser parser, Validator validator) {
     return new ParameterProcessorImpl(parameterName, location, isOptional, parser, validator);
   }

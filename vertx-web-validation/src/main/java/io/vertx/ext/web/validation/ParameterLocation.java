@@ -9,15 +9,8 @@ import io.vertx.codegen.annotations.VertxGen;
  */
 @VertxGen
 public enum ParameterLocation {
-  HEADER("header"),
-  QUERY("query"),
-  PATH("path"),
-  COOKIE("cookie");
-
-  public String s;
-
-  ParameterLocation(String s) {
-    this.s = s;
-  }
-
+  HEADER,
+  QUERY,
+  PATH,
+  COOKIE
 }

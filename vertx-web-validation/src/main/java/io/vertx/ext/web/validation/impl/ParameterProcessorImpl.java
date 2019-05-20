@@ -49,4 +49,9 @@ public class ParameterProcessorImpl implements ParameterProcessor {
   public String getName() {
     return parameterName;
   }
+
+  @Override
+  public ParameterLocation getLocation() {
+    return location;
+  }
 }

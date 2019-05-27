@@ -1,6 +1,7 @@
 package io.vertx.ext.web.validation.impl;
 
 import io.vertx.core.Future;
+import io.vertx.ext.json.schema.NoSyncValidationException;
 import io.vertx.ext.json.schema.Schema;
 import io.vertx.ext.json.schema.ValidationException;
 import io.vertx.ext.web.validation.RequestParameter;
@@ -26,7 +27,11 @@ public class SchemaValidator implements Validator {
       }
     }
     return s.validateAsync(json).map(v -> {
-      s.applyDefaultValues(json);
+      try {
+        s.applyDefaultValues(json);
+      } catch (NoSyncValidationException e){
+        // This happens if i try to apply default values to an async ref schema
+      }
       return RequestParameter.create(json);
     });
   }

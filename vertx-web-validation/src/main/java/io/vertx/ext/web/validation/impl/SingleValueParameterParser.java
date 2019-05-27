@@ -8,6 +8,8 @@ import io.vertx.ext.web.validation.ValueParser;
 import java.util.List;
 import java.util.Map;
 
+import static io.vertx.ext.web.validation.impl.ExplodedObjectValueParameterParser.isExplodedObjectValueParameterParserWithAdditionalProperties;
+
 public class SingleValueParameterParser implements ParameterParser  {
 
   String parameterName;
@@ -24,5 +26,11 @@ public class SingleValueParameterParser implements ParameterParser  {
     if (extractedList == null) return null;
     String extracted = extractedList.get(0);
     return extracted != null ? valueParser.parse(extracted) : null;
+  }
+
+  @Override
+  public int compareTo(ParameterParser o) {
+    if (isExplodedObjectValueParameterParserWithAdditionalProperties(o)) return -1;
+    return 0;
   }
 }

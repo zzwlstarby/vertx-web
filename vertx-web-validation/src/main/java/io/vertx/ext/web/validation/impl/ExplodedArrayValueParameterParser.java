@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collector;
 
+import static io.vertx.ext.web.validation.impl.ExplodedObjectValueParameterParser.isExplodedObjectValueParameterParserWithAdditionalProperties;
+
 public class ExplodedArrayValueParameterParser extends ArrayParser implements ParameterParser {
 
   String parameterName;
@@ -31,5 +33,11 @@ public class ExplodedArrayValueParameterParser extends ArrayParser implements Pa
   @Override
   protected boolean mustNullateValue(String serialized) {
     return serialized == null || (serialized.isEmpty() && itemsParser != ValueParser.NOOP_PARSER);
+  }
+
+  @Override
+  public int compareTo(ParameterParser o) {
+    if (isExplodedObjectValueParameterParserWithAdditionalProperties(o)) return -1;
+    return 0;
   }
 }

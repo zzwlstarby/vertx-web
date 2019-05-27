@@ -29,18 +29,26 @@ public class ValidationHandlerImpl implements ValidationHandler {
       parameterProcessors.get(ParameterLocation.QUERY) == null || parameterProcessors.get(ParameterLocation.QUERY).isEmpty() ?
         null :
         parameterProcessors.get(ParameterLocation.QUERY).toArray(new ParameterProcessor[0]);
+    if (this.queryParameters != null)
+      Arrays.sort(this.queryParameters);
     this.pathParameters =
       parameterProcessors.get(ParameterLocation.PATH) == null || parameterProcessors.get(ParameterLocation.PATH).isEmpty() ?
         null :
         parameterProcessors.get(ParameterLocation.PATH).toArray(new ParameterProcessor[0]);
+    if (this.pathParameters != null)
+      Arrays.sort(this.pathParameters);
     this.cookieParameters =
       parameterProcessors.get(ParameterLocation.COOKIE) == null || parameterProcessors.get(ParameterLocation.COOKIE).isEmpty() ?
         null :
         parameterProcessors.get(ParameterLocation.COOKIE).toArray(new ParameterProcessor[0]);
+    if (this.cookieParameters != null)
+      Arrays.sort(this.cookieParameters);
     this.headerParameters =
       parameterProcessors.get(ParameterLocation.HEADER) == null || parameterProcessors.get(ParameterLocation.HEADER).isEmpty() ?
         null :
         parameterProcessors.get(ParameterLocation.HEADER).toArray(new ParameterProcessor[0]);
+    if (this.headerParameters != null)
+      Arrays.sort(this.headerParameters);
     this.bodyProcessors =
       bodyProcessors == null || bodyProcessors.isEmpty() ?
         null :
@@ -165,6 +173,7 @@ public class ValidationHandlerImpl implements ValidationHandler {
   }
 
   public boolean isBodyRequired() {
+    if (predicates == null) return false;
     return Arrays.stream(predicates).anyMatch(p -> p == RequestPredicate.BODY_REQUIRED);
   }
 
@@ -191,13 +200,18 @@ public class ValidationHandlerImpl implements ValidationHandler {
 
   private Future<Map<String, RequestParameter>> validateCookieParams(RoutingContext routingContext) {
     // Validation process validate only params that are registered in the validation -> extra params are allowed
-    Map<String, List<String>> cookies;
-    if (!routingContext.request().headers().contains("Cookie"))
-      cookies = new HashMap<>();
-    else {
+    Map<String, List<String>> cookies = new HashMap<>();
+    if (routingContext.request().headers().contains("Cookie")) {
       // Some hack to reuse QueryStringDecoder
       QueryStringDecoder decoder = new QueryStringDecoder("/?" + routingContext.request().getHeader("Cookie"));
-      cookies = decoder.parameters();
+      // QueryStringDecoder doesn't trim whitespaces!
+
+      for (Map.Entry<String, List<String>> entry : decoder.parameters().entrySet()) {
+        cookies.merge(entry.getKey().trim(), entry.getValue(), (oldValue, newValue) -> {
+          oldValue.addAll(newValue);
+          return oldValue;
+        });
+      }
     }
     Map<String, RequestParameter> parsedParams = new HashMap<>();
 

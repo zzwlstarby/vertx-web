@@ -105,7 +105,10 @@ public class RequestParameterImpl implements RequestParameter {
 
   @Override
   public boolean isEmpty() {
-    return isNull();
+    return isNull() ||
+      (isString() && getString().isEmpty()) ||
+      (isJsonObject() && getJsonObject().isEmpty()) ||
+      (isJsonArray() && getJsonArray().isEmpty());
   }
 
   @Override

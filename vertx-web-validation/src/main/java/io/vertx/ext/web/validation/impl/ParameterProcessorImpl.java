@@ -8,7 +8,7 @@ import java.util.Map;
 
 import static io.vertx.ext.web.validation.ParameterProcessorException.*;
 
-public class ParameterProcessorImpl implements ParameterProcessor {
+public class ParameterProcessorImpl implements ParameterProcessor, Comparable<ParameterProcessorImpl> {
 
   private String parameterName;
   private ParameterLocation location;
@@ -53,5 +53,10 @@ public class ParameterProcessorImpl implements ParameterProcessor {
   @Override
   public ParameterLocation getLocation() {
     return location;
+  }
+
+  @Override
+  public int compareTo(ParameterProcessorImpl o) {
+    return parser.compareTo(o.parser);
   }
 }

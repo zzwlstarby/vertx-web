@@ -45,4 +45,15 @@ public class ExplodedObjectValueParameterParser extends ObjectParser<String> imp
   protected boolean mustNullateValue(String serialized, ValueParser<String> parser) {
     return serialized == null || (serialized.isEmpty() && parser != ValueParser.NOOP_PARSER);
   }
+
+  @Override
+  public int compareTo(ParameterParser o) {
+    if (isExplodedObjectValueParameterParserWithAdditionalProperties(this)) return 1;
+    if (isExplodedObjectValueParameterParserWithAdditionalProperties(o)) return -1;
+    return 0;
+  }
+
+  public static boolean isExplodedObjectValueParameterParserWithAdditionalProperties(ParameterParser o) {
+    return o instanceof ExplodedObjectValueParameterParser && ((ExplodedObjectValueParameterParser)o).additionalPropertiesParser != null;
+  }
 }

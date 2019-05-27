@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import static io.vertx.ext.web.validation.impl.ExplodedObjectValueParameterParser.isExplodedObjectValueParameterParserWithAdditionalProperties;
+
 public class DeepObjectValueParameterParser extends ObjectParser<String> implements ParameterParser {
 
   String parameterName;
@@ -47,5 +49,11 @@ public class DeepObjectValueParameterParser extends ObjectParser<String> impleme
   @Override
   protected boolean mustNullateValue(String serialized, ValueParser<String> parser) {
     return serialized == null || (serialized.isEmpty() && parser != ValueParser.NOOP_PARSER);
+  }
+
+  @Override
+  public int compareTo(ParameterParser o) {
+    if (isExplodedObjectValueParameterParserWithAdditionalProperties(o)) return -1;
+    return 0;
   }
 }

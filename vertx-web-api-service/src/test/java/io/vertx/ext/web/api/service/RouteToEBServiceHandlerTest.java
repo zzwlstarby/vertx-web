@@ -27,7 +27,7 @@ import java.net.URI;
 import static io.vertx.ext.json.schema.generic.dsl.Schemas.*;
 import static io.vertx.ext.web.validation.dsl.BodyProcessorFactory.json;
 import static io.vertx.ext.web.validation.dsl.SimpleParameterProcessorFactory.param;
-import static io.vertx.ext.web.validation.testutils.TestRequest.*;
+import static io.vertx.junit5.web.TestRequest.*;
 
 /**
  * @author Francesco Guardiani @slinkydeveloper
@@ -82,18 +82,18 @@ public class RouteToEBServiceHandlerTest extends BaseValidationHandlerTest {
 
 
     testRequest(client, HttpMethod.POST, "/testE/123")
-      .asserts(statusCode(200), statusMessage("OK"))
-      .asserts(jsonBodyResponse(new JsonObject().put("id", 123).put("value", 1)))
+      .expect(statusCode(200), statusMessage("OK"))
+      .expect(jsonBodyResponse(new JsonObject().put("id", 123).put("value", 1)))
       .sendJson(new JsonObject().put("value", 1), testContext, checkpoint);
 
     testRequest(client, HttpMethod.POST, "/testF/123")
-      .asserts(statusCode(200), statusMessage("OK"))
-      .asserts(jsonBodyResponse(new JsonArray().add(1 + 123).add(2 + 123).add(3 + 123)))
+      .expect(statusCode(200), statusMessage("OK"))
+      .expect(jsonBodyResponse(new JsonArray().add(1 + 123).add(2 + 123).add(3 + 123)))
       .sendJson(new JsonArray().add(1).add(2).add(3), testContext, checkpoint);
 
     testRequest(client, HttpMethod.POST, "/testF/123")
-      .asserts(statusCode(200), statusMessage("OK"))
-      .asserts(jsonBodyResponse(new JsonObject().put("id", 123).put("value", 1)))
+      .expect(statusCode(200), statusMessage("OK"))
+      .expect(jsonBodyResponse(new JsonObject().put("id", 123).put("value", 1)))
       .sendJson(new JsonObject().put("value", 1), testContext, checkpoint);
   }
 
@@ -121,9 +121,9 @@ public class RouteToEBServiceHandlerTest extends BaseValidationHandlerTest {
     JsonObject result = data.toJson().copy();
     result.remove("message");
 
-    testRequest(client, HttpMethod.POST)
-      .asserts(statusCode(200), statusMessage("OK"))
-      .asserts(jsonBodyResponse(result))
+    testRequest(client, HttpMethod.POST, "/test")
+      .expect(statusCode(200), statusMessage("OK"))
+      .expect(jsonBodyResponse(result))
       .sendJson(data.toJson(), testContext, checkpoint);
   }
 
@@ -143,9 +143,9 @@ public class RouteToEBServiceHandlerTest extends BaseValidationHandlerTest {
         RouteToEBServiceHandler.build(vertx.eventBus(), "someAddress", "testEmptyServiceResponse")
       );
 
-    testRequest(client, HttpMethod.GET)
-      .asserts(statusCode(200), statusMessage("OK"))
-      .asserts(emptyResponse())
+    testRequest(client, HttpMethod.GET, "/test")
+      .expect(statusCode(200), statusMessage("OK"))
+      .expect(emptyResponse())
       .send(testContext, checkpoint);
   }
 
@@ -184,9 +184,9 @@ public class RouteToEBServiceHandlerTest extends BaseValidationHandlerTest {
         RouteToEBServiceHandler.build(vertx.eventBus(), "someAddress", "testUser")
       );
 
-    testRequest(client, HttpMethod.GET)
-      .asserts(statusCode(200), statusMessage("OK"))
-      .asserts(jsonBodyResponse(new JsonObject().put("result", "Hello slinkydeveloper!")))
+    testRequest(client, HttpMethod.GET, "/test")
+      .expect(statusCode(200), statusMessage("OK"))
+      .expect(jsonBodyResponse(new JsonObject().put("result", "Hello slinkydeveloper!")))
       .send(testContext, checkpoint);
   }
 
@@ -208,9 +208,9 @@ public class RouteToEBServiceHandlerTest extends BaseValidationHandlerTest {
           .extraPayloadMapper(rc -> new JsonObject().put("username", "slinkydeveloper"))
       );
 
-    testRequest(client, HttpMethod.GET)
-      .asserts(statusCode(200), statusMessage("OK"))
-      .asserts(jsonBodyResponse(new JsonObject().put("result", "Hello slinkydeveloper!")))
+    testRequest(client, HttpMethod.GET, "/test")
+      .expect(statusCode(200), statusMessage("OK"))
+      .expect(jsonBodyResponse(new JsonObject().put("result", "Hello slinkydeveloper!")))
       .send(testContext, checkpoint);
   }
 
@@ -257,11 +257,11 @@ public class RouteToEBServiceHandlerTest extends BaseValidationHandlerTest {
       );
 
     testRequest(client, HttpMethod.POST, "/testFailure")
-      .asserts(statusCode(501), statusMessage("error for Francesco"))
+      .expect(statusCode(501), statusMessage("error for Francesco"))
       .sendJson(new JsonObject().put("hello", "Ciao").put("name", "Francesco"), testContext, checkpoint);
 
     testRequest(client, HttpMethod.POST, "/testException")
-      .asserts(statusCode(500), statusMessage("Unknown failure: (RECIPIENT_FAILURE,-1)"))
+      .expect(statusCode(500), statusMessage("Unknown failure: (RECIPIENT_FAILURE,-1)"))
       .sendJson(new JsonObject().put("hello", "Ciao").put("name", "Francesco"), testContext, checkpoint);
   }
 
@@ -285,9 +285,9 @@ public class RouteToEBServiceHandlerTest extends BaseValidationHandlerTest {
         RouteToEBServiceHandler.build(vertx.eventBus(), "someAddress", "binaryTest")
       );
 
-    testRequest(client, HttpMethod.GET)
-      .asserts(statusCode(200), statusMessage("OK"))
-      .asserts(bodyResponse(Buffer.buffer(new byte[] {(byte) 0xb0}), "application/octet-stream"))
+    testRequest(client, HttpMethod.GET, "/test")
+      .expect(statusCode(200), statusMessage("OK"))
+      .expect(bodyResponse(Buffer.buffer(new byte[] {(byte) 0xb0}), "application/octet-stream"))
       .send(testContext, checkpoint);
   }
 }

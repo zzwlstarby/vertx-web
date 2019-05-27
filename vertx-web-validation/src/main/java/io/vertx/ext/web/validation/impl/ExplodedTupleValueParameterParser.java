@@ -12,6 +12,8 @@ import java.util.function.Function;
 import java.util.stream.Collector;
 import java.util.stream.IntStream;
 
+import static io.vertx.ext.web.validation.impl.ExplodedObjectValueParameterParser.isExplodedObjectValueParameterParserWithAdditionalProperties;
+
 public class ExplodedTupleValueParameterParser extends TupleParser implements ParameterParser {
 
   String parameterName;
@@ -35,5 +37,11 @@ public class ExplodedTupleValueParameterParser extends TupleParser implements Pa
   @Override
   protected boolean mustNullateValue(String serialized, ValueParser<String> parser) {
     return serialized.isEmpty() && parser != ValueParser.NOOP_PARSER;
+  }
+
+  @Override
+  public int compareTo(ParameterParser o) {
+    if (isExplodedObjectValueParameterParserWithAdditionalProperties(o)) return -1;
+    return 0;
   }
 }

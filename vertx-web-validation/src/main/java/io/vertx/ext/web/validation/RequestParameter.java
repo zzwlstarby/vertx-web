@@ -114,7 +114,7 @@ public interface RequestParameter {
   boolean isNull();
 
   /**
-   * Alias of {@link RequestParameter#isNull()}
+   * A parameter is empty if it's an empty string, an empty json object/array or if it's null
    *
    * @return
    */

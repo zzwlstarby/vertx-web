@@ -26,9 +26,9 @@ import static io.vertx.ext.web.validation.dsl.BodyProcessorFactory.*;
 import static io.vertx.ext.web.validation.dsl.SimpleParameterProcessorFactory.optionalParam;
 import static io.vertx.ext.web.validation.dsl.SimpleParameterProcessorFactory.param;
 import static io.vertx.ext.web.validation.dsl.StyledParameterProcessorFactory.*;
-import static io.vertx.ext.web.validation.testutils.TestRequest.*;
 import static io.vertx.ext.web.validation.testutils.ValidationTestUtils.badBodyResponse;
 import static io.vertx.ext.web.validation.testutils.ValidationTestUtils.badParameterResponse;
+import static io.vertx.junit5.web.TestRequest.*;
 
 /**
  * @author Francesco Guardiani @slinkydeveloper
@@ -62,12 +62,12 @@ public class ValidationHandlerProcessorsIntegrationTest extends BaseValidationHa
     String c = "10";
 
     testRequest(client, HttpMethod.GET, String.format("/testPathParams/%s/%s/%s", a, b, c))
-      .asserts(statusCode(200), statusMessage(a + b + c))
+      .expect(statusCode(200), statusMessage(a + b + c))
       .send(testContext, checkpoint);
 
     testRequest(client, HttpMethod.GET, "/testPathParams/hello/bla/10")
-      .asserts(statusCode(400))
-      .asserts(badParameterResponse(
+      .expect(statusCode(400))
+      .expect(badParameterResponse(
         ParameterProcessorException.ParameterProcessorErrorType.PARSING_ERROR,
         "b",
         ParameterLocation.PATH
@@ -94,12 +94,12 @@ public class ValidationHandlerProcessorsIntegrationTest extends BaseValidationHa
       ).end();
     });
     testRequest(client, HttpMethod.GET, "/testQueryParams?param1=true&param2=10")
-      .asserts(statusCode(200), statusMessage("true10"))
+      .expect(statusCode(200), statusMessage("true10"))
       .send(testContext, checkpoint);
 
     testRequest(client, HttpMethod.GET, "/testQueryParams?param1=true&param2=bla")
-      .asserts(statusCode(400))
-      .asserts(badParameterResponse(
+      .expect(statusCode(400))
+      .expect(badParameterResponse(
         ParameterProcessorException.ParameterProcessorErrorType.PARSING_ERROR,
         "param2",
         ParameterLocation.QUERY
@@ -133,15 +133,15 @@ public class ValidationHandlerProcessorsIntegrationTest extends BaseValidationHa
       ));
 
     testRequest(client, HttpMethod.GET, "/test?myTree=" + urlEncode(testSuccessObj.encode()))
-      .asserts(statusCode(200), jsonBodyResponse(testSuccessObj))
+      .expect(statusCode(200), jsonBodyResponse(testSuccessObj))
       .send(testContext, checkpoint);
 
     JsonObject testFailureObj = testSuccessObj.copy();
     testFailureObj.remove("value");
 
     testRequest(client, HttpMethod.GET, "/test?myTree=" + urlEncode(testFailureObj.encode()))
-      .asserts(statusCode(400))
-      .asserts(badParameterResponse(
+      .expect(statusCode(400))
+      .expect(badParameterResponse(
         ParameterProcessorException.ParameterProcessorErrorType.VALIDATION_ERROR,
         "myTree",
         ParameterLocation.QUERY
@@ -168,12 +168,12 @@ public class ValidationHandlerProcessorsIntegrationTest extends BaseValidationHa
         ).end();
       });
     testRequest(client, HttpMethod.GET, "/test?param1=true&param2=5")
-      .asserts(statusCode(200), statusMessage("true5"))
+      .expect(statusCode(200), statusMessage("true5"))
       .send(testContext, checkpoint);
 
     testRequest(client, HttpMethod.GET, "/test?param1=bla&param2=5")
-      .asserts(statusCode(400))
-      .asserts(badParameterResponse(
+      .expect(statusCode(400))
+      .expect(badParameterResponse(
         ParameterProcessorException.ParameterProcessorErrorType.PARSING_ERROR,
         "param1",
         ParameterLocation.QUERY
@@ -181,8 +181,8 @@ public class ValidationHandlerProcessorsIntegrationTest extends BaseValidationHa
       .send(testContext, checkpoint);
 
     testRequest(client, HttpMethod.GET, "/test?param1=true&param2=bla")
-      .asserts(statusCode(400))
-      .asserts(badParameterResponse(
+      .expect(statusCode(400))
+      .expect(badParameterResponse(
         ParameterProcessorException.ParameterProcessorErrorType.PARSING_ERROR,
         "param2",
         ParameterLocation.QUERY
@@ -190,8 +190,8 @@ public class ValidationHandlerProcessorsIntegrationTest extends BaseValidationHa
       .send(testContext, checkpoint);
 
     testRequest(client, HttpMethod.GET, "/test?param1=true&param2=15")
-      .asserts(statusCode(400))
-      .asserts(badParameterResponse(
+      .expect(statusCode(400))
+      .expect(badParameterResponse(
         ParameterProcessorException.ParameterProcessorErrorType.VALIDATION_ERROR,
         "param2",
         ParameterLocation.QUERY
@@ -219,16 +219,16 @@ public class ValidationHandlerProcessorsIntegrationTest extends BaseValidationHa
       });
 
     testRequest(client, HttpMethod.GET, "/testQueryParams?param1=true&param2=10")
-      .asserts(statusCode(200), statusMessage("true10"))
+      .expect(statusCode(200), statusMessage("true10"))
       .send(testContext, checkpoint);
 
     testRequest(client, HttpMethod.GET, "/testQueryParams?param1=true")
-      .asserts(statusCode(200), statusMessage("truenull"))
+      .expect(statusCode(200), statusMessage("truenull"))
       .send(testContext, checkpoint);
 
     testRequest(client, HttpMethod.GET, "/testQueryParams?param1=true&param2=bla")
-      .asserts(statusCode(400))
-      .asserts(badParameterResponse(
+      .expect(statusCode(400))
+      .expect(badParameterResponse(
         ParameterProcessorException.ParameterProcessorErrorType.PARSING_ERROR,
         "param2",
         ParameterLocation.QUERY
@@ -257,12 +257,12 @@ public class ValidationHandlerProcessorsIntegrationTest extends BaseValidationHa
       });
 
     testRequest(client, HttpMethod.GET, "/test?parameter=2&parameter=4&parameter=6")
-      .asserts(statusCode(200), statusMessage("2,4,6"))
+      .expect(statusCode(200), statusMessage("2,4,6"))
       .send(testContext, checkpoint);
 
     testRequest(client, HttpMethod.GET, "/test?parameter=2&parameter=2&parameter=false")
-      .asserts(statusCode(400))
-      .asserts(badParameterResponse(
+      .expect(statusCode(400))
+      .expect(badParameterResponse(
         ParameterProcessorException.ParameterProcessorErrorType.PARSING_ERROR,
         "parameter",
         ParameterLocation.QUERY
@@ -270,8 +270,8 @@ public class ValidationHandlerProcessorsIntegrationTest extends BaseValidationHa
       .send(testContext, checkpoint);
 
     testRequest(client, HttpMethod.GET, "/test?parameter=2&parameter=2&parameter=1")
-      .asserts(statusCode(400))
-      .asserts(badParameterResponse(
+      .expect(statusCode(400))
+      .expect(badParameterResponse(
         ParameterProcessorException.ParameterProcessorErrorType.VALIDATION_ERROR,
         "parameter",
         ParameterLocation.QUERY
@@ -302,12 +302,12 @@ public class ValidationHandlerProcessorsIntegrationTest extends BaseValidationHa
       });
 
     testRequest(client, HttpMethod.GET, "/test?parameter=" + urlEncode("2,4,6"))
-      .asserts(statusCode(200), statusMessage("2,4,6"))
+      .expect(statusCode(200), statusMessage("2,4,6"))
       .send(testContext, checkpoint);
 
     testRequest(client, HttpMethod.GET, "/test?parameter=" + urlEncode("1,false,3"))
-      .asserts(statusCode(400))
-      .asserts(badParameterResponse(
+      .expect(statusCode(400))
+      .expect(badParameterResponse(
         ParameterProcessorException.ParameterProcessorErrorType.PARSING_ERROR,
         "parameter",
         ParameterLocation.QUERY
@@ -315,8 +315,8 @@ public class ValidationHandlerProcessorsIntegrationTest extends BaseValidationHa
       .send(testContext, checkpoint);
 
     testRequest(client, HttpMethod.GET, "/test?parameter=" + urlEncode("6,2,1"))
-      .asserts(statusCode(400))
-      .asserts(badParameterResponse(
+      .expect(statusCode(400))
+      .expect(badParameterResponse(
         ParameterProcessorException.ParameterProcessorErrorType.VALIDATION_ERROR,
         "parameter",
         ParameterLocation.QUERY
@@ -345,16 +345,16 @@ public class ValidationHandlerProcessorsIntegrationTest extends BaseValidationHa
       });
 
     testRequest(client, HttpMethod.GET, "/test?param1=5&param2=10")
-      .asserts(statusCode(200), statusMessage("510"))
+      .expect(statusCode(200), statusMessage("510"))
       .send(testContext, checkpoint);
 
     testRequest(client, HttpMethod.GET, "/test?param2=10")
-      .asserts(statusCode(200), statusMessage("1010"))
+      .expect(statusCode(200), statusMessage("1010"))
       .send(testContext, checkpoint);
 
     testRequest(client, HttpMethod.GET, "/test?param1=5")
-      .asserts(statusCode(400))
-      .asserts(badParameterResponse(
+      .expect(statusCode(400))
+      .expect(badParameterResponse(
         ParameterProcessorException.ParameterProcessorErrorType.MISSING_PARAMETER_WHEN_REQUIRED_ERROR,
         "param2",
         ParameterLocation.QUERY
@@ -386,12 +386,12 @@ public class ValidationHandlerProcessorsIntegrationTest extends BaseValidationHa
       });
 
     testRequest(client, HttpMethod.GET, "/testQueryParams/true?awesomeArray=1&awesomeArray=2&awesomeArray=3&anotherParam=5.2")
-      .asserts(statusCode(200), statusMessage("true" + new JsonArray().add(1).add(2).add(3).toString() + "5.2"))
+      .expect(statusCode(200), statusMessage("true" + new JsonArray().add(1).add(2).add(3).toString() + "5.2"))
       .send(testContext, checkpoint);
 
     testRequest(client, HttpMethod.GET, "/testQueryParams/true?awesomeArray=1&awesomeArray=bla&awesomeArray=3&anotherParam=5.2")
-      .asserts(statusCode(400))
-      .asserts(badParameterResponse(
+      .expect(statusCode(400))
+      .expect(badParameterResponse(
         ParameterProcessorException.ParameterProcessorErrorType.PARSING_ERROR,
         "awesomeArray",
         ParameterLocation.QUERY
@@ -424,13 +424,13 @@ public class ValidationHandlerProcessorsIntegrationTest extends BaseValidationHa
     String c = "10";
 
     testRequest(client, HttpMethod.GET, "/testHeaderParams")
-      .transformations(header("x-a", a), header("x-b", b), header("x-c", c))
-      .asserts(statusCode(200), statusMessage(a + b + c))
+      .with(requestHeader("x-a", a), requestHeader("x-b", b), requestHeader("x-c", c))
+      .expect(statusCode(200), statusMessage(a + b + c))
       .send(testContext, checkpoint);
 
     testRequest(client, HttpMethod.GET, "/testHeaderParams")
-      .transformations(header("x-a", a), header("x-b", "bla"), header("x-c", c))
-      .asserts(badParameterResponse(
+      .with(requestHeader("x-a", a), requestHeader("x-b", "bla"), requestHeader("x-c", c))
+      .expect(badParameterResponse(
         ParameterProcessorException.ParameterProcessorErrorType.PARSING_ERROR,
         "x-b",
         ParameterLocation.HEADER
@@ -462,32 +462,32 @@ public class ValidationHandlerProcessorsIntegrationTest extends BaseValidationHa
     String b = "false";
     String c = "10";
 
-    testRequest(client, HttpMethod.GET)
-      .transformations(header("x-a", a), header("x-b", b), header("x-c", c))
-      .asserts(statusCode(200), statusMessage(a + b + c))
+    testRequest(client, HttpMethod.GET, "/test")
+      .with(requestHeader("x-a", a), requestHeader("x-b", b), requestHeader("x-c", c))
+      .expect(statusCode(200), statusMessage(a + b + c))
       .send(testContext, checkpoint);
 
-    testRequest(client, HttpMethod.GET)
-      .transformations(header("x-a", a), header("x-b", "bla"), header("x-c", c))
-      .asserts(badParameterResponse(
+    testRequest(client, HttpMethod.GET, "/test")
+      .with(requestHeader("x-a", a), requestHeader("x-b", "bla"), requestHeader("x-c", c))
+      .expect(badParameterResponse(
         ParameterProcessorException.ParameterProcessorErrorType.PARSING_ERROR,
         "x-b",
         ParameterLocation.HEADER
       ))
       .send(testContext, checkpoint);
 
-    testRequest(client, HttpMethod.GET)
-      .transformations(header("x-a", a), header("x-b", b), header("x-c", "bla"))
-      .asserts(badParameterResponse(
+    testRequest(client, HttpMethod.GET, "/test")
+      .with(requestHeader("x-a", a), requestHeader("x-b", b), requestHeader("x-c", "bla"))
+      .expect(badParameterResponse(
         ParameterProcessorException.ParameterProcessorErrorType.PARSING_ERROR,
         "x-c",
         ParameterLocation.HEADER
       ))
       .send(testContext, checkpoint);
 
-    testRequest(client, HttpMethod.GET)
-      .transformations(header("x-a", a), header("x-b", b), header("x-c", "15"))
-      .asserts(badParameterResponse(
+    testRequest(client, HttpMethod.GET, "/test")
+      .with(requestHeader("x-a", a), requestHeader("x-b", b), requestHeader("x-c", "15"))
+      .expect(badParameterResponse(
         ParameterProcessorException.ParameterProcessorErrorType.VALIDATION_ERROR,
         "x-c",
         ParameterLocation.HEADER
@@ -522,8 +522,8 @@ public class ValidationHandlerProcessorsIntegrationTest extends BaseValidationHa
     successParams.addParam("param2", "10");
     
     testRequest(client, HttpMethod.GET, "/testCookieParams")
-      .transformations(cookie(successParams))
-      .asserts(statusCode(200), statusMessage("true10"))
+      .with(cookie(successParams))
+      .expect(statusCode(200), statusMessage("true10"))
       .send(testContext, checkpoint);
 
     QueryStringEncoder failureParams = new QueryStringEncoder("/");
@@ -531,9 +531,9 @@ public class ValidationHandlerProcessorsIntegrationTest extends BaseValidationHa
     failureParams.addParam("param2", "bla");
 
     testRequest(client, HttpMethod.GET, "/testCookieParams")
-      .transformations(cookie(failureParams))
-      .asserts(statusCode(400))
-      .asserts(badParameterResponse(
+      .with(cookie(failureParams))
+      .expect(statusCode(400))
+      .expect(badParameterResponse(
         ParameterProcessorException.ParameterProcessorErrorType.PARSING_ERROR,
         "param2",
         ParameterLocation.COOKIE
@@ -566,18 +566,18 @@ public class ValidationHandlerProcessorsIntegrationTest extends BaseValidationHa
     QueryStringEncoder successParams = new QueryStringEncoder("/");
     successParams.addParam("param1", "true");
     successParams.addParam("param2", "10");
-    testRequest(client, HttpMethod.GET)
-      .transformations(cookie(successParams))
-      .asserts(statusCode(200), statusMessage("true10"))
+    testRequest(client, HttpMethod.GET, "/test")
+      .with(cookie(successParams))
+      .expect(statusCode(200), statusMessage("true10"))
       .send(testContext, checkpoint);
 
     QueryStringEncoder failureParams1 = new QueryStringEncoder("/");
     failureParams1.addParam("param1", "true");
     failureParams1.addParam("param2", "bla");
-    testRequest(client, HttpMethod.GET)
-      .transformations(cookie(failureParams1))
-      .asserts(statusCode(400))
-      .asserts(badParameterResponse(
+    testRequest(client, HttpMethod.GET, "/test")
+      .with(cookie(failureParams1))
+      .expect(statusCode(400))
+      .expect(badParameterResponse(
         ParameterProcessorException.ParameterProcessorErrorType.PARSING_ERROR,
         "param2",
         ParameterLocation.COOKIE
@@ -587,10 +587,10 @@ public class ValidationHandlerProcessorsIntegrationTest extends BaseValidationHa
     QueryStringEncoder failureParams2 = new QueryStringEncoder("/");
     failureParams2.addParam("param1", "true");
     failureParams2.addParam("param2", "15");
-    testRequest(client, HttpMethod.GET)
-      .transformations(cookie(failureParams2))
-      .asserts(statusCode(400))
-      .asserts(badParameterResponse(
+    testRequest(client, HttpMethod.GET, "/test")
+      .with(cookie(failureParams2))
+      .expect(statusCode(400))
+      .expect(badParameterResponse(
         ParameterProcessorException.ParameterProcessorErrorType.VALIDATION_ERROR,
         "param2",
         ParameterLocation.COOKIE
@@ -622,12 +622,12 @@ public class ValidationHandlerProcessorsIntegrationTest extends BaseValidationHa
     });
 
     testRequest(client, HttpMethod.POST, "/testFormParam")
-      .asserts(statusCode(200), statusMessage("5"))
+      .expect(statusCode(200), statusMessage("5"))
       .sendURLEncodedForm(MultiMap.caseInsensitiveMultiMap().add("parameter", "5"), testContext, checkpoint);
 
     testRequest(client, HttpMethod.POST, "/testFormParam")
-      .asserts(statusCode(400))
-      .asserts(
+      .expect(statusCode(400))
+      .expect(
         badBodyResponse(BodyProcessorException.BodyProcessorErrorType.PARSING_ERROR)
       )
       .sendURLEncodedForm(MultiMap.caseInsensitiveMultiMap().add("parameter", "bla"), testContext, checkpoint);
@@ -657,12 +657,12 @@ public class ValidationHandlerProcessorsIntegrationTest extends BaseValidationHa
       });
 
     testRequest(client, HttpMethod.POST, "/testFormParam")
-      .asserts(statusCode(200), statusMessage("5"))
+      .expect(statusCode(200), statusMessage("5"))
       .sendMultipartForm(MultipartForm.create().attribute("parameter", "5"), testContext, checkpoint);
 
     testRequest(client, HttpMethod.POST, "/testFormParam")
-      .asserts(statusCode(400))
-      .asserts(
+      .expect(statusCode(400))
+      .expect(
         badBodyResponse(BodyProcessorException.BodyProcessorErrorType.PARSING_ERROR)
       )
       .sendMultipartForm(MultipartForm.create().attribute("parameter", "bla"), testContext, checkpoint);
@@ -700,34 +700,34 @@ public class ValidationHandlerProcessorsIntegrationTest extends BaseValidationHa
       });
 
     testRequest(client, HttpMethod.POST, "/testFormParam")
-      .asserts(statusCode(200), statusMessage("5"))
+      .expect(statusCode(200), statusMessage("5"))
       .sendURLEncodedForm(MultiMap.caseInsensitiveMultiMap().add("parameter", "5"), testContext, checkpoint);
 
     testRequest(client, HttpMethod.POST, "/testFormParam")
-      .asserts(statusCode(400))
-      .asserts(
+      .expect(statusCode(400))
+      .expect(
         badBodyResponse(BodyProcessorException.BodyProcessorErrorType.PARSING_ERROR)
       )
       .sendURLEncodedForm(MultiMap.caseInsensitiveMultiMap().add("parameter", "bla"), testContext, checkpoint);
 
     testRequest(client, HttpMethod.POST, "/testFormParam")
-      .asserts(statusCode(200), statusMessage("5"))
+      .expect(statusCode(200), statusMessage("5"))
       .sendMultipartForm(MultipartForm.create().attribute("parameter", "5"), testContext, checkpoint);
 
     testRequest(client, HttpMethod.POST, "/testFormParam")
-      .asserts(statusCode(400))
-      .asserts(
+      .expect(statusCode(400))
+      .expect(
         badBodyResponse(BodyProcessorException.BodyProcessorErrorType.PARSING_ERROR)
       )
       .sendMultipartForm(MultipartForm.create().attribute("parameter", "bla"), testContext, checkpoint);
 
     testRequest(client, HttpMethod.POST, "/testFormParam")
-      .asserts(statusCode(200), statusMessage("No body"))
+      .expect(statusCode(200), statusMessage("No body"))
       .send(testContext, checkpoint);
 
     testRequest(client, HttpMethod.POST, "/testFormParam")
-      .asserts(statusCode(400))
-      .asserts(
+      .expect(statusCode(400))
+      .expect(
         badBodyResponse(BodyProcessorException.BodyProcessorErrorType.MISSING_MATCHING_BODY_PROCESSOR)
       )
       .sendJson(new JsonObject(), testContext, checkpoint);
@@ -774,7 +774,7 @@ public class ValidationHandlerProcessorsIntegrationTest extends BaseValidationHa
       });
 
     testRequest(client, HttpMethod.POST, "/testFormParam")
-      .asserts(statusCode(200))
+      .expect(statusCode(200))
       .sendURLEncodedForm(
         MultiMap
           .caseInsensitiveMultiMap()
@@ -786,7 +786,7 @@ public class ValidationHandlerProcessorsIntegrationTest extends BaseValidationHa
       );
 
     testRequest(client, HttpMethod.POST, "/testFormParam")
-      .asserts(statusCode(200))
+      .expect(statusCode(200))
       .sendMultipartForm(
         MultipartForm.create()
           .attribute("int", "10")
@@ -797,7 +797,7 @@ public class ValidationHandlerProcessorsIntegrationTest extends BaseValidationHa
       );
 
     testRequest(client, HttpMethod.POST, "/testFormParam")
-      .asserts(statusCode(200))
+      .expect(statusCode(200))
       .sendJson(expectedResult , testContext, checkpoint);
   }
 
@@ -830,7 +830,7 @@ public class ValidationHandlerProcessorsIntegrationTest extends BaseValidationHa
     });
 
     testRequest(client, HttpMethod.GET, "/testHandlersChaining?param1=10&param2=true")
-      .asserts(statusCode(200), statusMessage("10true"))
+      .expect(statusCode(200), statusMessage("10true"))
       .send(testContext, checkpoint);
   }
 
@@ -856,13 +856,13 @@ public class ValidationHandlerProcessorsIntegrationTest extends BaseValidationHa
           .end();
       });
 
-    testRequest(client, HttpMethod.POST)
-      .asserts(statusCode(200), statusMessage("{}"))
+    testRequest(client, HttpMethod.POST, "/test")
+      .expect(statusCode(200), statusMessage("{}"))
       .sendJson(new JsonObject(), testContext, checkpoint);
 
-    testRequest(client, HttpMethod.POST)
-      .asserts(statusCode(400))
-      .asserts(badBodyResponse(BodyProcessorException.BodyProcessorErrorType.VALIDATION_ERROR))
+    testRequest(client, HttpMethod.POST, "/test")
+      .expect(statusCode(400))
+      .expect(badBodyResponse(BodyProcessorException.BodyProcessorErrorType.VALIDATION_ERROR))
       .sendJson("aaa", testContext, checkpoint);
   }
 
@@ -892,13 +892,13 @@ public class ValidationHandlerProcessorsIntegrationTest extends BaseValidationHa
           .end(params.body().getJsonObject().toBuffer());
       });
 
-    testRequest(client, HttpMethod.POST)
-      .asserts(statusCode(200), jsonBodyResponse(testObj))
+    testRequest(client, HttpMethod.POST, "/test")
+      .expect(statusCode(200), jsonBodyResponse(testObj))
       .sendJson(testObj, testContext, checkpoint);
 
-    testRequest(client, HttpMethod.POST)
-      .asserts(statusCode(400))
-      .asserts(badBodyResponse(BodyProcessorException.BodyProcessorErrorType.VALIDATION_ERROR))
+    testRequest(client, HttpMethod.POST, "/test")
+      .expect(statusCode(400))
+      .expect(badBodyResponse(BodyProcessorException.BodyProcessorErrorType.VALIDATION_ERROR))
       .sendJson("aaa", testContext, checkpoint);
   }
 
@@ -926,21 +926,21 @@ public class ValidationHandlerProcessorsIntegrationTest extends BaseValidationHa
           .end(params.queryParameter("explodedObject").getJsonObject().toBuffer());
       });
 
-    testRequest(client, HttpMethod.GET)
-      .asserts(statusCode(200), jsonBodyResponse(new JsonObject()))
+    testRequest(client, HttpMethod.GET, "/test")
+      .expect(statusCode(200), jsonBodyResponse(new JsonObject()))
       .send(testContext, checkpoint);
 
     testRequest(client, HttpMethod.GET, "/test?wellKnownProperty=10")
-      .asserts(statusCode(200), jsonBodyResponse(new JsonObject().put("wellKnownProperty", 10)))
+      .expect(statusCode(200), jsonBodyResponse(new JsonObject().put("wellKnownProperty", 10)))
       .send(testContext, checkpoint);
 
     testRequest(client, HttpMethod.GET, "/test?wellKnownProperty=10&myFlag=false")
-      .asserts(statusCode(200), jsonBodyResponse(new JsonObject().put("wellKnownProperty", 10).put("myFlag", false)))
+      .expect(statusCode(200), jsonBodyResponse(new JsonObject().put("wellKnownProperty", 10).put("myFlag", false)))
       .send(testContext, checkpoint);
 
     testRequest(client, HttpMethod.GET, "/test?wellKnownProperty=10&myFlag=bla")
-      .asserts(statusCode(400))
-      .asserts(badParameterResponse(
+      .expect(statusCode(400))
+      .expect(badParameterResponse(
         ParameterProcessorException.ParameterProcessorErrorType.PARSING_ERROR,
         "explodedObject",
         ParameterLocation.QUERY

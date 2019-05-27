@@ -12,9 +12,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.regex.Pattern;
 
-import static io.vertx.ext.web.validation.testutils.TestRequest.statusCode;
-import static io.vertx.ext.web.validation.testutils.TestRequest.testRequest;
 import static io.vertx.ext.web.validation.testutils.ValidationTestUtils.failurePredicateResponse;
+import static io.vertx.junit5.web.TestRequest.statusCode;
+import static io.vertx.junit5.web.TestRequest.testRequest;
 
 /**
  * @author Francesco Guardiani @slinkydeveloper
@@ -43,15 +43,15 @@ public class ValidationHandlerPredicatesIntegrationTest extends BaseValidationHa
       );
 
     testRequest(client, HttpMethod.POST, "/testRequiredBody")
-      .asserts(statusCode(200))
+      .expect(statusCode(200))
       .sendJson(new JsonObject(), testContext, checkpoint);
 
     testRequest(client, HttpMethod.GET, "/testRequiredBody")
-      .asserts(statusCode(400), failurePredicateResponse())
+      .expect(statusCode(400), failurePredicateResponse())
       .send(testContext, checkpoint);
 
     testRequest(client, HttpMethod.POST, "/testRequiredBody")
-      .asserts(statusCode(400), failurePredicateResponse())
+      .expect(statusCode(400), failurePredicateResponse())
       .send(testContext, checkpoint);
   }
 
@@ -78,19 +78,19 @@ public class ValidationHandlerPredicatesIntegrationTest extends BaseValidationHa
       );
 
     testRequest(client, HttpMethod.POST, "/testFileUpload")
-      .asserts(statusCode(200))
+      .expect(statusCode(200))
       .send(testContext, checkpoint);
 
     testRequest(client, HttpMethod.POST, "/testFileUpload")
-      .asserts(statusCode(400))
+      .expect(statusCode(400))
       .sendMultipartForm(MultipartForm.create(), testContext, checkpoint);
 
     testRequest(client, HttpMethod.POST, "/testFileUpload")
-      .asserts(statusCode(400))
+      .expect(statusCode(400))
       .sendMultipartForm(MultipartForm.create().attribute("myfile", "bla"), testContext, checkpoint);
 
     testRequest(client, HttpMethod.POST, "/testFileUpload")
-      .asserts(statusCode(200))
+      .expect(statusCode(200))
       .sendMultipartForm(MultipartForm.create().textFileUpload("myfile", "myfile.txt", "src/test/resources/myfile.txt", "text/plain"), testContext, checkpoint);
   }
 

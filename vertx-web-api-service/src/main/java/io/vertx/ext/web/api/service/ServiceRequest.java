@@ -9,6 +9,9 @@ import io.vertx.core.json.JsonObject;
 import java.util.Map;
 import java.util.function.Function;
 
+/**
+ * Data object that encapsulates all informations about an HTTP Request
+ */
 @DataObject(generateConverter = true, publicConverter = false)
 public class ServiceRequest {
 

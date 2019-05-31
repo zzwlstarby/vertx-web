@@ -1,5 +1,6 @@
 package io.vertx.ext.web.api.service;
 
+import io.netty.handler.codec.http.HttpResponseStatus;
 import io.vertx.codegen.annotations.DataObject;
 import io.vertx.codegen.annotations.Fluent;
 import io.vertx.core.MultiMap;
@@ -11,6 +12,9 @@ import io.vertx.core.json.JsonObject;
 
 import java.util.Map;
 
+/**
+ * Data object that encapsulates all informations about an HTTP Response
+ */
 @DataObject(generateConverter = true, publicConverter = false)
 public class ServiceResponse {
 
@@ -112,27 +116,51 @@ public class ServiceResponse {
     return this;
   }
 
+  /**
+   * Creates a {@link ServiceResponse} with status code 200, status message OK, content type {@code application/json} and {@code jsonObject} as body
+   *
+   * @param jsonObject
+   * @return
+   */
   public static ServiceResponse completedWithJson(JsonObject jsonObject) {
     return completedWithJson(jsonObject.toBuffer());
   }
 
+  /**
+   * Creates a {@link ServiceResponse} with status code 200, status message OK, content type {@code application/json} and {@code jsonArray} as body
+   *
+   * @param jsonArray
+   * @return
+   */
   public static ServiceResponse completedWithJson(JsonArray jsonArray) {
    return completedWithJson(jsonArray.toBuffer());
   }
 
+  /**
+   * Creates a {@link ServiceResponse} with status code 200, status message OK, content type {@code application/json} and {@code json} as body
+   *
+   * @param json
+   * @return
+   */
   public static ServiceResponse completedWithJson(Buffer json) {
     ServiceResponse op = new ServiceResponse();
     op.setStatusCode(200);
-    op.setStatusMessage("OK");
+    op.setStatusMessage(HttpResponseStatus.OK.reasonPhrase());
     op.putHeader(HttpHeaders.CONTENT_TYPE.toString(), "application/json");
     op.setPayload(json);
     return op;
   }
 
+  /**
+   * Creates a {@link ServiceResponse} with status code 200, status message OK, content type {@code text/plain} and {@code text} as body
+   *
+   * @param text
+   * @return
+   */
   public static ServiceResponse completedWithPlainText(Buffer text) {
     return new ServiceResponse()
       .setStatusCode(200)
-      .setStatusMessage("OK")
+      .setStatusMessage(HttpResponseStatus.OK.reasonPhrase())
       .putHeader(HttpHeaders.CONTENT_TYPE.toString(), "text/plain")
       .setPayload(text);
   }

@@ -1017,6 +1017,23 @@ public class WebClientTest extends HttpTestBase {
   }
 
   @Test
+  public void testTimeoutSendForm() throws Exception {
+    MultiMap form = MultiMap.caseInsensitiveMultiMap().add("hello", "world");
+
+    server.requestHandler(req -> vertx.setTimer(1000, t -> req.response().end()));
+    startServer();
+    client
+      .post(DEFAULT_HTTP_PORT, DEFAULT_HTTP_HOST, "/somepath")
+      .as(BodyCodec.string())
+      .timeout(500)
+      .sendForm(form, onFailure(err -> {
+        assertTrue(err instanceof TimeoutException);
+        testComplete();
+    }));
+    await();
+  }
+
+  @Test
   public void testQueryParam() throws Exception {
     testRequest(client -> client.get(DEFAULT_HTTP_PORT, DEFAULT_HTTP_HOST, "/").addQueryParam("param", "param_value"), req -> {
       assertEquals("param=param_value", req.query());

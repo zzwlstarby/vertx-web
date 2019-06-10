@@ -2,13 +2,12 @@ package io.vertx.ext.web.validation.impl;
 
 import io.vertx.core.Vertx;
 import io.vertx.ext.json.schema.SchemaParser;
-import io.vertx.ext.json.schema.SchemaParserOptions;
 import io.vertx.ext.json.schema.SchemaRouter;
 import io.vertx.ext.json.schema.SchemaRouterOptions;
 import io.vertx.ext.json.schema.draft7.Draft7SchemaParser;
 import io.vertx.ext.web.RoutingContext;
-import io.vertx.ext.web.validation.BodyProcessor;
-import io.vertx.ext.web.validation.dsl.BodyProcessorFactory;
+import io.vertx.ext.web.validation.builder.Bodies;
+import io.vertx.ext.web.validation.impl.body.BodyProcessor;
 import io.vertx.ext.web.validation.testutils.TestSchemas;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
@@ -34,14 +33,14 @@ public class TextPlainBodyProcessorTest {
   @BeforeEach
   public void setUp(Vertx vertx) {
     router = SchemaRouter.create(vertx, new SchemaRouterOptions());
-    parser = Draft7SchemaParser.create(new SchemaParserOptions(), router);
+    parser = Draft7SchemaParser.create(router);
   }
 
   @Test
   public void testString(VertxTestContext testContext) {
     when(mockedContext.getBodyAsString()).thenReturn(TestSchemas.VALID_STRING);
 
-    BodyProcessor processor = BodyProcessorFactory.textPlain(TestSchemas.SAMPLE_STRING_SCHEMA_BUILDER).create(parser);
+    BodyProcessor processor = Bodies.textPlain(TestSchemas.SAMPLE_STRING_SCHEMA_BUILDER).create(parser);
 
     processor.process(mockedContext).setHandler(testContext.succeeding(rp -> {
       testContext.verify(() -> {

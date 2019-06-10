@@ -6,26 +6,29 @@ import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.json.pointer.JsonPointer;
-import io.vertx.ext.json.schema.generic.dsl.ObjectSchemaBuilder;
+import io.vertx.ext.json.schema.common.dsl.ObjectSchemaBuilder;
 import io.vertx.ext.web.handler.BodyHandler;
 import io.vertx.ext.web.multipart.MultipartForm;
-import io.vertx.ext.web.validation.dsl.ArrayParserFactory;
-import io.vertx.ext.web.validation.dsl.ValidationHandlerBuilder;
+import io.vertx.ext.web.validation.builder.Bodies;
+import io.vertx.ext.web.validation.builder.Parameters;
+import io.vertx.ext.web.validation.builder.Parsers;
+import io.vertx.ext.web.validation.builder.ValidationHandlerBuilder;
+import io.vertx.ext.web.validation.impl.ParameterLocation;
+import io.vertx.ext.web.validation.impl.parser.ValueParser;
 import io.vertx.junit5.Checkpoint;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.io.TempDir;
 
 import java.net.URI;
+import java.nio.file.Path;
 import java.util.stream.Collectors;
 
-import static io.vertx.ext.json.schema.generic.dsl.Keywords.multipleOf;
-import static io.vertx.ext.json.schema.generic.dsl.Schemas.*;
-import static io.vertx.ext.web.validation.dsl.BodyProcessorFactory.*;
-import static io.vertx.ext.web.validation.dsl.SimpleParameterProcessorFactory.optionalParam;
-import static io.vertx.ext.web.validation.dsl.SimpleParameterProcessorFactory.param;
-import static io.vertx.ext.web.validation.dsl.StyledParameterProcessorFactory.*;
+import static io.vertx.ext.json.schema.draft7.dsl.Keywords.multipleOf;
+import static io.vertx.ext.json.schema.draft7.dsl.Schemas.*;
+import static io.vertx.ext.web.validation.builder.Parameters.*;
 import static io.vertx.ext.web.validation.testutils.ValidationTestUtils.badBodyResponse;
 import static io.vertx.ext.web.validation.testutils.ValidationTestUtils.badParameterResponse;
 import static io.vertx.junit5.web.TestRequest.*;
@@ -113,7 +116,7 @@ public class ValidationHandlerProcessorsIntegrationTest extends BaseValidationHa
 
     ValidationHandler validationHandler = ValidationHandlerBuilder
       .create(parser)
-      .queryParameter(jsonParam("myTree", ref(JsonPointer.fromURI(URI.create("tree_schema.json")))))
+      .queryParameter(Parameters.jsonParam("myTree", ref(JsonPointer.fromURI(URI.create("tree_schema.json")))))
       .build();
     router
       .get("/test")
@@ -287,7 +290,7 @@ public class ValidationHandlerProcessorsIntegrationTest extends BaseValidationHa
       .create(parser)
       .queryParameter(serializedParam(
         "parameter",
-        ArrayParserFactory.commaSeparatedArrayParser(),
+        Parsers.commaSeparatedArrayParser(),
         arraySchema().items(intSchema().with(multipleOf(2)))
       ))
       .build();
@@ -599,17 +602,17 @@ public class ValidationHandlerProcessorsIntegrationTest extends BaseValidationHa
   }
 
   @Test
-  public void testFormURLEncoded(VertxTestContext testContext) throws Exception {
+  public void testFormURLEncoded(VertxTestContext testContext, @TempDir Path tempDir) throws Exception {
     Checkpoint checkpoint = testContext.checkpoint(2);
 
     ValidationHandler validationHandler = ValidationHandler
       .builder(parser)
       .body(
-        formUrlEncoded(objectSchema().requiredProperty("parameter", intSchema()))
+        Bodies.formUrlEncoded(objectSchema().requiredProperty("parameter", intSchema()))
       )
       .build();
 
-    router.route().handler(BodyHandler.create());
+    router.route().handler(BodyHandler.create(tempDir.toAbsolutePath().toString()));
     router
       .post("/testFormParam")
       .handler(validationHandler)
@@ -634,17 +637,17 @@ public class ValidationHandlerProcessorsIntegrationTest extends BaseValidationHa
   }
 
   @Test
-  public void testMultipartForm(VertxTestContext testContext) throws Exception {
+  public void testMultipartForm(VertxTestContext testContext, @TempDir Path tempDir) throws Exception {
     Checkpoint checkpoint = testContext.checkpoint(2);
 
     ValidationHandler validationHandler = ValidationHandler
       .builder(parser)
       .body(
-        multipartFormData(objectSchema().requiredProperty("parameter", intSchema()))
+        Bodies.multipartFormData(objectSchema().requiredProperty("parameter", intSchema()))
       )
       .build();
 
-    router.route().handler(BodyHandler.create());
+    router.route().handler(BodyHandler.create(tempDir.toAbsolutePath().toString()));
     router
       .post("/testFormParam")
       .handler(validationHandler)
@@ -669,18 +672,18 @@ public class ValidationHandlerProcessorsIntegrationTest extends BaseValidationHa
   }
 
   @Test
-  public void testBothFormTypes(VertxTestContext testContext) throws Exception {
+  public void testBothFormTypes(VertxTestContext testContext, @TempDir Path tempDir) throws Exception {
     Checkpoint checkpoint = testContext.checkpoint(6);
 
     ObjectSchemaBuilder bodySchema = objectSchema().requiredProperty("parameter", intSchema());
 
     ValidationHandler validationHandler = ValidationHandler
       .builder(parser)
-      .body(multipartFormData(bodySchema))
-      .body(formUrlEncoded(bodySchema))
+      .body(Bodies.multipartFormData(bodySchema))
+      .body(Bodies.formUrlEncoded(bodySchema))
       .build();
 
-    router.route().handler(BodyHandler.create());
+    router.route().handler(BodyHandler.create(tempDir.toAbsolutePath().toString()));
     router
       .post("/testFormParam")
       .handler(validationHandler)
@@ -734,7 +737,7 @@ public class ValidationHandlerProcessorsIntegrationTest extends BaseValidationHa
   }
 
   @Test
-  public void testSameResultWithDifferentBodyTypes(VertxTestContext testContext) throws Exception {
+  public void testSameResultWithDifferentBodyTypes(VertxTestContext testContext, @TempDir Path tempDir) throws Exception {
     Checkpoint checkpoint = testContext.checkpoint(3);
 
     JsonObject expectedResult = new JsonObject()
@@ -749,12 +752,12 @@ public class ValidationHandlerProcessorsIntegrationTest extends BaseValidationHa
 
     ValidationHandler validationHandler = ValidationHandler
       .builder(parser)
-      .body(json(bodySchema))
-      .body(multipartFormData(bodySchema))
-      .body(formUrlEncoded(bodySchema))
+      .body(Bodies.json(bodySchema))
+      .body(Bodies.multipartFormData(bodySchema))
+      .body(Bodies.formUrlEncoded(bodySchema))
       .build();
 
-    router.route().handler(BodyHandler.create());
+    router.route().handler(BodyHandler.create(tempDir.toAbsolutePath().toString()));
     router
       .post("/testFormParam")
       .handler(validationHandler)
@@ -835,16 +838,16 @@ public class ValidationHandlerProcessorsIntegrationTest extends BaseValidationHa
   }
 
   @Test
-  public void testJsonBody(VertxTestContext testContext) {
+  public void testJsonBody(VertxTestContext testContext, @TempDir Path tempDir) {
     Checkpoint checkpoint = testContext.checkpoint(2);
 
     ValidationHandler validationHandler = ValidationHandler
       .builder(parser)
-      .body(json(objectSchema()))
+      .body(Bodies.json(objectSchema()))
       .build();
 
     router.post("/test")
-      .handler(BodyHandler.create())
+      .handler(BodyHandler.create(tempDir.toAbsolutePath().toString()))
       .handler(validationHandler)
       .handler(routingContext -> {
         RequestParameters params = routingContext.get("parsedParameters");
@@ -867,12 +870,12 @@ public class ValidationHandlerProcessorsIntegrationTest extends BaseValidationHa
   }
 
   @Test
-  public void testJsonBodyAsyncCircular(VertxTestContext testContext) {
+  public void testJsonBodyAsyncCircular(VertxTestContext testContext, @TempDir Path tempDir) {
     Checkpoint checkpoint = testContext.checkpoint(2);
 
     ValidationHandler validationHandler1 = ValidationHandler
       .builder(parser)
-      .body(json(ref(JsonPointer.fromURI(URI.create("tree_schema.json")))))
+      .body(Bodies.json(ref(JsonPointer.fromURI(URI.create("tree_schema.json")))))
       .build();
 
     JsonObject testObj = new JsonObject()
@@ -882,7 +885,7 @@ public class ValidationHandlerProcessorsIntegrationTest extends BaseValidationHa
       ));
 
     router.post("/test")
-      .handler(BodyHandler.create())
+      .handler(BodyHandler.create(tempDir.toAbsolutePath().toString()))
       .handler(validationHandler1)
       .handler(routingContext -> {
         RequestParameters params = routingContext.get("parsedParameters");
@@ -908,7 +911,7 @@ public class ValidationHandlerProcessorsIntegrationTest extends BaseValidationHa
 
     ValidationHandler validationHandler = ValidationHandler
       .builder(parser)
-      .queryParameter(explodedParamOptional("explodedObject",
+      .queryParameter(optionalExplodedParam("explodedObject",
         objectSchema()
           .property("wellKnownProperty", intSchema())
           .additionalProperties(booleanSchema())

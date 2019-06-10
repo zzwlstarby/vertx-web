@@ -4,8 +4,11 @@ import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 import io.vertx.ext.json.schema.*;
 import io.vertx.ext.json.schema.draft7.Draft7SchemaParser;
-import io.vertx.ext.web.validation.Validator;
 import io.vertx.ext.web.validation.*;
+import io.vertx.ext.web.validation.impl.parameter.ParameterParser;
+import io.vertx.ext.web.validation.impl.parameter.ParameterProcessor;
+import io.vertx.ext.web.validation.impl.parameter.ParameterProcessorImpl;
+import io.vertx.ext.web.validation.impl.validator.ValueValidator;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,13 +31,15 @@ public class ParameterProcessorUnitTest {
   SchemaRouter router;
   SchemaParser parser;
 
-  @Mock ParameterParser mockedParser;
-  @Mock Validator mockedValidator;
+  @Mock
+  ParameterParser mockedParser;
+  @Mock
+  ValueValidator mockedValidator;
 
   @BeforeEach
   public void setUp(Vertx vertx) {
     router = SchemaRouter.create(vertx, new SchemaRouterOptions());
-    parser = Draft7SchemaParser.create(new SchemaParserOptions(), router);
+    parser = Draft7SchemaParser.create(router);
   }
 
   @Test

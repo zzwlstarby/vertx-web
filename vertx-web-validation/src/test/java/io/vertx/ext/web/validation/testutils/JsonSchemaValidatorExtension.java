@@ -2,7 +2,6 @@ package io.vertx.ext.web.validation.testutils;
 
 import io.vertx.core.Vertx;
 import io.vertx.ext.json.schema.SchemaParser;
-import io.vertx.ext.json.schema.SchemaParserOptions;
 import io.vertx.ext.json.schema.SchemaRouter;
 import io.vertx.ext.json.schema.SchemaRouterOptions;
 import io.vertx.ext.json.schema.draft7.Draft7SchemaParser;
@@ -36,13 +35,13 @@ public class JsonSchemaValidatorExtension implements ParameterResolver {
     if (Draft7SchemaParser.class.equals(type) || SchemaParser.class.equals(type))
       return store.getOrComputeIfAbsent(
         DRAFT7_PARSER,
-        s -> Draft7SchemaParser.create(new SchemaParserOptions(), getRouter(extensionContext, store)),
+        s -> Draft7SchemaParser.create(getRouter(extensionContext, store)),
         Draft7SchemaParser.class
       );
     if (OpenAPI3SchemaParser.class.equals(type))
       return store.getOrComputeIfAbsent(
         OPENAPI3_PARSER,
-        s -> OpenAPI3SchemaParser.create(new SchemaParserOptions(), getRouter(extensionContext, store)),
+        s -> OpenAPI3SchemaParser.create(getRouter(extensionContext, store)),
         OpenAPI3SchemaParser.class
       );
     throw new IllegalStateException("Looks like the ParameterResolver needs a fix...");

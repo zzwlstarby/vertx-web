@@ -3,12 +3,12 @@ package io.vertx.ext.web.validation.impl;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.json.schema.SchemaParser;
-import io.vertx.ext.json.schema.SchemaParserOptions;
 import io.vertx.ext.json.schema.SchemaRouter;
 import io.vertx.ext.json.schema.SchemaRouterOptions;
 import io.vertx.ext.json.schema.draft7.Draft7SchemaParser;
 import io.vertx.ext.web.validation.MalformedValueException;
-import io.vertx.ext.web.validation.ValueParser;
+import io.vertx.ext.web.validation.impl.parser.SplitterCharObjectParser;
+import io.vertx.ext.web.validation.impl.parser.ValueParser;
 import io.vertx.ext.web.validation.testutils.TestParsers;
 import io.vertx.junit5.VertxExtension;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,7 +27,7 @@ public class SplitterCharObjectValueParserTest {
   @BeforeEach
   public void setUp(Vertx vertx) {
     router = SchemaRouter.create(vertx, new SchemaRouterOptions());
-    parser = Draft7SchemaParser.create(new SchemaParserOptions(), router);
+    parser = Draft7SchemaParser.create(router);
   }
 
   @Test

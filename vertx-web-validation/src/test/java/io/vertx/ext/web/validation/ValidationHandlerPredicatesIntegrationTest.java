@@ -9,7 +9,9 @@ import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.io.TempDir;
 
+import java.nio.file.Path;
 import java.util.regex.Pattern;
 
 import static io.vertx.ext.web.validation.testutils.ValidationTestUtils.failurePredicateResponse;
@@ -24,7 +26,7 @@ import static io.vertx.junit5.web.TestRequest.testRequest;
 public class ValidationHandlerPredicatesIntegrationTest extends BaseValidationHandlerTest{
 
   @Test
-  public void testRequiredBodyPredicate(VertxTestContext testContext) {
+  public void testRequiredBodyPredicate(VertxTestContext testContext, @TempDir Path tempDir) {
     Checkpoint checkpoint = testContext.checkpoint(2);
 
     ValidationHandler validationHandler = ValidationHandler
@@ -33,7 +35,7 @@ public class ValidationHandlerPredicatesIntegrationTest extends BaseValidationHa
       .build();
 
     router.route("/testRequiredBody")
-      .handler(BodyHandler.create())
+      .handler(BodyHandler.create(tempDir.toAbsolutePath().toString()))
       .handler(validationHandler)
       .handler(routingContext ->
         routingContext
@@ -56,19 +58,19 @@ public class ValidationHandlerPredicatesIntegrationTest extends BaseValidationHa
   }
 
   @Test
-  public void testFileUploadExists(VertxTestContext testContext) {
+  public void testFileUploadExists(VertxTestContext testContext, @TempDir Path tempDir) {
     Checkpoint checkpoint = testContext.checkpoint(4);
 
     ValidationHandler validationHandler = ValidationHandler
       .builder(parser)
       .predicate(RequestPredicate.multipartFileUploadExists(
         "myfile",
-        Pattern.compile(Pattern.quote("text/plain"))
+        Pattern.quote("text/plain")
       ))
       .build();
 
     router.post("/testFileUpload")
-      .handler(BodyHandler.create())
+      .handler(BodyHandler.create(tempDir.toAbsolutePath().toString()))
       .handler(validationHandler)
       .handler(routingContext ->
         routingContext

@@ -2,9 +2,9 @@ package io.vertx.ext.web.validation.testutils;
 
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-import io.vertx.ext.json.schema.generic.dsl.ArraySchemaBuilder;
-import io.vertx.ext.json.schema.generic.dsl.ObjectSchemaBuilder;
-import io.vertx.ext.json.schema.generic.dsl.StringSchemaBuilder;
+import io.vertx.ext.json.schema.common.dsl.ArraySchemaBuilder;
+import io.vertx.ext.json.schema.common.dsl.ObjectSchemaBuilder;
+import io.vertx.ext.json.schema.common.dsl.StringSchemaBuilder;
 
 import java.util.regex.Pattern;
 

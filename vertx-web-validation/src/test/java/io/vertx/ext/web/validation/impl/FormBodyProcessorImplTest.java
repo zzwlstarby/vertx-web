@@ -7,16 +7,15 @@ import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.json.schema.SchemaParser;
-import io.vertx.ext.json.schema.SchemaParserOptions;
 import io.vertx.ext.json.schema.SchemaRouter;
 import io.vertx.ext.json.schema.SchemaRouterOptions;
 import io.vertx.ext.json.schema.draft7.Draft7SchemaParser;
-import io.vertx.ext.json.schema.generic.dsl.ObjectSchemaBuilder;
+import io.vertx.ext.json.schema.common.dsl.ObjectSchemaBuilder;
 import io.vertx.ext.web.RoutingContext;
-import io.vertx.ext.web.validation.BodyProcessor;
 import io.vertx.ext.web.validation.BodyProcessorException;
 import io.vertx.ext.web.validation.MalformedValueException;
-import io.vertx.ext.web.validation.dsl.BodyProcessorFactory;
+import io.vertx.ext.web.validation.builder.Bodies;
+import io.vertx.ext.web.validation.impl.body.BodyProcessor;
 import io.vertx.ext.web.validation.testutils.TestSchemas;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
@@ -42,7 +41,7 @@ class FormBodyProcessorImplTest {
   @BeforeEach
   public void setUp(Vertx vertx) {
     router = SchemaRouter.create(vertx, new SchemaRouterOptions());
-    parser = Draft7SchemaParser.create(new SchemaParserOptions(), router);
+    parser = Draft7SchemaParser.create(router);
   }
 
   @Test
@@ -61,7 +60,7 @@ class FormBodyProcessorImplTest {
     when(mockedServerRequest.formAttributes()).thenReturn(map);
     when(mockedContext.request()).thenReturn(mockedServerRequest);
 
-    BodyProcessor processor = BodyProcessorFactory.formUrlEncoded(schemaBuilder).create(parser);
+    BodyProcessor processor = Bodies.formUrlEncoded(schemaBuilder).create(parser);
 
     assertThat(processor.canProcess("application/x-www-form-urlencoded")).isTrue();
 
@@ -101,7 +100,7 @@ class FormBodyProcessorImplTest {
     when(mockedServerRequest.formAttributes()).thenReturn(map);
     when(mockedContext.request()).thenReturn(mockedServerRequest);
 
-    BodyProcessor processor = BodyProcessorFactory.formUrlEncoded(schemaBuilder).create(parser);
+    BodyProcessor processor = Bodies.formUrlEncoded(schemaBuilder).create(parser);
 
     assertThat(processor.canProcess("application/x-www-form-urlencoded")).isTrue();
 

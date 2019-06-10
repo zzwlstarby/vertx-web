@@ -16,91 +16,91 @@ import io.vertx.ext.web.validation.impl.RequestParameterImpl;
 public interface RequestParameter {
 
   /**
-   * Returns null if value is not a String, otherwise it returns value
+   * Returns null if value is not a {@link String}, otherwise it returns value
    *
    * @return
    */
   @Nullable String getString();
 
   /**
-   * Returns true if value of RequestParameter is a String instance
+   * Returns true if value of this instance is a {@link String} instance
    *
    * @return
    */
   boolean isString();
 
   /**
-   * Returns null if value is not an Integer, otherwise it returns value
+   * Returns null if value is not a {@link Number}, otherwise it returns value as {@link Integer}
    *
    * @return
    */
   @Nullable Integer getInteger();
 
   /**
-   * Returns null if value is not a Long, otherwise it returns value
+   * Returns null if value is not a {@link Number}, otherwise it returns value as {@link Long}
    *
    * @return
    */
   @Nullable Long getLong();
 
   /**
-   * Returns null if value is not a Float, otherwise it returns value
+   * Returns null if value is not a {@link Number}, otherwise it returns value as {@link Float}
    *
    * @return
    */
   @Nullable Float getFloat();
 
   /**
-   * Returns null if value is not a Double, otherwise it returns value
+   * Returns null if value is not a {@link Number}, otherwise it returns value as {@link Double}
    *
    * @return
    */
   @Nullable Double getDouble();
 
   /**
-   * Returns true if value of RequestParameter is a Number instance
+   * Returns true if value of this instance is a {@link Number} instance
    *
    * @return
    */
   boolean isNumber();
 
   /**
-   * Returns null if value is not a Boolean, otherwise it returns value
+   * Returns null if value is not a {@link Boolean}, otherwise it returns value
    *
    * @return
    */
   @Nullable Boolean getBoolean();
 
   /**
-   * Returns true if value of RequestParameter is a Boolean instance
+   * Returns true if value of this instance is a {@link Boolean} instance
    *
    * @return
    */
   boolean isBoolean();
 
   /**
-   * Returns null if value is not a JsonObject, otherwise it returns value
+   * Returns null if value is not a {@link JsonObject}, otherwise it returns value
    *
    * @return
    */
   @Nullable JsonObject getJsonObject();
 
   /**
-   * Returns true if value of RequestParameter is a JsonObject instance
+   * Returns true if value of this instance is a {@link JsonObject} instance
    *
    * @return
    */
   boolean isJsonObject();
 
   /**
-   * Returns null if value is not a JsonArray, otherwise it returns value
+   * Returns null if value is not a {@link JsonArray}, otherwise it returns value
    *
    * @return
    */
   @Nullable JsonArray getJsonArray();
 
   /**
-   * Returns true if value of RequestParameter is a JsonArray instance
+   * Returns true if value of this instance is a {@link JsonArray} instance
    *
    * @return
    */
@@ -121,7 +121,7 @@ public interface RequestParameter {
   boolean isEmpty();
 
   /**
-   * Converts deeply this RequestParameter in a Json representation
+   * Converts deeply this instance into a Json representation
    *
    * @return
    */

@@ -1,7 +1,8 @@
 package io.vertx.ext.web.validation.impl;
 
 import io.vertx.core.json.JsonObject;
-import io.vertx.ext.web.validation.ValueParser;
+import io.vertx.ext.web.validation.impl.body.FormValueParser;
+import io.vertx.ext.web.validation.impl.parser.ValueParser;
 
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.List;
@@ -10,7 +11,7 @@ import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import static io.vertx.ext.web.validation.ValueParser.*;
+import static io.vertx.ext.web.validation.impl.parser.ValueParser.*;
 
 public class ValueParserInferenceUtils {
 

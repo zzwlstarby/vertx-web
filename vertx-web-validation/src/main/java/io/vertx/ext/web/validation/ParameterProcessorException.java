@@ -1,12 +1,27 @@
 package io.vertx.ext.web.validation;
 
+import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.json.JsonObject;
+import io.vertx.ext.web.validation.impl.ParameterLocation;
 
+/**
+ * Represents an exception while processing a parameter
+ */
 public class ParameterProcessorException extends BadRequestException {
 
+  @VertxGen
   public enum ParameterProcessorErrorType {
+    /**
+     * Parameter is required but it's missing
+     */
     MISSING_PARAMETER_WHEN_REQUIRED_ERROR,
+    /**
+     * Error during parsing. The cause of the exception is instance of {@link MalformedValueException}
+     */
     PARSING_ERROR,
+    /**
+     * Error during validation
+     */
     VALIDATION_ERROR
   }
 

@@ -3,10 +3,9 @@ package io.vertx.ext.web.validation.impl;
 import io.vertx.core.Vertx;
 import io.vertx.ext.json.schema.*;
 import io.vertx.ext.json.schema.draft7.Draft7SchemaParser;
-import io.vertx.ext.web.validation.ParameterLocation;
-import io.vertx.ext.web.validation.ParameterProcessor;
 import io.vertx.ext.web.validation.ParameterProcessorException;
-import io.vertx.ext.web.validation.dsl.StyledParameterProcessorFactory;
+import io.vertx.ext.web.validation.builder.Parameters;
+import io.vertx.ext.web.validation.impl.parameter.ParameterProcessor;
 import io.vertx.ext.web.validation.testutils.TestSchemas;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
@@ -32,12 +31,12 @@ public class ParameterProcessorIntegrationTest {
   @BeforeEach
   public void setUp(Vertx vertx) {
     router = SchemaRouter.create(vertx, new SchemaRouterOptions());
-    parser = Draft7SchemaParser.create(new SchemaParserOptions(), router);
+    parser = Draft7SchemaParser.create(router);
   }
 
   @Test
   public void testJsonParam(VertxTestContext testContext) {
-    ParameterProcessor processor = StyledParameterProcessorFactory
+    ParameterProcessor processor = Parameters
       .jsonParam("myParam", TestSchemas.SAMPLE_OBJECT_SCHEMA_BUILDER)
       .create(ParameterLocation.QUERY, parser);
 
@@ -58,7 +57,7 @@ public class ParameterProcessorIntegrationTest {
 
   @Test
   public void testInvalidJsonParam(VertxTestContext testContext) {
-    ParameterProcessor processor = StyledParameterProcessorFactory
+    ParameterProcessor processor = Parameters
       .jsonParam("myParam", TestSchemas.SAMPLE_OBJECT_SCHEMA_BUILDER)
       .create(ParameterLocation.QUERY, parser);
 

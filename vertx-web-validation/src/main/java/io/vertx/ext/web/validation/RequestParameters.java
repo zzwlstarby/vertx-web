@@ -15,9 +15,6 @@ import java.util.List;
 @VertxGen
 public interface RequestParameters {
 
-
-  //TODO remove body and form stuff and encapsulate in request body new handling
-
   /**
    * Get list of all parameter names inside path
    *
@@ -79,7 +76,7 @@ public interface RequestParameters {
   @Nullable RequestParameter cookieParameter(String name);
 
   /**
-   * Return request body
+   * Return request body when parsed. Forms are managed as {@link JsonObject}
    *
    * @return
    */

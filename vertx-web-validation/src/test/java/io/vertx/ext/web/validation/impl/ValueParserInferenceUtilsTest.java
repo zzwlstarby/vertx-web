@@ -4,7 +4,7 @@ import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.json.schema.*;
 import io.vertx.ext.json.schema.draft7.Draft7SchemaParser;
-import io.vertx.ext.web.validation.ValueParser;
+import io.vertx.ext.web.validation.impl.parser.ValueParser;
 import io.vertx.junit5.VertxExtension;
 import org.assertj.core.api.Condition;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,7 +26,7 @@ public class ValueParserInferenceUtilsTest {
   @BeforeEach
   public void setUp(Vertx vertx) {
     router = SchemaRouter.create(vertx, new SchemaRouterOptions());
-    parser = Draft7SchemaParser.create(new SchemaParserOptions(), router);
+    parser = Draft7SchemaParser.create(router);
   }
 
   @Test

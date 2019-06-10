@@ -3,6 +3,9 @@ package io.vertx.ext.web.validation;
 import io.vertx.codegen.annotations.DataObject;
 import io.vertx.core.json.JsonObject;
 
+/**
+ * Data object representing a Request predicate result
+ */
 @DataObject
 public class RequestPredicateResult {
 
@@ -20,7 +23,7 @@ public class RequestPredicateResult {
     return new JsonObject().put("errorMessage", errorMessage);
   }
 
-  public boolean succeded() {
+  public boolean succeeded() {
     return errorMessage == null;
   }
 

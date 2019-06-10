@@ -5,6 +5,7 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.client.HttpResponse;
 import io.vertx.ext.web.validation.*;
+import io.vertx.ext.web.validation.impl.ParameterLocation;
 
 import java.util.function.Consumer;
 

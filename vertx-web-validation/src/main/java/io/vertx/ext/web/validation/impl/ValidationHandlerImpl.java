@@ -5,6 +5,10 @@ import io.vertx.core.Future;
 import io.vertx.core.MultiMap;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.validation.*;
+import io.vertx.ext.web.validation.impl.body.BodyProcessor;
+import io.vertx.ext.web.validation.impl.parameter.ParameterProcessor;
+import io.vertx.ext.web.validation.RequestPredicate;
+import io.vertx.ext.web.validation.RequestPredicateResult;
 
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.*;
@@ -180,7 +184,7 @@ public class ValidationHandlerImpl implements ValidationHandler {
   private void runPredicates(RoutingContext context) throws BadRequestException {
     for (Function<RoutingContext, RequestPredicateResult> p : predicates) {
       RequestPredicateResult res = p.apply(context);
-      if (!res.succeded()) throw new RequestPredicateException(res.getErrorMessage());
+      if (!res.succeeded()) throw new RequestPredicateException(res.getErrorMessage());
     }
   }
 

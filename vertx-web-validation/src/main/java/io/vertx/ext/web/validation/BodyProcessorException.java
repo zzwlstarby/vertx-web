@@ -3,11 +3,23 @@ package io.vertx.ext.web.validation;
 import io.vertx.core.json.DecodeException;
 import io.vertx.core.json.JsonObject;
 
+/**
+ * Represents an exception while processing a body
+ */
 public class BodyProcessorException extends BadRequestException {
 
   public enum BodyProcessorErrorType {
+    /**
+     * Error during parsing. The cause of the exception is instance of {@link MalformedValueException}
+     */
     PARSING_ERROR,
+    /**
+     * Error during validation
+     */
     VALIDATION_ERROR,
+    /**
+     * The provided content type doesn't match any of the managed content type by the mounted {@link ValidationHandler}
+     */
     MISSING_MATCHING_BODY_PROCESSOR
   }
 

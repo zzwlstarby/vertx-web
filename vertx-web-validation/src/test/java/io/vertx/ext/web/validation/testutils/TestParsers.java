@@ -2,7 +2,7 @@ package io.vertx.ext.web.validation.testutils;
 
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-import io.vertx.ext.web.validation.ValueParser;
+import io.vertx.ext.web.validation.impl.parser.ValueParser;
 
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Arrays;

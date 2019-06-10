@@ -3,7 +3,6 @@ package io.vertx.ext.web.validation;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpServer;
 import io.vertx.ext.json.schema.SchemaParser;
-import io.vertx.ext.json.schema.SchemaParserOptions;
 import io.vertx.ext.json.schema.SchemaRouter;
 import io.vertx.ext.json.schema.SchemaRouterOptions;
 import io.vertx.ext.json.schema.draft7.Draft7SchemaParser;
@@ -31,7 +30,7 @@ public abstract class BaseValidationHandlerTest {
     ValidationTestUtils.mountRouterFailureHandler(router);
 
     schemaRouter = SchemaRouter.create(vertx, new SchemaRouterOptions());
-    parser = Draft7SchemaParser.create(new SchemaParserOptions(), schemaRouter);
+    parser = Draft7SchemaParser.create(schemaRouter);
 
     client = WebClient.create(vertx, new WebClientOptions().setDefaultPort(9000).setDefaultHost("localhost"));
     server = vertx

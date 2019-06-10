@@ -3,6 +3,10 @@
 [[ServiceRequest]]
 == ServiceRequest
 
+++++
+ Data object that encapsulates all informations about an HTTP Request
+++++
+'''
 
 [cols=">25%,25%,50%"]
 [frame="topbot"]
@@ -22,6 +26,10 @@ Get request principal user as routingContext.user().principal(), null if no user
 [[ServiceResponse]]
 == ServiceResponse
 
+++++
+ Data object that encapsulates all informations about an HTTP Response
+++++
+'''
 
 [cols=">25%,25%,50%"]
 [frame="topbot"]

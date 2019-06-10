@@ -44,11 +44,9 @@ public class WebApiProxyHandlerGen extends ServiceProxyHandlerGen {
     return model.getIfaceSimpleName() + "VertxProxyHandler";
   }
 
-  public Stream<String> additionalImports(ProxyModel model) {
-    return Stream.concat(
-      model.getImportedTypes().stream().filter(c -> !c.getPackageName().equals("java.lang")).map(ClassTypeInfo::toString),
-      Stream.of("io.vertx.ext.web.api.service.ServiceRequest", "java.util.Optional")
-    );
+  @Override
+  public Stream<String> additionalImports() {
+    return Stream.of("io.vertx.ext.web.api.service.ServiceRequest", "java.util.Optional");
   }
 
   @Override

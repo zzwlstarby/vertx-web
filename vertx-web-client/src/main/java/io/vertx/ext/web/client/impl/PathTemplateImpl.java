@@ -53,7 +53,7 @@ public class PathTemplateImpl implements PathTemplate {
         final String paramName = builder.toString();
         templateChunksGenerators.add(f -> {
           if (f.getEscapedParam(paramName) == null) throw new IllegalArgumentException("Missing path parameter " + paramName);
-          else return f.getEscapedParam(paramName);
+          else return String.join("/", f.getEscapedParam(paramName));
         });
         tempPathTemplate = tempPathTemplate.substring(index);
       }

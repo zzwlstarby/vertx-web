@@ -4,6 +4,7 @@ import io.vertx.codegen.annotations.GenIgnore;
 import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.ext.web.client.impl.PathParametersImpl;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -30,7 +31,18 @@ public interface PathParameters {
   PathParameters param(String key, String value);
 
   /**
-   * Add unescaped param. This param will not be escaped with {@link java.net.URLEncoder#encode(String, String)}
+   * Add array param. This param will be escaped with {@link java.net.URLEncoder#encode(String, String)} <br/>
+   *
+   * This param will be rendered in path as {@code value1/value2}
+   *
+   * @param key
+   * @param value
+   * @return
+   */
+  PathParameters param(String key, List<String> value);
+
+  /**
+   * Add param already escaped. This param won't be escaped as with {@link this#param(String, String)}
    *
    * @param key
    * @param value
@@ -38,7 +50,24 @@ public interface PathParameters {
    */
   PathParameters escapedParam(String key, String value);
 
-  String getEscapedParam(String key);
+  /**
+   * Add array param already escaped. This param won't be escaped as with {@link this#param(String, List)} <br/>
+   *
+   * This param will be rendered in path as {@code value1/value2}
+   *
+   * @param key
+   * @param value
+   * @return
+   */
+  PathParameters escapedParam(String key, List<String> value);
+
+  /**
+   * Get parameter already escaped
+   *
+   * @param key
+   * @return
+   */
+  List<String> getEscapedParam(String key);
 
   /**
    * Create a new empty {@link PathParameters}

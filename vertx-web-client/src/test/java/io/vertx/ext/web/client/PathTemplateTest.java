@@ -2,6 +2,8 @@ package io.vertx.ext.web.client;
 
 import org.junit.Test;
 
+import java.util.Arrays;
+
 import static org.junit.Assert.assertEquals;
 
 public class PathTemplateTest {
@@ -12,6 +14,15 @@ public class PathTemplateTest {
     assertEquals(
       "/1",
       template.expand(PathParameters.create().param("x", 1))
+    );
+  }
+
+  @Test
+  public void testArrayParam() {
+    PathTemplate template = PathTemplate.parse("/:x/y");
+    assertEquals(
+      "/a/b/c/y",
+      template.expand(PathParameters.create().param("x", Arrays.asList("a", "b", "c")))
     );
   }
 
@@ -30,6 +41,15 @@ public class PathTemplateTest {
     assertEquals(
       "/%3B/./%2C",
       template.expand(PathParameters.create().param("semi", ";").param("dot", ".").escapedParam("comma", "%2C"))
+    );
+  }
+
+  @Test
+  public void testAlreadyEscapedArrayParam() {
+    PathTemplate template = PathTemplate.parse("/:symbol");
+    assertEquals(
+      "/%3B/%2C/.",
+      template.expand(PathParameters.create().escapedParam("symbol", Arrays.asList("%3B", "%2C")).param("symbol", "."))
     );
   }
 

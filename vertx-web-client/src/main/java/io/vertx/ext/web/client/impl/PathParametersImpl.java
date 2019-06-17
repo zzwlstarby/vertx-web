@@ -4,12 +4,15 @@ import io.vertx.ext.web.client.PathParameters;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class PathParametersImpl implements PathParameters {
 
-  Map<String, String> escapedParams;
+  Map<String, List<String>> escapedParams;
 
   public PathParametersImpl() {
     this.escapedParams = new HashMap<>();
@@ -21,13 +24,24 @@ public class PathParametersImpl implements PathParameters {
   }
 
   @Override
+  public PathParameters param(String key, List<String> value) {
+    return escapedParam(key, value.stream().map(PathParametersImpl::urlEncode).collect(Collectors.toList()));
+  }
+
+  @Override
   public PathParameters escapedParam(String key, String value) {
-    escapedParams.put(key, value);
+    escapedParams.computeIfAbsent(key, k -> new ArrayList<>()).add(value);
     return this;
   }
 
   @Override
-  public String getEscapedParam(String key) {
+  public PathParameters escapedParam(String key, List<String> value) {
+    escapedParams.computeIfAbsent(key, k -> new ArrayList<>()).addAll(value);
+    return this;
+  }
+
+  @Override
+  public List<String> getEscapedParam(String key) {
     return escapedParams.get(key);
   }
 

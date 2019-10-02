@@ -251,4 +251,9 @@ public class OAuth2AuthHandlerImpl extends AuthorizationAuthHandler implements O
 
     return this;
   }
+
+  @Override
+  protected String authenticateHeader(RoutingContext context) {
+    return "Bearer realm=\"" + realm + "\"";
+  }
 }

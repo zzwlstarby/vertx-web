@@ -828,6 +828,9 @@ final class RouteState {
         if (m.groupCount() > 0) {
           if (!exactPath) {
             context.matchRest = m.start("rest");
+            if (context.matchRest != -1) {
+              addPathParam(context, "*", path.substring(context.matchRest));
+            }
           }
 
           if (!isEmpty(groups)) {

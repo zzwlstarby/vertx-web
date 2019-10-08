@@ -110,7 +110,17 @@ public class StaticHandlerImpl implements StaticHandler {
       if (log.isTraceEnabled()) log.trace("Not GET or HEAD so ignoring request");
       context.next();
     } else {
-      String path = HttpUtils.removeDots(URIDecoder.decodeURIComponent(context.normalisedPath(), false));
+      // extract the path from the request
+      String path;
+      // are we using wildcard?
+      path = context.pathParam("*");
+      if (path == null) {
+        // path is the full normalized path
+        path = context.normalisedPath();
+      }
+      // clean up dots as per HTTP spec
+      path = HttpUtils.removeDots(URIDecoder.decodeURIComponent(path, false));
+
       // if the normalized path is null it cannot be resolved
       if (path == null) {
         log.warn("Invalid path: " + context.request().path());
@@ -236,7 +246,7 @@ public class StaticHandlerImpl implements StaticHandler {
     }
 
     if (directoryListing) {
-      sendDirectoryListing(file, context);
+      sendDirectoryListing(file, path, context);
     } else if (indexPage != null) {
       // send index page
       String indexPath;
@@ -579,7 +589,7 @@ public class StaticHandlerImpl implements StaticHandler {
     this.webRoot = webRoot;
   }
 
-  private void sendDirectoryListing(String dir, RoutingContext context) {
+  private void sendDirectoryListing(String dir, String path, RoutingContext context) {
     final FileSystem fileSystem = context.vertx().fileSystem();
     final HttpServerRequest request = context.request();
     final HttpServerResponse response = context.response();
@@ -595,9 +605,9 @@ public class StaticHandlerImpl implements StaticHandler {
         }
 
         if (accept.contains("html")) {
-          String normalizedDir = context.normalisedPath();
-          if (!normalizedDir.endsWith("/")) {
-            normalizedDir += "/";
+          String normalizedPath = path;
+          if (!normalizedPath.endsWith("/")) {
+            normalizedPath += "/";
           }
 
           String file;
@@ -613,7 +623,7 @@ public class StaticHandlerImpl implements StaticHandler {
               continue;
             }
             files.append("<li><a href=\"");
-            files.append(normalizedDir);
+            files.append(normalizedPath);
             files.append(file);
             files.append("\" title=\"");
             files.append(file);
@@ -626,19 +636,19 @@ public class StaticHandlerImpl implements StaticHandler {
 
           // link to parent dir
           int slashPos = 0;
-          for (int i = normalizedDir.length() - 2; i > 0; i--) {
-            if (normalizedDir.charAt(i) == '/') {
+          for (int i = normalizedPath.length() - 2; i > 0; i--) {
+            if (normalizedPath.charAt(i) == '/') {
               slashPos = i;
               break;
             }
           }
 
-          String parent = "<a href=\"" + normalizedDir.substring(0, slashPos + 1) + "\">..</a>";
+          String parent = "<a href=\"" + normalizedPath.substring(0, slashPos + 1) + "\">..</a>";
 
           response
             .putHeader(HttpHeaders.CONTENT_TYPE, "text/html")
             .end(
-              directoryTemplate(context.vertx()).replace("{directory}", normalizedDir)
+              directoryTemplate(context.vertx()).replace("{directory}", normalizedPath)
                 .replace("{parent}", parent)
                 .replace("{files}", files.toString()));
         } else if (accept.contains("json")) {

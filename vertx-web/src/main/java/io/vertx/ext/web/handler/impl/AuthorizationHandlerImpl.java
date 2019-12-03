@@ -16,9 +16,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Objects;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.function.BiConsumer;
 
+import io.vertx.core.MultiMap;
+import io.vertx.core.impl.logging.Logger;
+import io.vertx.core.impl.logging.LoggerFactory;
 import io.vertx.ext.auth.authorization.Authorization;
 import io.vertx.ext.auth.authorization.AuthorizationContext;
 import io.vertx.ext.auth.authorization.AuthorizationProvider;
@@ -31,12 +33,15 @@ import io.vertx.ext.web.handler.AuthorizationHandler;
  * @author <a href="mail://stephane.bastian.dev@gmail.com">Stephane Bastian</a>
  */
 public class AuthorizationHandlerImpl implements AuthorizationHandler {
-  private final static Logger logger = Logger.getLogger(AuthorizationHandler.class.getName());
+
+  private final static Logger LOG = LoggerFactory.getLogger(AuthorizationHandler.class);
+
   private final static int FORBIDDEN_CODE = 403;
   private final static HttpStatusException FORBIDDEN_EXCEPTION = new HttpStatusException(FORBIDDEN_CODE);
 
   private Authorization authorization;
   private Collection<AuthorizationProvider> authorizationProviders;
+  private BiConsumer<RoutingContext, AuthorizationContext> variableHandler;
 
   public AuthorizationHandlerImpl(Authorization authorization) {
     this.authorization = Objects.requireNonNull(authorization);
@@ -53,6 +58,12 @@ public class AuthorizationHandlerImpl implements AuthorizationHandler {
       // check or fetch authorizations
       checkOrFetchAuthorizations(routingContext, authorizationContext, authorizationProviders.iterator());
     }
+  }
+
+  @Override
+  public AuthorizationHandler variableConsumer(BiConsumer<RoutingContext, AuthorizationContext> handler) {
+    this.variableHandler = variableHandler;
+    return this;
   }
 
   /**
@@ -82,7 +93,7 @@ public class AuthorizationHandlerImpl implements AuthorizationHandler {
       if (! routingContext.user().authorizations().getProviderIds().contains(provider.getId())) {
         provider.getAuthorizations(routingContext.user(), authorizationResult -> {
           if (authorizationResult.failed()) {
-            logger.log(Level.WARNING, "An error occured getting authorization - providerId: " + provider.getId());
+            LOG.warn("An error occured getting authorization - providerId: " + provider.getId(), authorizationResult.cause());
             // note that we don't 'record' the fact that we tried to fetch the authorization provider. therefore it will be re-fetched later-on
           }
           else {
@@ -96,12 +107,11 @@ public class AuthorizationHandlerImpl implements AuthorizationHandler {
     }
   }
 
-  private final static AuthorizationContext getAuhorizationContext(RoutingContext event) {
-    AuthorizationContext result = AuthorizationContext.create(event.user());
-    // add request parameters,  as it may be useful to allow/deny access based on the value of a request param
-    result.variables().addAll(event.request().params());
-    // add the remove address
-    result.variables().add(AuthorizationHandler.VARIABLE_REMOTE_IP, event.request().connection().remoteAddress().toString());
+  private final AuthorizationContext getAuhorizationContext(RoutingContext event) {
+    final AuthorizationContext result = AuthorizationContext.create(event.user());
+    if (variableHandler != null) {
+      variableHandler.accept(event, result);
+    }
     return result;
   }
 

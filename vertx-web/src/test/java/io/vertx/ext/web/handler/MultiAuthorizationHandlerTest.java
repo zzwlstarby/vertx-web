@@ -1,14 +1,21 @@
 package io.vertx.ext.web.handler;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
 
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
+import io.vertx.ext.auth.User;
+import io.vertx.ext.auth.authorization.Authorization;
 import org.junit.Before;
 import org.junit.Test;
 
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;
-import io.vertx.ext.auth.AuthorizationProvider;
-import io.vertx.ext.auth.RoleBasedAuthorization;
+import io.vertx.ext.auth.authorization.AuthorizationProvider;
+import io.vertx.ext.auth.authorization.RoleBasedAuthorization;
 import io.vertx.ext.auth.jwt.JWTAuth;
 import io.vertx.ext.auth.jwt.JWTAuthOptions;
 import io.vertx.ext.jwt.JWTOptions;
@@ -19,7 +26,7 @@ public class MultiAuthorizationHandlerTest extends WebTestBase {
   JWTAuth authProvider;
 
   @Before
-  public void setup() throws Exception {
+  public void setup() {
     JsonObject authConfig = new JsonObject().put("keyStore",
         new JsonObject().put("type", "jceks").put("path", "keystore.jceks").put("password", "secret"));
 
@@ -82,8 +89,7 @@ public class MultiAuthorizationHandlerTest extends WebTestBase {
     router.route("/protected/*")
         .handler(
             AuthorizationHandler.create(RoleBasedAuthorization.create("role1"))
-            .addAuthorizationProvider(AuthorizationProvider.create("authzProvider1", Set.of(RoleBasedAuthorization.create("role1"))))
-        );
+            .addAuthorizationProvider(new TestAuthorizationProvider("authzProvider1", RoleBasedAuthorization.create("role1"))));
 
     router.route("/protected/page1").handler(rc -> {
       assertNotNull(rc.user());
@@ -109,9 +115,9 @@ public class MultiAuthorizationHandlerTest extends WebTestBase {
     router.route("/protected/*")
         .handler(
             AuthorizationHandler.create(RoleBasedAuthorization.create("role3"))
-            .addAuthorizationProvider(AuthorizationProvider.create("authzProvider1", Set.of(RoleBasedAuthorization.create("role1"))))
-            .addAuthorizationProvider(AuthorizationProvider.create("authzProvider2", Set.of(RoleBasedAuthorization.create("role2"))))
-            .addAuthorizationProvider(AuthorizationProvider.create("authzProvider3", Set.of(RoleBasedAuthorization.create("role3"))))
+            .addAuthorizationProvider(new TestAuthorizationProvider("authzProvider1", RoleBasedAuthorization.create("role1")))
+            .addAuthorizationProvider(new TestAuthorizationProvider("authzProvider2", RoleBasedAuthorization.create("role2")))
+            .addAuthorizationProvider(new TestAuthorizationProvider("authzProvider3", RoleBasedAuthorization.create("role3")))
         );
 
     router.route("/protected/page1").handler(rc -> {
@@ -133,14 +139,14 @@ public class MultiAuthorizationHandlerTest extends WebTestBase {
     // authentication via jwt
     // 3 authorization providers are registered
     // an authorization is required on the path
-    // => the test should fail since no authorization providers provide the correct authorization 
+    // => the test should fail since no authorization providers provide the correct authorization
     router.route("/protected/*").handler(JWTAuthHandler.create(authProvider));
     router.route("/protected/*")
         .handler(
             AuthorizationHandler.create(RoleBasedAuthorization.create("role4"))
-            .addAuthorizationProvider(AuthorizationProvider.create("authzProvider1", Set.of(RoleBasedAuthorization.create("role1"))))
-            .addAuthorizationProvider(AuthorizationProvider.create("authzProvider2", Set.of(RoleBasedAuthorization.create("role2"))))
-            .addAuthorizationProvider(AuthorizationProvider.create("authzProvider3", Set.of(RoleBasedAuthorization.create("role3"))))
+            .addAuthorizationProvider(new TestAuthorizationProvider("authzProvider1", RoleBasedAuthorization.create("role1")))
+            .addAuthorizationProvider(new TestAuthorizationProvider("authzProvider2", RoleBasedAuthorization.create("role2")))
+            .addAuthorizationProvider(new TestAuthorizationProvider("authzProvider3", RoleBasedAuthorization.create("role3")))
         );
 
     router.route("/protected/page1").handler(rc -> {
@@ -155,5 +161,25 @@ public class MultiAuthorizationHandlerTest extends WebTestBase {
             "Bearer " + authProvider.generateToken(new JsonObject().put("sub", "paulo"), new JWTOptions())),
         403, "Forbidden", "Forbidden");
   }
+}
 
+class TestAuthorizationProvider implements AuthorizationProvider {
+
+  private final String id;
+  private final Set<Authorization> authorizations;
+
+  TestAuthorizationProvider(String id, Authorization... authorizations) {
+    this.id = id;
+    this.authorizations = new HashSet<>(Arrays.asList(authorizations));
+  }
+
+  @Override
+  public String getId() {
+    return id;
+  }
+
+  @Override
+  public void getAuthorizations(User user, Handler<AsyncResult<Set<Authorization>>> handler) {
+    handler.handle(Future.succeededFuture(authorizations));
+  }
 }

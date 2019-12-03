@@ -25,7 +25,6 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.impl.logging.Logger;
 import io.vertx.core.impl.logging.LoggerFactory;
-import io.vertx.ext.auth.AuthProvider;
 import io.vertx.ext.auth.oauth2.OAuth2Auth;
 import io.vertx.ext.web.Route;
 import io.vertx.ext.web.RoutingContext;
@@ -38,31 +37,12 @@ import java.net.URL;
 import java.util.HashSet;
 import java.util.Set;
 
-import static io.vertx.ext.auth.oauth2.OAuth2FlowType.AUTH_CODE;
-
 /**
  * @author <a href="http://pmlopes@gmail.com">Paulo Lopes</a>
  */
 public class OAuth2AuthHandlerImpl extends AuthorizationAuthHandler implements OAuth2AuthHandler {
 
   private static final Logger log = LoggerFactory.getLogger(OAuth2AuthHandlerImpl.class);
-
-  /**
-   * This is a verification step, it can abort the instantiation by
-   * throwing a RuntimeException
-   *
-   * @param provider a auth provider
-   * @return the provider if valid
-   */
-  private static AuthProvider verifyProvider(AuthProvider provider) {
-    if (provider instanceof OAuth2Auth) {
-      if (((OAuth2Auth) provider).getFlowType() != AUTH_CODE) {
-        throw new IllegalArgumentException("OAuth2Auth + Bearer Auth requires OAuth2 AUTH_CODE flow");
-      }
-    }
-
-    return provider;
-  }
 
   private final String host;
   private final String callbackPath;
@@ -74,7 +54,7 @@ public class OAuth2AuthHandlerImpl extends AuthorizationAuthHandler implements O
   private boolean bearerOnly = true;
 
   public OAuth2AuthHandlerImpl(OAuth2Auth authProvider, String callbackURL) {
-    super(verifyProvider(authProvider), Type.BEARER);
+    super(authProvider, Type.BEARER);
 
     try {
       if (callbackURL != null) {
@@ -138,7 +118,7 @@ public class OAuth2AuthHandlerImpl extends AuthorizationAuthHandler implements O
         }
       } else {
         // attempt to decode the token and handle it as a user
-        ((OAuth2Auth) authProvider).decodeToken(token, decodeToken -> {
+        authProvider.authenticate(new JsonObject().put("access_token", token).put("token_type", Type.BEARER), decodeToken -> {
           if (decodeToken.failed()) {
             handler.handle(Future.failedFuture(new HttpStatusException(401, decodeToken.cause().getMessage())));
             return;

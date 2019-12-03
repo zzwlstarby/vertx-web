@@ -19,15 +19,14 @@ import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import io.vertx.ext.auth.Authorization;
-import io.vertx.ext.auth.AuthorizationContext;
-import io.vertx.ext.auth.AuthorizationProvider;
-import io.vertx.ext.auth.impl.AuthorizationContextImpl;
+import io.vertx.ext.auth.authorization.Authorization;
+import io.vertx.ext.auth.authorization.AuthorizationContext;
+import io.vertx.ext.auth.authorization.AuthorizationProvider;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.AuthorizationHandler;
 
 /**
- * Implementation of the {@link io.vertx.ext.web.AuthorizationHandler}
+ * Implementation of the {@link io.vertx.ext.web.handler.AuthorizationHandler}
  *
  * @author <a href="mail://stephane.bastian.dev@gmail.com">Stephane Bastian</a>
  */
@@ -38,7 +37,7 @@ public class AuthorizationHandlerImpl implements AuthorizationHandler {
 
   private Authorization authorization;
   private Collection<AuthorizationProvider> authorizationProviders;
-  
+
   public AuthorizationHandlerImpl(Authorization authorization) {
     this.authorization = Objects.requireNonNull(authorization);
     this.authorizationProviders = new ArrayList<>();
@@ -55,11 +54,11 @@ public class AuthorizationHandlerImpl implements AuthorizationHandler {
       checkOrFetchAuthorizations(routingContext, authorizationContext, authorizationProviders.iterator());
     }
   }
-  
+
   /**
    * this method checks that the specified authorization match the current content.
    * It doesn't fetch all providers at once in order to do early-out, but rather tries to be smart and fetch authorizations one provider at a time
-   * 
+   *
    * @param routingContext
    * @param authorizationContext
    * @param providers
@@ -73,10 +72,10 @@ public class AuthorizationHandlerImpl implements AuthorizationHandler {
       routingContext.fail(FORBIDDEN_CODE, FORBIDDEN_EXCEPTION);
       return;
     }
-    
+
     // there was no match, in this case we do the following:
     // 1) contact the next provider we haven't contacted yet
-    // 2) if there is a match, get out right away otherwise repeat 1) 
+    // 2) if there is a match, get out right away otherwise repeat 1)
     while (providers.hasNext()) {
       AuthorizationProvider provider = providers.next();
       // we haven't fetch authorization from this provider yet
@@ -96,20 +95,20 @@ public class AuthorizationHandlerImpl implements AuthorizationHandler {
       }
     }
   }
-  
+
   private final static AuthorizationContext getAuhorizationContext(RoutingContext event) {
-    AuthorizationContext result = new AuthorizationContextImpl(event.user());
+    AuthorizationContext result = AuthorizationContext.create(event.user());
     // add request parameters,  as it may be useful to allow/deny access based on the value of a request param
     result.variables().addAll(event.request().params());
     // add the remove address
     result.variables().add(AuthorizationHandler.VARIABLE_REMOTE_IP, event.request().connection().remoteAddress().toString());
     return result;
   }
-  
+
   @Override
   public AuthorizationHandler addAuthorizationProvider(AuthorizationProvider authorizationProvider) {
     Objects.requireNonNull(authorizationProvider);
-    
+
     this.authorizationProviders.add(authorizationProvider);
     return this;
   }

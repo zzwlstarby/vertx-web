@@ -431,7 +431,7 @@ public class OpenAPI3ServiceProxiesTest extends ApiWebTestBase {
       200,
       "OK"
     );
-    
+
     consumer.unregister();
   }
 
@@ -468,6 +468,11 @@ public class OpenAPI3ServiceProxiesTest extends ApiWebTestBase {
             @Override
             public void setAuthProvider(AuthProvider authProvider) {
 
+            }
+
+            @Override
+            public JsonObject attributes() {
+              return new JsonObject();
             }
           }); // Put user mock into context
           rc.next();

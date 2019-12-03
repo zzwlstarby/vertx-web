@@ -16,9 +16,6 @@
 
 package io.vertx.ext.web.handler.impl;
 
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Future;
-import io.vertx.core.Handler;
 import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.http.HttpServerRequest;
@@ -26,18 +23,13 @@ import io.vertx.ext.auth.AuthProvider;
 import io.vertx.ext.auth.User;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.Session;
-import io.vertx.ext.web.handler.AuthHandler;
-
-import java.util.HashSet;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
+import io.vertx.ext.web.handler.AuthenticationHandler;
 
 /**
  * @author <a href="http://tfox.org">Tim Fox</a>
  * @author <a href="mailto:pmlopes@gmail.com">Paulo Lopes</a>
  */
-public abstract class AuthHandlerImpl implements AuthHandler {
+public abstract class AuthenticationHandlerImpl implements AuthenticationHandler {
 
   static final String AUTH_PROVIDER_CONTEXT_KEY = "io.vertx.ext.web.handler.AuthHandler.provider";
 
@@ -47,66 +39,14 @@ public abstract class AuthHandlerImpl implements AuthHandler {
 
   protected final String realm;
   protected final AuthProvider authProvider;
-  protected final Set<String> authorities = new HashSet<>();
 
-  public AuthHandlerImpl(AuthProvider authProvider) {
+  public AuthenticationHandlerImpl(AuthProvider authProvider) {
     this(authProvider, "");
   }
 
-  public AuthHandlerImpl(AuthProvider authProvider, String realm) {
+  public AuthenticationHandlerImpl(AuthProvider authProvider, String realm) {
     this.authProvider = authProvider;
     this.realm = realm;
-  }
-
-  @Override
-  public AuthHandler addAuthority(String authority) {
-    authorities.add(authority);
-    return this;
-  }
-
-  @Override
-  public AuthHandler addAuthorities(Set<String> authorities) {
-    this.authorities.addAll(authorities);
-    return this;
-  }
-
-  @Override
-  public void authorize(User user, Handler<AsyncResult<Void>> handler) {
-    int requiredcount = authorities.size();
-    if (requiredcount > 0) {
-      if (user == null) {
-        handler.handle(Future.failedFuture(FORBIDDEN));
-        return;
-      }
-
-      AtomicInteger count = new AtomicInteger();
-      AtomicBoolean sentFailure = new AtomicBoolean();
-
-      Handler<AsyncResult<Boolean>> authHandler = res -> {
-        if (res.succeeded()) {
-          if (res.result()) {
-            if (count.incrementAndGet() == requiredcount) {
-              // Has all required authorities
-              handler.handle(Future.succeededFuture());
-            }
-          } else {
-            if (sentFailure.compareAndSet(false, true)) {
-              handler.handle(Future.failedFuture(FORBIDDEN));
-            }
-          }
-        } else {
-          handler.handle(Future.failedFuture(res.cause()));
-        }
-      };
-      for (String authority : authorities) {
-        if (!sentFailure.get()) {
-          user.isAuthorized(authority, authHandler);
-        }
-      }
-    } else {
-      // No auth required
-      handler.handle(Future.succeededFuture());
-    }
   }
 
   protected String authenticateHeader(RoutingContext context) {
@@ -122,8 +62,8 @@ public abstract class AuthHandlerImpl implements AuthHandler {
 
     User user = ctx.user();
     if (user != null) {
-      // proceed to AuthZ
-      authorizeUser(ctx, user);
+      // success, allowed to continue
+      ctx.next();
       return;
     }
     // parse the request in order to extract the credentials object
@@ -142,8 +82,8 @@ public abstract class AuthHandlerImpl implements AuthHandler {
           // session should be upgraded as recommended by owasp
           session.regenerateId();
         }
-        // proceed to AuthZ
-        authorizeUser(ctx, updatedUser);
+        // success, allowed to continue
+        ctx.next();
         return;
       }
 
@@ -158,8 +98,8 @@ public abstract class AuthHandlerImpl implements AuthHandler {
             // session should be upgraded as recommended by owasp
             session.regenerateId();
           }
-          // proceed to AuthZ
-          authorizeUser(ctx, authenticated);
+          // success, allowed to continue
+          ctx.next();
         } else {
           String header = authenticateHeader(ctx);
           if (header != null) {
@@ -212,17 +152,6 @@ public abstract class AuthHandlerImpl implements AuthHandler {
 
     // fallback 500
     ctx.fail(exception);
-  }
-
-  private void authorizeUser(RoutingContext ctx, User user) {
-    authorize(user, authZ -> {
-      if (authZ.failed()) {
-        processException(ctx, authZ.cause());
-        return;
-      }
-      // success, allowed to continue
-      ctx.next();
-    });
   }
 
   private boolean handlePreflight(RoutingContext ctx) {

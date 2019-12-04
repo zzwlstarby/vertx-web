@@ -19,8 +19,8 @@ package io.vertx.ext.web.handler.impl;
 import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.http.HttpServerRequest;
-import io.vertx.ext.auth.AuthProvider;
 import io.vertx.ext.auth.User;
+import io.vertx.ext.auth.authentication.AuthenticationProvider;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.Session;
 import io.vertx.ext.web.handler.AuthenticationHandler;
@@ -31,20 +31,19 @@ import io.vertx.ext.web.handler.AuthenticationHandler;
  */
 public abstract class AuthenticationHandlerImpl implements AuthenticationHandler {
 
-  static final String AUTH_PROVIDER_CONTEXT_KEY = "io.vertx.ext.web.handler.AuthHandler.provider";
+  static final String AUTH_PROVIDER_CONTEXT_KEY = "io.vertx.ext.web.handler.AuthenticationHandler.provider";
 
-  static final HttpStatusException FORBIDDEN = new HttpStatusException(403);
   static final HttpStatusException UNAUTHORIZED = new HttpStatusException(401);
   static final HttpStatusException BAD_REQUEST = new HttpStatusException(400);
 
   protected final String realm;
-  protected final AuthProvider authProvider;
+  protected final AuthenticationProvider authProvider;
 
-  public AuthenticationHandlerImpl(AuthProvider authProvider) {
+  public AuthenticationHandlerImpl(AuthenticationProvider authProvider) {
     this(authProvider, "");
   }
 
-  public AuthenticationHandlerImpl(AuthProvider authProvider, String realm) {
+  public AuthenticationHandlerImpl(AuthenticationProvider authProvider, String realm) {
     this.authProvider = authProvider;
     this.realm = realm;
   }
@@ -176,9 +175,9 @@ public abstract class AuthenticationHandlerImpl implements AuthenticationHandler
     return false;
   }
 
-  private AuthProvider getAuthProvider(RoutingContext ctx) {
+  private AuthenticationProvider getAuthProvider(RoutingContext ctx) {
     try {
-      AuthProvider provider = ctx.get(AUTH_PROVIDER_CONTEXT_KEY);
+      AuthenticationProvider provider = ctx.get(AUTH_PROVIDER_CONTEXT_KEY);
       if (provider != null) {
         // we're overruling the configured one for this request
         return provider;

@@ -21,7 +21,7 @@ import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpClientRequest;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;
-import io.vertx.ext.auth.AuthProvider;
+import io.vertx.ext.auth.authentication.AuthenticationProvider;
 import io.vertx.ext.auth.shiro.ShiroAuth;
 import io.vertx.ext.auth.shiro.ShiroAuthOptions;
 import io.vertx.ext.auth.shiro.ShiroAuthRealmType;
@@ -42,7 +42,7 @@ public class RedirectAuthHandlerTest extends AuthHandlerTestBase {
 
   protected AtomicReference<String> sessionCookie = new AtomicReference<>();
   protected FormLoginHandler formLoginHandler;
-  protected AuthProvider authProvider;
+  protected AuthenticationProvider authProvider;
   protected String usernameParam;
   protected String passwordParam;
 

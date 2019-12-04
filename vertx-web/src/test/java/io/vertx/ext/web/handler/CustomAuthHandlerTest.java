@@ -20,8 +20,8 @@ import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;
-import io.vertx.ext.auth.AuthProvider;
 import io.vertx.ext.auth.User;
+import io.vertx.ext.auth.authentication.AuthenticationProvider;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.impl.AuthenticationHandlerImpl;
 import io.vertx.ext.web.handler.impl.HttpStatusException;
@@ -31,7 +31,7 @@ import static org.mockito.Mockito.*;
 
 public class CustomAuthHandlerTest extends AuthHandlerTestBase {
 
-  private AuthenticationHandler newAuthHandler(AuthProvider authProvider, Handler<Throwable> exceptionProcessor) {
+  private AuthenticationHandler newAuthHandler(AuthenticationProvider authProvider, Handler<Throwable> exceptionProcessor) {
     return new AuthenticationHandlerImpl(authProvider) {
 
       @Override
@@ -59,7 +59,7 @@ public class CustomAuthHandlerTest extends AuthHandlerTestBase {
     };
 
     Throwable rootCause = new IllegalArgumentException("validation of credentials failed");
-    AuthProvider authProvider = mock(AuthProvider.class);
+    AuthenticationProvider authProvider = mock(AuthenticationProvider.class);
     doAnswer(invocation -> {
       final Handler<AsyncResult<User>> resultHandler = invocation.getArgument(1);
       resultHandler.handle(Future.failedFuture(rootCause));
@@ -86,7 +86,7 @@ public class CustomAuthHandlerTest extends AuthHandlerTestBase {
     };
 
     Throwable rootCause = new HttpStatusException(499, "bla");
-    AuthProvider authProvider = mock(AuthProvider.class);
+    AuthenticationProvider authProvider = mock(AuthenticationProvider.class);
     doAnswer(invocation -> {
       final Handler<AsyncResult<User>> resultHandler = invocation.getArgument(1);
       resultHandler.handle(Future.failedFuture(rootCause));

@@ -18,7 +18,7 @@ package io.vertx.ext.web.handler.impl;
 
 import io.vertx.core.impl.logging.Logger;
 import io.vertx.core.impl.logging.LoggerFactory;
-import io.vertx.ext.auth.AuthProvider;
+import io.vertx.ext.auth.authentication.AuthenticationProvider;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.UserSessionHandler;
 
@@ -31,7 +31,7 @@ public class UserSessionHandlerImpl implements UserSessionHandler {
 
   private static final Logger log = LoggerFactory.getLogger(UserSessionHandlerImpl.class);
 
-  public UserSessionHandlerImpl(AuthProvider authProvider) {
+  public UserSessionHandlerImpl(AuthenticationProvider authProvider) {
     log.warn("This handler is not needed anymore, the SessionHandler takes care of the user session.");
   }
 

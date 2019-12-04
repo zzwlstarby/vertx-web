@@ -9,6 +9,7 @@ import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.ext.auth.User;
 import io.vertx.ext.auth.authorization.Authorization;
+import io.vertx.ext.auth.jwt.JWTAuthentication;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -16,21 +17,20 @@ import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.auth.authorization.AuthorizationProvider;
 import io.vertx.ext.auth.authorization.RoleBasedAuthorization;
-import io.vertx.ext.auth.jwt.JWTAuth;
 import io.vertx.ext.auth.jwt.JWTAuthOptions;
 import io.vertx.ext.jwt.JWTOptions;
 import io.vertx.ext.web.WebTestBase;
 
 public class MultiAuthorizationHandlerTest extends WebTestBase {
 
-  JWTAuth authProvider;
+  JWTAuthentication authProvider;
 
   @Before
   public void setup() {
     JsonObject authConfig = new JsonObject().put("keyStore",
         new JsonObject().put("type", "jceks").put("path", "keystore.jceks").put("password", "secret"));
 
-    authProvider = JWTAuth.create(vertx, new JWTAuthOptions(authConfig));
+    authProvider = JWTAuthentication.create(vertx, new JWTAuthOptions(authConfig));
   }
 
   @Test

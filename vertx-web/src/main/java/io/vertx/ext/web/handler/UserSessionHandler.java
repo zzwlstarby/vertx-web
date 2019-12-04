@@ -17,7 +17,7 @@ package io.vertx.ext.web.handler;
 
 import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.Handler;
-import io.vertx.ext.auth.AuthProvider;
+import io.vertx.ext.auth.authentication.AuthenticationProvider;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.impl.UserSessionHandlerImpl;
 
@@ -44,7 +44,7 @@ public interface UserSessionHandler extends Handler<RoutingContext> {
    * @param authProvider  The auth provider to use
    * @return  the handler
    */
-  static UserSessionHandler create(AuthProvider authProvider) {
+  static UserSessionHandler create(AuthenticationProvider authProvider) {
     return new UserSessionHandlerImpl(authProvider);
   }
 

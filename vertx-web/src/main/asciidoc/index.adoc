@@ -992,7 +992,7 @@ Vert.x comes with some out-of-the-box handlers for handling both authentication 
 
 === Creating an auth handler
 
-To create an auth handler you need an instance of {@link io.vertx.ext.auth.AuthProvider}. Auth provider is
+To create an auth handler you need an instance of {@link io.vertx.ext.auth.authentication.AuthenticationProvider}. Auth provider is
 used for authentication and authorisation of users. Vert.x provides several auth provider instances out of the box
 in the vertx-auth project. For full information on auth providers and how to use and configure them
 please consult the auth documentation.
@@ -1042,7 +1042,7 @@ prompt the user to enter their username and password.
 The request is made to the resource again, this time with the `Authorization` header set, containing the username
 and password encoded in Base64.
 
-When the basic auth handler receives this information, it calls the configured {@link io.vertx.ext.auth.AuthProvider}
+When the basic auth handler receives this information, it calls the configured {@link io.vertx.ext.auth.authentication.AuthenticationProvider}
 with the username and password to authenticate the user. If the authentication is successful the handler attempts
 to authorise the user. If that is successful then the routing of the request is allowed to continue to the application
 handlers, otherwise a `403` response is returned to signify that access is denied.

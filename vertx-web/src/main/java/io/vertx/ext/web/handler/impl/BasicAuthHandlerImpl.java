@@ -20,8 +20,8 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
+import io.vertx.ext.auth.authentication.AuthenticationProvider;
 import io.vertx.ext.web.RoutingContext;
-import io.vertx.ext.auth.AuthProvider;
 import io.vertx.ext.web.handler.BasicAuthHandler;
 
 import java.util.Base64;
@@ -32,7 +32,7 @@ import java.util.Base64;
  */
 public class BasicAuthHandlerImpl extends AuthorizationAuthHandler implements BasicAuthHandler {
 
-  public BasicAuthHandlerImpl(AuthProvider authProvider, String realm) {
+  public BasicAuthHandlerImpl(AuthenticationProvider authProvider, String realm) {
     super(authProvider, realm, Type.BASIC);
   }
 

@@ -21,6 +21,7 @@ import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.auth.jwt.JWTAuth;
 import io.vertx.ext.auth.jwt.JWTAuthOptions;
+import io.vertx.ext.auth.jwt.JWTAuthentication;
 import io.vertx.ext.jwt.JWTOptions;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.WebTestBase;
@@ -32,7 +33,7 @@ import org.junit.Test;
  */
 public class JWTAuthHandlerTest extends WebTestBase {
 
-  JWTAuth authProvider;
+  JWTAuthentication authProvider;
 
   @Before
   public void setup() throws Exception {
@@ -41,7 +42,7 @@ public class JWTAuthHandlerTest extends WebTestBase {
         .put("path", "keystore.jceks")
         .put("password", "secret"));
 
-    authProvider = JWTAuth.create(vertx, new JWTAuthOptions(authConfig));
+    authProvider = JWTAuthentication.create(vertx, new JWTAuthOptions(authConfig));
   }
 
   @Test

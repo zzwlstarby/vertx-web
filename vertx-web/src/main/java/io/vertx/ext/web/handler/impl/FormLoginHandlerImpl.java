@@ -24,10 +24,10 @@ import io.vertx.core.http.HttpServerResponse;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.impl.logging.Logger;
 import io.vertx.core.impl.logging.LoggerFactory;
+import io.vertx.ext.auth.authentication.AuthenticationProvider;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.Session;
 import io.vertx.ext.web.handler.FormLoginHandler;
-import io.vertx.ext.auth.AuthProvider;
 import io.vertx.ext.auth.User;
 
 /**
@@ -37,7 +37,7 @@ public class FormLoginHandlerImpl implements FormLoginHandler {
 
   private static final Logger log = LoggerFactory.getLogger(FormLoginHandlerImpl.class);
 
-  private final AuthProvider authProvider;
+  private final AuthenticationProvider authProvider;
 
   private String usernameParam;
   private String passwordParam;
@@ -68,7 +68,7 @@ public class FormLoginHandlerImpl implements FormLoginHandler {
     return this;
   }
 
-  public FormLoginHandlerImpl(AuthProvider authProvider, String usernameParam, String passwordParam,
+  public FormLoginHandlerImpl(AuthenticationProvider authProvider, String usernameParam, String passwordParam,
                               String returnURLParam, String directLoggedInOKURL) {
     this.authProvider = authProvider;
     this.usernameParam = usernameParam;

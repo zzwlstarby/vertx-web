@@ -21,7 +21,7 @@ import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-import io.vertx.ext.auth.jwt.JWTAuth;
+import io.vertx.ext.auth.jwt.JWTAuthentication;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.JWTAuthHandler;
 
@@ -34,7 +34,7 @@ public class JWTAuthHandlerImpl extends AuthorizationAuthHandler implements JWTA
 
   private final JsonObject options;
 
-  public JWTAuthHandlerImpl(JWTAuth authProvider) {
+  public JWTAuthHandlerImpl(JWTAuthentication authProvider) {
     super(authProvider, Type.BEARER);
     options = new JsonObject();
   }

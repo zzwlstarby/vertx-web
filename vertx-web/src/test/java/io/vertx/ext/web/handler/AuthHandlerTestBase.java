@@ -17,20 +17,8 @@
 package io.vertx.ext.web.handler;
 
 import io.vertx.core.Vertx;
-import io.vertx.core.http.HttpMethod;
-import io.vertx.core.json.JsonObject;
-import io.vertx.ext.auth.shiro.ShiroAuthOptions;
 import io.vertx.ext.web.WebTestBase;
-import io.vertx.ext.web.sstore.LocalSessionStore;
-import io.vertx.ext.web.sstore.SessionStore;
-import io.vertx.ext.auth.AuthProvider;
-import io.vertx.ext.auth.shiro.ShiroAuth;
-import io.vertx.ext.auth.shiro.ShiroAuthRealmType;
 import org.junit.AfterClass;
-import org.junit.Test;
-
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * @author <a href="http://tfox.org">Tim Fox</a>

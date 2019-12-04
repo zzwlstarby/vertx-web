@@ -18,7 +18,7 @@ package io.vertx.ext.web.handler;
 
 import io.vertx.codegen.annotations.Fluent;
 import io.vertx.codegen.annotations.VertxGen;
-import io.vertx.ext.auth.jwt.JWTAuth;
+import io.vertx.ext.auth.jwt.JWTAuthentication;
 import io.vertx.ext.web.handler.impl.JWTAuthHandlerImpl;
 
 import java.util.List;
@@ -37,7 +37,7 @@ public interface JWTAuthHandler extends AuthenticationHandler {
    * @param authProvider  the auth provider to use
    * @return the auth handler
    */
-  static JWTAuthHandler create(JWTAuth authProvider) {
+  static JWTAuthHandler create(JWTAuthentication authProvider) {
     return new JWTAuthHandlerImpl(authProvider);
   }
 

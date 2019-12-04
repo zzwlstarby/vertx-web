@@ -1,21 +1,18 @@
 package examples;
 
-import io.vertx.codegen.annotations.CacheReturn;
-import io.vertx.codegen.annotations.Fluent;
-import io.vertx.codegen.annotations.GenIgnore;
 import io.vertx.core.*;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.*;
-import io.vertx.core.http.impl.MimeMapping;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-import io.vertx.ext.auth.AuthProvider;
 import io.vertx.ext.auth.KeyStoreOptions;
 import io.vertx.ext.auth.User;
+import io.vertx.ext.auth.authentication.AuthenticationProvider;
 import io.vertx.ext.auth.authorization.PermissionBasedAuthorization;
 import io.vertx.ext.auth.authorization.RoleBasedAuthorization;
 import io.vertx.ext.auth.jwt.JWTAuth;
 import io.vertx.ext.auth.jwt.JWTAuthOptions;
+import io.vertx.ext.auth.jwt.JWTAuthentication;
 import io.vertx.ext.jwt.JWTOptions;
 import io.vertx.ext.auth.oauth2.OAuth2Auth;
 import io.vertx.ext.auth.oauth2.OAuth2ClientOptions;
@@ -737,14 +734,14 @@ public class WebExamples {
   }
 
 
-  public void example37(Vertx vertx, AuthProvider authProvider, Router router) {
+  public void example37(Vertx vertx, AuthenticationProvider authProvider, Router router) {
 
     router.route().handler(SessionHandler.create(LocalSessionStore.create(vertx)));
 
     AuthenticationHandler basicAuthHandler = BasicAuthHandler.create(authProvider);
   }
 
-  public void example38(Vertx vertx, AuthProvider authProvider, Router router) {
+  public void example38(Vertx vertx, AuthenticationProvider authProvider, Router router) {
 
     router.route().handler(SessionHandler.create(LocalSessionStore.create(vertx)));
 
@@ -769,7 +766,7 @@ public class WebExamples {
     });
   }
 
-  public void example39(Vertx vertx, AuthProvider authProvider, Router router) {
+  public void example39(Vertx vertx, AuthenticationProvider authProvider, Router router) {
 
     router.route().handler(SessionHandler.create(LocalSessionStore.create(vertx)));
 
@@ -956,7 +953,7 @@ public class WebExamples {
     BridgeOptions options = new BridgeOptions().addInboundPermitted(inboundPermitted);
   }
 
-  public void example48(Vertx vertx, AuthProvider authProvider) {
+  public void example48(Vertx vertx, AuthenticationProvider authProvider) {
 
     Router router = Router.router(vertx);
 
@@ -1079,7 +1076,7 @@ public class WebExamples {
         .setPath("keystore.jceks")
         .setPassword("secret"));
 
-    JWTAuth authProvider = JWTAuth.create(vertx, authConfig);
+    JWTAuthentication authProvider = JWTAuthentication.create(vertx, authConfig);
 
     router.route("/protected/*").handler(JWTAuthHandler.create(authProvider));
 
@@ -1360,7 +1357,7 @@ public class WebExamples {
     }));
   }
 
-  public void example63(Router router, AuthProvider provider) {
+  public void example63(Router router, AuthenticationProvider provider) {
 
     ChainAuthHandler chain = ChainAuthHandler.create();
 

@@ -1,14 +1,12 @@
 package examples;
 
-import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.parser.core.models.AuthorizationValue;
-import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerOptions;
 import io.vertx.core.json.JsonObject;
-import io.vertx.ext.auth.jwt.JWTAuth;
+import io.vertx.ext.auth.jwt.JWTAuthentication;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.api.RequestParameter;
@@ -87,7 +85,7 @@ public class OpenAPI3Examples {
     routerFactory.addSecurityHandler("security_scheme_name", securityHandler);
   }
 
-  public void addJWT(OpenAPI3RouterFactory routerFactory, JWTAuth jwtAuthProvider) {
+  public void addJWT(OpenAPI3RouterFactory routerFactory, JWTAuthentication jwtAuthProvider) {
     routerFactory.addSecurityHandler("jwt_auth", JWTAuthHandler.create(jwtAuthProvider));
   }
 

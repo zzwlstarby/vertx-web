@@ -22,7 +22,6 @@ import io.vertx.core.Vertx;
 import io.vertx.core.http.Cookie;
 import io.vertx.core.impl.logging.Logger;
 import io.vertx.core.impl.logging.LoggerFactory;
-import io.vertx.ext.auth.AuthProvider;
 import io.vertx.ext.auth.User;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.Session;
@@ -46,7 +45,6 @@ public class SessionHandlerImpl implements SessionHandler {
   private boolean sessionCookieSecure;
   private boolean sessionCookieHttpOnly;
   private int minLength;
-  private AuthProvider authProvider;
 
   public SessionHandlerImpl(String sessionCookieName, String sessionCookiePath, long sessionTimeout, boolean nagHttps,
                             boolean sessionCookieSecure, boolean sessionCookieHttpOnly, int minLength, SessionStore sessionStore) {
@@ -103,12 +101,6 @@ public class SessionHandlerImpl implements SessionHandler {
   }
 
   @Override
-  public SessionHandler setAuthProvider(AuthProvider authProvider) {
-    this.authProvider = authProvider;
-    return this;
-  }
-
-  @Override
   public void handle(RoutingContext context) {
     if (nagHttps && log.isDebugEnabled()) {
       String uri = context.request().absoluteURI();
@@ -130,31 +122,24 @@ public class SessionHandlerImpl implements SessionHandler {
             Session session = res.result();
             if (session != null) {
               context.setSession(session);
-              // attempt to load the user from the session if auth provider is known
-              if (authProvider != null) {
-                UserHolder holder = session.get(SESSION_USER_HOLDER_KEY);
-                if (holder != null) {
-                  User user = null;
-                  RoutingContext prevContext = holder.context;
-                  if (prevContext != null) {
-                    user = prevContext.user();
-                  } else if (holder.user != null) {
-                    user = holder.user;
-                    user.setAuthProvider(authProvider);
-                    holder.context = context;
-                    holder.user = null;
-                  }
+              // attempt to load the user from the session
+              UserHolder holder = session.get(SESSION_USER_HOLDER_KEY);
+              if (holder != null) {
+                User user = null;
+                RoutingContext prevContext = holder.context;
+                if (prevContext != null) {
+                  user = prevContext.user();
+                } else if (holder.user != null) {
+                  user = holder.user;
                   holder.context = context;
-                  if (user != null) {
-                    context.setUser(user);
-                  }
+                  holder.user = null;
                 }
-                addStoreSessionHandler(context, holder == null);
-              } else {
-                // never store user as there's no provider for auth
-                addStoreSessionHandler(context, false);
+                holder.context = context;
+                if (user != null) {
+                  context.setUser(user);
+                }
               }
-
+              addStoreSessionHandler(context, holder == null);
             } else {
               // Cannot find session - either it timed out, or was explicitly destroyed at the
               // server side on a
@@ -291,6 +276,6 @@ public class SessionHandlerImpl implements SessionHandler {
     // Don't set max age - it's a session cookie
     context.addCookie(cookie);
     // only store the user if there's a auth provider
-    addStoreSessionHandler(context, authProvider != null);
+    addStoreSessionHandler(context, true);
   }
 }

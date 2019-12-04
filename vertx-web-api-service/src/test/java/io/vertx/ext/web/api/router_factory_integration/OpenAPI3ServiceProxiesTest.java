@@ -461,11 +461,6 @@ public class OpenAPI3ServiceProxiesTest extends ApiWebTestBase {
             }
 
             @Override
-            public void setAuthProvider(AuthProvider authProvider) {
-
-            }
-
-            @Override
             public JsonObject attributes() {
               return new JsonObject();
             }

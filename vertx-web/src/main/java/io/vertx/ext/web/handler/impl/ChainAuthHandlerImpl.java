@@ -5,51 +5,34 @@ import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
-import io.vertx.ext.web.handler.AuthHandler;
+import io.vertx.ext.web.handler.AuthenticationHandler;
 import io.vertx.ext.web.handler.ChainAuthHandler;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
-public class ChainAuthHandlerImpl extends AuthHandlerImpl implements ChainAuthHandler {
+public class ChainAuthHandlerImpl extends AuthenticationHandlerImpl implements ChainAuthHandler {
 
-  private final List<AuthHandler> handlers = new ArrayList<>();
+  private final List<AuthenticationHandler> handlers = new ArrayList<>();
 
   public ChainAuthHandlerImpl() {
     super(null);
   }
 
   @Override
-  public ChainAuthHandler append(AuthHandler other) {
+  public ChainAuthHandler append(AuthenticationHandler other) {
     handlers.add(other);
     return this;
   }
 
   @Override
-  public boolean remove(AuthHandler other) {
+  public boolean remove(AuthenticationHandler other) {
     return handlers.remove(other);
   }
 
   @Override
   public void clear() {
     handlers.clear();
-  }
-
-  @Override
-  public AuthHandler addAuthority(String authority) {
-    for (AuthHandler h : handlers) {
-      h.addAuthority(authority);
-    }
-    return this;
-  }
-
-  @Override
-  public AuthHandler addAuthorities(Set<String> authorities) {
-    for (AuthHandler h : handlers) {
-      h.addAuthorities(authorities);
-    }
-    return this;
   }
 
   @Override
@@ -67,7 +50,7 @@ public class ChainAuthHandlerImpl extends AuthHandlerImpl implements ChainAuthHa
     }
 
     // parse the request in order to extract the credentials object
-    final AuthHandler authHandler = handlers.get(idx);
+    final AuthenticationHandler authHandler = handlers.get(idx);
 
     authHandler.parseCredentials(ctx, res -> {
       if (res.failed()) {
@@ -88,8 +71,8 @@ public class ChainAuthHandlerImpl extends AuthHandlerImpl implements ChainAuthHa
       }
 
       // setup the desired auth provider if we can
-      if (authHandler instanceof AuthHandlerImpl) {
-        ctx.put(AuthHandlerImpl.AUTH_PROVIDER_CONTEXT_KEY, ((AuthHandlerImpl) authHandler).authProvider);
+      if (authHandler instanceof AuthenticationHandlerImpl) {
+        ctx.put(AuthenticationHandlerImpl.AUTH_PROVIDER_CONTEXT_KEY, ((AuthenticationHandlerImpl) authHandler).authProvider);
       }
       handler.handle(Future.succeededFuture(res.result()));
     });
@@ -97,9 +80,9 @@ public class ChainAuthHandlerImpl extends AuthHandlerImpl implements ChainAuthHa
 
   @Override
   protected String authenticateHeader(RoutingContext ctx) {
-    AuthHandler authHandler = handlers.get(handlers.size()-1);
-    if (authHandler instanceof AuthHandlerImpl) {
-      return ((AuthHandlerImpl) authHandler).authenticateHeader(ctx);
+    AuthenticationHandler authHandler = handlers.get(handlers.size() - 1);
+    if (authHandler instanceof AuthenticationHandlerImpl) {
+      return ((AuthenticationHandlerImpl) authHandler).authenticateHeader(ctx);
     }
     return null;
   }

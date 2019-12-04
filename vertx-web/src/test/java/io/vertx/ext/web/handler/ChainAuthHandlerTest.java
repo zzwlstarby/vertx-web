@@ -12,7 +12,7 @@ import org.junit.Test;
 
 public class ChainAuthHandlerTest extends WebTestBase {
 
-  private AuthHandler redirectAuthHandler;
+  private AuthenticationHandler redirectAuthHandler;
 
   protected ChainAuthHandler chain;
 

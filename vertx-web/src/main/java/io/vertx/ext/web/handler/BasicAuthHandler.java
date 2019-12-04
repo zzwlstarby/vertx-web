@@ -26,7 +26,7 @@ import io.vertx.ext.auth.AuthProvider;
  * @author <a href="http://tfox.org">Tim Fox</a>
  */
 @VertxGen
-public interface BasicAuthHandler extends AuthHandler {
+public interface BasicAuthHandler extends AuthenticationHandler {
 
   /**
    * The default realm to use
@@ -39,7 +39,7 @@ public interface BasicAuthHandler extends AuthHandler {
    * @param authProvider  the auth provider to use
    * @return the auth handler
    */
-  static AuthHandler create(AuthProvider authProvider) {
+  static BasicAuthHandler create(AuthProvider authProvider) {
     return new BasicAuthHandlerImpl(authProvider, DEFAULT_REALM);
   }
 
@@ -50,7 +50,7 @@ public interface BasicAuthHandler extends AuthHandler {
    * @param realm  the realm to use
    * @return the auth handler
    */
-  static AuthHandler create(AuthProvider authProvider, String realm) {
+  static BasicAuthHandler create(AuthProvider authProvider, String realm) {
     return new BasicAuthHandlerImpl(authProvider, realm);
   }
 }

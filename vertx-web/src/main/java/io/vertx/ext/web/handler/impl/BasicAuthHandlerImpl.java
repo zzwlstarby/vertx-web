@@ -22,6 +22,7 @@ import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.auth.AuthProvider;
+import io.vertx.ext.web.handler.BasicAuthHandler;
 
 import java.util.Base64;
 
@@ -29,7 +30,7 @@ import java.util.Base64;
  * @author <a href="http://pmlopes@gmail.com">Paulo Lopes</a>
  * @author <a href="http://tfox.org">Tim Fox</a>
  */
-public class BasicAuthHandlerImpl extends AuthorizationAuthHandler {
+public class BasicAuthHandlerImpl extends AuthorizationAuthHandler implements BasicAuthHandler {
 
   public BasicAuthHandlerImpl(AuthProvider authProvider, String realm) {
     super(authProvider, realm, Type.BASIC);

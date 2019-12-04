@@ -224,7 +224,7 @@ public class OAuth2AuthHandlerTest extends WebTestBase {
 
     latch.await();
 
-    AuthHandler oauth2Handler = BasicAuthHandler.create(oauth2);
+    AuthenticationHandler oauth2Handler = BasicAuthHandler.create(oauth2);
 
     // protect everything under /protected
     router.route("/protected/*").handler(oauth2Handler);

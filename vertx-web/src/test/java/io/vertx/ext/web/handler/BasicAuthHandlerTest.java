@@ -33,6 +33,7 @@ import io.vertx.ext.web.sstore.impl.SharedDataSessionImpl;
 import io.vertx.ext.auth.AuthProvider;
 import io.vertx.ext.auth.shiro.ShiroAuth;
 import io.vertx.ext.auth.shiro.ShiroAuthRealmType;
+import org.junit.AfterClass;
 import org.junit.Test;
 
 import java.util.Map;
@@ -44,6 +45,14 @@ import java.util.concurrent.atomic.AtomicReference;
  * @author <a href="http://tfox.org">Tim Fox</a>
  */
 public class BasicAuthHandlerTest extends AuthHandlerTestBase {
+
+  @AfterClass
+  public static void oneTimeTearDown() {
+    Vertx vertx = Vertx.vertx();
+    if (vertx.fileSystem().existsBlocking(BodyHandler.DEFAULT_UPLOADS_DIRECTORY)) {
+      vertx.fileSystem().deleteRecursiveBlocking(BodyHandler.DEFAULT_UPLOADS_DIRECTORY, true);
+    }
+  }
 
   @Test
   public void testLoginDefaultRealm() throws Exception {
@@ -189,11 +198,6 @@ public class BasicAuthHandlerTest extends AuthHandlerTestBase {
 
     }, 401, "Unauthorized", null);
 
-  }
-
-  @Override
-  protected AuthHandler createAuthHandler(AuthProvider authProvider) {
-    return BasicAuthHandler.create(authProvider);
   }
 
   private class SerializingSessionStore implements SessionStore {

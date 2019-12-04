@@ -156,7 +156,7 @@ public class RedirectAuthHandlerTest extends AuthHandlerTestBase {
     router.route().handler(BodyHandler.create());
     SessionStore store = LocalSessionStore.create(vertx);
     router.route().handler(SessionHandler.create(store).setAuthProvider(authProvider));
-    AuthHandler authHandler = RedirectAuthHandler.create(authProvider);
+    AuthenticationHandler authHandler = RedirectAuthHandler.create(authProvider);
 
     router.route("/protected/*").handler(authHandler);
 
@@ -200,16 +200,6 @@ public class RedirectAuthHandlerTest extends AuthHandlerTestBase {
     }, 200, "OK", "Welcome to the protected resource!");
   }
 
-  @Override
-  protected AuthHandler createAuthHandler(AuthProvider authProvider) {
-    return RedirectAuthHandler.create(authProvider);
-  }
-
-  @Override
-  protected boolean requiresSession() {
-    return true;
-  }
-
   private void testLoginFail(boolean badUser) throws Exception {
 
     doLoginFail(badUser, rc -> {
@@ -244,10 +234,7 @@ public class RedirectAuthHandlerTest extends AuthHandlerTestBase {
     router.route().handler(BodyHandler.create());
     SessionStore store = LocalSessionStore.create(vertx);
     router.route().handler(SessionHandler.create(store).setAuthProvider(authProvider));
-    AuthHandler authHandler = RedirectAuthHandler.create(authProvider);
-    if (authorities != null) {
-      authHandler.addAuthorities(authorities);
-    }
+    AuthenticationHandler authHandler = RedirectAuthHandler.create(authProvider);
     router.route("/protected/*").handler(authHandler);
     router.route("/protected/somepage").handler(handler);
     String loginHTML = createloginHTML();

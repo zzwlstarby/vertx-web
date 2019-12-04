@@ -21,7 +21,6 @@ import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.http.HttpMethod;
-import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.impl.logging.Logger;
 import io.vertx.core.impl.logging.LoggerFactory;
@@ -29,13 +28,10 @@ import io.vertx.ext.auth.oauth2.OAuth2Auth;
 import io.vertx.ext.web.Route;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.Session;
-import io.vertx.ext.web.handler.AuthHandler;
 import io.vertx.ext.web.handler.OAuth2AuthHandler;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * @author <a href="http://pmlopes@gmail.com">Paulo Lopes</a>
@@ -46,7 +42,6 @@ public class OAuth2AuthHandlerImpl extends AuthorizationAuthHandler implements O
 
   private final String host;
   private final String callbackPath;
-  private final Set<String> scopes = new HashSet<>();
 
   private Route callback;
   private JsonObject extraParams;
@@ -68,18 +63,6 @@ public class OAuth2AuthHandlerImpl extends AuthorizationAuthHandler implements O
     } catch (MalformedURLException e) {
       throw new RuntimeException(e);
     }
-  }
-
-  @Override
-  public AuthHandler addAuthority(String authority) {
-    scopes.add(authority);
-    return this;
-  }
-
-  @Override
-  public AuthHandler addAuthorities(Set<String> authorities) {
-    this.scopes.addAll(authorities);
-    return this;
   }
 
   @Override
@@ -142,16 +125,6 @@ public class OAuth2AuthHandlerImpl extends AuthorizationAuthHandler implements O
 
     if (extraParams != null) {
       config.mergeIn(extraParams);
-    }
-
-    if (scopes.size() > 0) {
-      JsonArray _scopes = new JsonArray();
-      // scopes are passed as an array because the auth provider has the knowledge on how to encode them
-      for (String authority : scopes) {
-        _scopes.add(authority);
-      }
-
-      config.put("scopes", _scopes);
     }
 
     return ((OAuth2Auth) authProvider).authorizeURL(config);

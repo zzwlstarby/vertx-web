@@ -456,11 +456,6 @@ public class OpenAPI3ServiceProxiesTest extends ApiWebTestBase {
             }
 
             @Override
-            public User clearCache() {
-              return null;
-            }
-
-            @Override
             public JsonObject principal() {
               return new JsonObject().put("username", "slinkydeveloper");
             }

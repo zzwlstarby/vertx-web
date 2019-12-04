@@ -23,7 +23,7 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.ext.auth.AuthProvider;
 import io.vertx.ext.auth.User;
 import io.vertx.ext.web.RoutingContext;
-import io.vertx.ext.web.handler.impl.AuthHandlerImpl;
+import io.vertx.ext.web.handler.impl.AuthenticationHandlerImpl;
 import io.vertx.ext.web.handler.impl.HttpStatusException;
 import org.junit.Test;
 
@@ -31,13 +31,8 @@ import static org.mockito.Mockito.*;
 
 public class CustomAuthHandlerTest extends AuthHandlerTestBase {
 
-  @Override
-  protected AuthHandler createAuthHandler(AuthProvider authProvider) {
-    return newAuthHandler(authProvider, null);
-  }
-
-  private AuthHandler newAuthHandler(AuthProvider authProvider, Handler<Throwable> exceptionProcessor) {
-    return new AuthHandlerImpl(authProvider) {
+  private AuthenticationHandler newAuthHandler(AuthProvider authProvider, Handler<Throwable> exceptionProcessor) {
+    return new AuthenticationHandlerImpl(authProvider) {
 
       @Override
       public void parseCredentials(RoutingContext context, Handler<AsyncResult<JsonObject>> handler) {
@@ -73,7 +68,7 @@ public class CustomAuthHandlerTest extends AuthHandlerTestBase {
 
     router.route("/protected/*").handler(newAuthHandler(authProvider, exception -> {
       assertTrue(exception instanceof HttpStatusException);
-      assertEquals(rootCause, ((HttpStatusException) exception).getCause());
+      assertEquals(rootCause, exception.getCause());
     }));
 
     router.route("/protected/somepage").handler(handler);

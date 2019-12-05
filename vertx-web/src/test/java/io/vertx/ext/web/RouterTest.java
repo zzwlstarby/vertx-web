@@ -1459,6 +1459,7 @@ public class RouterTest extends WebTestBase {
   @Test
   public void testGetWithPathExact() throws Exception {
     router.get("/somepath/").handler(rc -> rc.response().setStatusMessage("foo").end());
+    testRequest(HttpMethod.GET, "/somepath", 404, "Not Found");
     testRequest(HttpMethod.GET, "/somepath/", 200, "foo");
     testRequest(HttpMethod.GET, "/otherpath/whatever", 404, "Not Found");
     testRequest(HttpMethod.POST, "/somepath/whatever", 404, "Not Found");
@@ -1478,6 +1479,18 @@ public class RouterTest extends WebTestBase {
     testRequest(HttpMethod.DELETE, "/somepath/whatever", HttpResponseStatus.METHOD_NOT_ALLOWED);
     testRequest(HttpMethod.OPTIONS, "/somepath/whatever", HttpResponseStatus.METHOD_NOT_ALLOWED);
     testRequest(HttpMethod.HEAD, "/somepath/whatever", HttpResponseStatus.METHOD_NOT_ALLOWED);
+  }
+
+  @Test
+  public void testGetWithPathBeginShouldNotMatchPrefix() throws Exception {
+    router.get("/swagger-ui/*").handler(rc -> rc.response().setStatusMessage("/swagger-ui/*").end());
+    router.get("/swagger-ui").handler(rc -> rc.response().setStatusMessage("/swagger-ui").end());
+    router.get("/swagger").handler(rc -> rc.response().setStatusMessage("/swagger").end());
+    testRequest(HttpMethod.GET, "/swagger-ui/", 200, "/swagger-ui/*");
+    testRequest(HttpMethod.GET, "/swagger-ui/whatever", 200, "/swagger-ui/*");
+    testRequest(HttpMethod.GET, "/swagger", 200, "/swagger");
+    testRequest(HttpMethod.GET, "/swagger/", 200, "/swagger"); // Is that expected ?
+    testRequest(HttpMethod.GET, "/swagger/whatever", 404, "Not Found");
   }
 
   @Test
@@ -1740,7 +1753,8 @@ public class RouterTest extends WebTestBase {
   @Test
   public void testRouteNormalised2() throws Exception {
     router.route("/foo/").handler(rc -> rc.response().setStatusMessage("socks").end());
-    testRequest(HttpMethod.GET, "/foo", 200, "socks");
+    // note that the final slash is significant
+    testRequest(HttpMethod.GET, "/foo", 404, "Not Found");
     testRequest(HttpMethod.GET, "/foo/", 200, "socks");
     testRequest(HttpMethod.GET, "//foo/", 200, "socks");
     testRequest(HttpMethod.GET, "//foo//", 200, "socks");
@@ -2375,6 +2389,7 @@ public class RouterTest extends WebTestBase {
         HttpServerResponse response = mock(HttpServerResponse.class);
         when(request.method()).thenReturn(HttpMethod.GET);
         when(request.rawMethod()).thenReturn("GET");
+        when(request.scheme()).thenReturn("http");
         when(request.uri()).thenReturn("http://localhost/path");
         when(request.absoluteURI()).thenReturn("http://localhost/path");
         when(request.host()).thenReturn("localhost");
@@ -2541,5 +2556,24 @@ public class RouterTest extends WebTestBase {
     });
 
     testRequest(HttpMethod.GET, "/foo/bar", HttpResponseStatus.OK);
+  }
+
+  @Test
+  public void testToString() {
+    // Check we can compute toString() without infinite recursion
+    assertNotNull(router.toString());
+    Route route = router.route("/foo/:param1");
+    assertNotNull(router.toString());
+    assertNotNull(route.toString());
+  }
+
+  @Test
+  public void testRouteMatching() throws Exception {
+    router.route("/foo/bar/").handler(rc -> rc.response().setStatusMessage("socks").end());
+    testRequest(HttpMethod.GET, "/foo/bar", 404, "Not Found");
+    testRequest(HttpMethod.GET, "/foo/bar/", 200, "socks");
+    testRequest(HttpMethod.GET, "/foo/bar/baz", 404, "Not Found");
+    testRequest(HttpMethod.GET, "/foo/b", 404, "Not Found");
+    testRequest(HttpMethod.GET, "/f", 404, "Not Found");
   }
 }

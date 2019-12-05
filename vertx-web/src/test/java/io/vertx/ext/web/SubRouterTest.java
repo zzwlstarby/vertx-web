@@ -70,7 +70,7 @@ public class SubRouterTest extends WebTestBase {
     router.mountSubRouter("/subpath/", subRouter);
 
     subRouter.route("/foo").handler(rc -> {
-      assertEquals("/subpath", rc.mountPoint());
+      assertEquals("/subpath/", rc.mountPoint());
       rc.response().setStatusMessage(rc.request().path()).end();
     });
 
@@ -436,7 +436,7 @@ public class SubRouterTest extends WebTestBase {
     router.mountSubRouter("/api/", subRouter);
     subRouter.route("/").handler(rc -> rc.response().setStatusMessage("sausages").end());
     testRequest(HttpMethod.GET, "/api/", 200, "sausages");
-    testRequest(HttpMethod.GET, "/api", 200, "sausages");
+    testRequest(HttpMethod.GET, "/api", 404, "Not Found");
     testRequest(HttpMethod.GET, "/api///", 200, "sausages");
     testRequest(HttpMethod.GET, "//api//", 200, "sausages");
   }
@@ -521,5 +521,25 @@ public class SubRouterTest extends WebTestBase {
       .subRouter(subRouter);
 
     subRouter.get("/:id").handler(null);
+  }
+
+  @Test
+  public void testSubRouterWithRegex() {
+    Router router = Router.router(vertx);
+    router.getWithRegex("some-regex").handler(null);
+    router.mountSubRouter("/", router);
+  }
+
+  @Test
+  public void testStrictSlashSubRouter() throws Exception {
+    Router subRouter = Router.router(vertx);
+
+    subRouter.get("/files/info").handler(ctx -> {
+      ctx.response().end();
+    });
+
+    router.mountSubRouter("/v/", subRouter);
+
+    testRequest(HttpMethod.GET, "/v/files/info", 200, "OK");
   }
 }
